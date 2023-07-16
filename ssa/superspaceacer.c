@@ -1,9 +1,3 @@
-// TODO: all game modes - need to add bonus points on game win for remaining lives - maybe 10k? (which is really only 100) (or shields for the cruiser)
-// The end of game bonus tally could maybe look like the easy win screen, but without the simulation complete bit? :)
-// TODO: Selena, with no shield or lives, can just have a fixed 10000 "Best Princess Bonus"
-
-// TODO: Is ladybug supposed to have a last score digit of 0? Or did it get lost?
-
 /* program SUPER SPACE ACER design version 2.2 */
 /* ported to ColecoVision by M.Brent */
 
@@ -25,9 +19,11 @@
 static void (* const hwreboot)()=0x802c;
 
 // startup and init, central code
-#define SIZE_OF_CHARS		160
+#define SIZE_OF_CHARS		176
 #define SIZE_OF_SPRITES		2048
-#define LIVESCHAR			19
+#define LIVESCHARSSA		19
+#define LIVESCHARLADYBUG	20
+#define LIVESCHARGNAT		21
 
 // for sprite flicker, manage in CPU memory, copy up during vblank
 struct _sprite SpriteTab[32];
@@ -1068,7 +1064,17 @@ void ispace() {
 	// show score
 	addscore(0);
 	if ((playership != SHIP_SELENA) && (playership != SHIP_CRUISER)) {
-		hchar(23, 2, LIVESCHAR, lives);
+        switch (playership) {
+            case SHIP_LADYBUG:
+        		hchar(23, 2, LIVESCHARLADYBUG, lives);
+                break;
+            case SHIP_GNAT:
+        		hchar(23, 2, LIVESCHARGNAT, lives);
+                break;
+            default:
+        		hchar(23, 2, LIVESCHARSSA, lives);
+                break;
+        }
 	}
 
 	// background color for cloaked enemies

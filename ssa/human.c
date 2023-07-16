@@ -1,5 +1,4 @@
 // enable this for a test mode - ships will fire constantly
-// enable this for a test mode - ships will fire constantly
 // collisions are checked, but player never dies. You can
 // start a game at high speed with the debugger open and
 // just watch for VDP overruns
@@ -612,6 +611,12 @@ void plycol() {
 						// kill off the enemy
 						if (ent[a] < ENEMY_SAUCER) {
 							wrapnoen(a);
+                            if (en_func[a]==enemyhominglaser) {
+                                // special case, we need to leave it active so the trail fades out
+                                // importantly, noen does not delete the function pointer
+                                // change type so we keep being called
+			                    ent[a]=ENEMY_EXPLOSION;
+                            }
 						} else {
 							ep[a]=0;
 							dyen(a);
@@ -625,6 +630,12 @@ void plycol() {
 							shield+=100;	// ladybug recharges shield by hitting enemies
 						} else {
 							wrapnoen(a);
+                            if (en_func[a]==enemyhominglaser) {
+                                // special case, we need to leave it active so the trail fades out
+                                // importantly, noen does not delete the function pointer
+                                // change type so we keep being called
+			                    ent[a]=ENEMY_EXPLOSION;
+                            }
 						}
 					} else {
 						// still kill off whatever we ran into
@@ -633,6 +644,12 @@ void plycol() {
 							dyen(a);
 						} else {
 							wrapnoen(a);
+                            if (en_func[a]==enemyhominglaser) {
+                                // special case, we need to leave it active so the trail fades out
+                                // importantly, noen does not delete the function pointer
+                                // change type so we keep being called
+			                    ent[a]=ENEMY_EXPLOSION;
+                            }
 						}
 					}
 				}
@@ -655,6 +672,12 @@ void plycol() {
 							dyen(a);
 						} else {
 							wrapnoen(a);
+                            if (en_func[a]==enemyhominglaser) {
+                                // special case, we need to leave it active so the trail fades out
+                                // importantly, noen does not delete the function pointer
+                                // change type so we keep being called
+			                    ent[a]=ENEMY_EXPLOSION;
+                            }
 						}
 					}
 				}

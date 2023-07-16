@@ -1,6 +1,5 @@
 - ending for Snowball
 - ending for cruiser
-- can we make the final boss a little more fair? Slower movement
 -- add intersital animations flying to a planet - every other stage on a planet level:
        space, jungle, space, water, space, [secret warp stage?]
        
@@ -27,8 +26,10 @@
     = that's a total of 7 + (12/3s) 4 = 11 screens. A scanline bitmap screen is 12k+6k = 18k total, so that's 198k needed.
       We'd need better than 50% compression on average.
     = if we did normal 15-color palette instead, that's only 32 extra bytes per picture, so 132k.
-- there are also 5 bosses to be converted to 4 color bitmap. At existing sizes (88x64,88x88,88x56,88x96,120x72) that's 1408 + 1936 + 1232 + 2112 + 2160 bytes = 8848 bytes unpacked.
-- So figure about 12k for expanded in-game graphics, no biggie, and 198k for screens in scanline palette mode, or if not scanline palette, we can do regular palette for just 32 bytes extra (negligable), so the screens then need 132k.
+- there are also 5 bosses to be converted to 4 color bitmap. At existing sizes (88x64,88x88,88x56,88x96,120x72) that's 
+  1408 + 1936 + 1232 + 2112 + 2160 bytes = 8848 bytes unpacked.
+- So figure about 12k for expanded in-game graphics, no biggie, and 198k for screens in scanline palette mode, or if not 
+  scanline palette, we can do regular palette for just 32 bytes extra (negligable), so the screens then need 132k.
 - Given that it's much closer to what is left, I think the regular palette option is the way to go.
 
 VRAM map (except for ending scroll)
@@ -96,8 +97,8 @@ CHARACTER PATTERNS
 17		- pulse wave powerup
 18		- 3 way powerup
 19		- small snowball ship (lives)
-20		- small ladybug ship (lives) <- TODO - not drawn
-21		- small gnat ship (lives)    <- TODO - not drawn
+20		- small ladybug ship (lives)
+21		- small gnat ship (lives)
 22-23	- (unused)
 -- end colored for lives counter --
 
@@ -146,7 +147,7 @@ Do not shoot during the stage, then destroy the boss without missing, and earn 1
 
 If you have an AY sound chip (Phoenix, SGM), then sound effects will be played on it.
 
-Game Modes:
+Game Modes (second number is 'scoremode' and what is displayed):
 0	-	cruiser
 1	-	snowball
 2	-	ladybird
@@ -156,7 +157,7 @@ Game Modes:
 6
 7
 8
-9	-	cheat mode
+9.9	-	cheat mode
 
 ==============================================================================
 	

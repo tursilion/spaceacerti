@@ -50,8 +50,7 @@ const char selenaTxt[] =
 // predefined characters... 96 available in each character set (8*12) that's only 24 combinations with 2 pixel scrolling
 // combinations in above text: 29 in just the first column. So we won't be doing that.
 
-// TODO: we have lots of time - add a second line like. "Maybe flying somewhere exciting!"
-// text for the ladybug single line
+// text for the ladybug lines
 //                       12345678901234567890123456789012
 const char LadyText[] = "What do you think bugs dream of?";
 const char LadyText2[]= "Maybe flying somewhere exciting!";

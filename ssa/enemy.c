@@ -40,7 +40,7 @@ const unsigned char mincnt[8] = {
     12  // bomb
 };
 
-// per level (first level is 1, so 0 is a dummy
+// per level (first level is 1, so 0 is a dummy (0 is never used)
 // then 8 random numbers (0-7)
 const unsigned char oddstable[6][8] = {
 /*0*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_SAUCER, ENEMY_JET,     ENEMY_SAUCER,     ENEMY_JET,        ENEMY_SAUCER,     ENEMY_JET },
@@ -479,7 +479,6 @@ void enemyhominglaser(uint8 a) {
 	char x;
 	(void)a;
 
-	// TODO: the laser isn't dying properly...
 	if (ent[7] == ENEMY_EXPLOSION) {
 		// just fade out the trail
 		for (unsigned char i=11; i>7; --i) {
@@ -594,7 +593,7 @@ void enemyexplosion(uint8 x) {
 }
 
 void enemybeamgen(uint8 x) {
-	unsigned char max, min;
+	unsigned char bmax, bmin;
 
 	enr[x]++;	// always slow downward movement
 
@@ -603,14 +602,14 @@ void enemybeamgen(uint8 x) {
 	// but the sprite draw is a little more complex
 	if (ech[x] == esc[x]) {
 		ech[x] = eec[x];
-		min = enc[x];
+		bmin = enc[x];
 		enc[x] += 96;		// really important that the init be correct here ;)
-		max = enc[x];
+		bmax = enc[x];
 	} else {
 		ech[x] = esc[x];
-		max = enc[x];
+		bmax = enc[x];
 		enc[x] -= 96;
-		min = enc[x];
+		bmin = enc[x];
 	}
 
 	// handle the beam. If the helicopter stole it, wait for it to be free
@@ -624,19 +623,19 @@ void enemybeamgen(uint8 x) {
 		esc[x+6] = 228;
 		ech[x+6] = 228;
 		enr[x+6] = enr[x];
-		enc[x+6] = min+8;
+		enc[x+6] = bmin+8;
 	} else if (ent[x+6] == ENEMY_BEAM) {
 		// handle motion
 		enr[x+6] = enr[x];
 		if (ecs[x+6] > 0) {
 			enc[x+6] += ecs[x+6];
-			if (enc[x+6] >= max-8) {
+			if (enc[x+6] >= bmax-8) {
 				ech[x+6] = 104;
 				ecs[x+6] = -8;
 			}
 		} else {
 			enc[x+6] += ecs[x+6];
-			if (enc[x+6] <= min+8) {
+			if (enc[x+6] <= bmin+8) {
 				ech[x+6] = 228;
 				ecs[x+6] = 8;
 			}
@@ -658,20 +657,20 @@ void enemybeamgen(uint8 x) {
 			// we have a 4 frame cycle to flicker the two sprites over 3 positions
 			// the beam alternates every frame, while the generators get 2
 			// solid frames in a row
-			// we'll just use the row
+			// we'll just use the row (enr[x+6] and enr[x] are the same, so just use [x] for enr)
 			switch (enr[x]&3) {
 				case 0:	// left and beam
-					sprite(x+ENEMY_SPRITE, 76, c, enr[x], min);
-					sprite(x+6+ENEMY_SPRITE, ech[x+6], COLOR_LTYELLOW, enr[x+6], enc[x+6]);
+					sprite(x+ENEMY_SPRITE, 76, c, enr[x], bmin);
+					sprite(x+6+ENEMY_SPRITE, ech[x+6], COLOR_LTYELLOW, enr[x], enc[x+6]);
 					break;
 				case 3:
 				case 1:	// left and right
-					sprite(x+ENEMY_SPRITE, 76, c, enr[x], min);
-					sprite(x+6+ENEMY_SPRITE, 80, c, enr[x], max);
+					sprite(x+ENEMY_SPRITE, 76, c, enr[x], bmin);
+					sprite(x+6+ENEMY_SPRITE, 80, c, enr[x], bmax);  // WARNING: if you enable spposn for NULL type sprites (shot/cockpit), that will make this follow the bullet
 					break;
 				case 2:	// right and beam
-					sprite(x+ENEMY_SPRITE, 80, c, enr[x], max);
-					sprite(x+6+ENEMY_SPRITE, ech[x+6], COLOR_LTYELLOW, enr[x+6], enc[x+6]);
+					sprite(x+ENEMY_SPRITE, 80, c, enr[x], bmax);
+					sprite(x+6+ENEMY_SPRITE, ech[x+6], COLOR_LTYELLOW, enr[x], enc[x+6]);
 					break;
 			}
 		}

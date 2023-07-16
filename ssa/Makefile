@@ -1,6 +1,8 @@
-CC = D:/work/coleco/sdcc-4.2.0/bin/sdcc.exe
+#CC = D:/work/coleco/sdcc-4.2.0/bin/sdcc.exe
+CC = D:/work/coleco/sdcc20230715/bin/sdcc.exe
 CFLAGS = -mz80 --vc -c "-Id:/work/coleco/libti99coleco" "-ID:/work/TI/vgmcomp2/Players/libcolecovgm2" -DENABLEFX --std-sdcc11 --opt-code-speed --less-pedantic --fsigned-char
-AS = D:/work/coleco/sdcc-4.2.0/bin/sdasz80
+#AS = D:/work/coleco/sdcc-4.2.0/bin/sdasz80
+AS = D:/work/coleco/sdcc20230715/bin/sdasz80
 AFLAGS = -plosgff
 
 .PHONY: all clean
@@ -73,23 +75,23 @@ title_p.rel: title_p.c
 	$(CC) $(CFLAGS) -o title_p.rel title_p.c --codeseg titlep --constseg titlep
 
 boss1.rel: boss1.bmp
-	D:/work/SuperSpaceAcer/coleco/SuperSpaceAcer/packboss/Debug/packboss.exe boss1.bmp boss1.c BOSS1
+	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss1.bmp boss1.c BOSS1
 	$(CC) $(CFLAGS) -oboss1.rel boss1.c --codeseg boss1 --constseg boss1
 
 boss2.rel: boss2.bmp
-	D:/work/SuperSpaceAcer/coleco/SuperSpaceAcer/packboss/Debug/packboss.exe boss2.bmp boss2.c BOSS2
+	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss2.bmp boss2.c BOSS2
 	$(CC) $(CFLAGS) -oboss2.rel boss2.c --codeseg boss2 --constseg boss2
 
 boss3.rel: boss3.bmp
-	D:/work/SuperSpaceAcer/coleco/SuperSpaceAcer/packboss/Debug/packboss.exe boss3.bmp boss3.c BOSS3
+	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss3.bmp boss3.c BOSS3
 	$(CC) $(CFLAGS) -oboss3.rel boss3.c --codeseg boss3 --constseg boss3
 
 boss4.rel: boss4.bmp
-	D:/work/SuperSpaceAcer/coleco/SuperSpaceAcer/packboss/Debug/packboss.exe boss4.bmp boss4.c BOSS4
+	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss4.bmp boss4.c BOSS4
 	$(CC) $(CFLAGS) -oboss4.rel boss4.c --codeseg boss4 --constseg boss4
 
 boss5.rel: boss5.bmp
-	D:/work/SuperSpaceAcer/coleco/SuperSpaceAcer/packboss/Debug/packboss.exe boss5.bmp boss5.c BOSS5
+	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss5.bmp boss5.c BOSS5
 	$(CC) $(CFLAGS) -oboss5.rel boss5.c --codeseg boss5 --constseg boss5
 
 #songpack1.rel: songpack1.c

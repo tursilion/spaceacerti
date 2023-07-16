@@ -1,13 +1,4 @@
-// TODO: boss cockpit sprite needs to better conform to the boss shape.
-// If I have the ROM to spare, and I probably do, I could write a little
-// program to generate a lookup table. We currently get a pixel coordinate
-// roughly inside the boss rectangle. If we subtract roff/coff and divide
-// by 8 to get a character position, the lookup table could provide the
-// closest valid pixel position. Then we add back roff/coff and any fractional
-// pixels (mod 8)
-
-// TODO: homing laser trail gets left behind when the laser hits you (and shields end it)
-// We can do the same end as the offscreen end, and let it fade out.
+// TODO: slows down when full pulse weapon is damaging body - can we optimize more?
 
 // libti99 
 #include <vdp.h>
@@ -31,7 +22,6 @@
 uint8 scaledLevel;
 #define HOMINGFRAMES 10
 
-// TODO: slows down when full pulse weapon is damaging body - can we optimize more?
 
 // some graphics copies so we don't need to page flip for graphics during the final boss
 const unsigned char beamleftgfx[] = {
@@ -56,6 +46,65 @@ const char BOSTAB[] = {
 	9,15,	5,15,	6,50,	5,84,	COLOR_MAGENTA
 };
 
+// boss shapes for cockpit (per row, min/max character)
+const unsigned char bossShape1[8*2] = {
+    2*8,7*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    2*8,7*8-8,
+    3*8,6*8-8,
+    4*8,5*8-8
+};
+const unsigned char bossShape2[11*2] = {
+    0*8,10*8-8,
+    0*8,10*8-8,
+    2*8,7*8-8,
+    3*8,6*8-8,
+    4*8,5*8-8,
+    4*8,5*8-8,
+    3*8,6*8-8,
+    3*8,6*8-8,
+    3*8,6*8-8,
+    3*8,6*8-8,
+    4*8,5*8-8
+};
+const unsigned char bossShape3[7*2] = {
+    0*8,9*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    0*8,9*8-8,
+    1*8,8*8-8,
+    2*8,7*8-8
+};
+const unsigned char bossShape4[12*2] = {
+    0*8,10*8-8,
+    0*8,10*8-8,
+    0*8,10*8-8,
+    0*8,10*8-8,
+    0*8,10*8-8,
+    0*8,10*8-8,
+    3*8,5*8-8,
+    3*8,6*8-8,
+    2*8,7*8-8,
+    2*8,7*8-8,
+    2*8,7*8-8,
+    3*8,6*8-8
+};
+const unsigned char bossShape5[9*2] = {
+    0*8,13*8-8,
+    0*8,13*8-8,
+    0*8,13*8-8,
+    0*8,13*8-8,
+    1*8,12*8-8,
+    2*8,11*8-8,
+    4*8,9*8-8,
+    5*8,8*8-8,
+    6*8,7*8-8
+};
+
 char br,bd;			// these ones need to be signed
 unsigned char bc;	// but this one doesn't
 unsigned char BNR,BNC;
@@ -63,6 +112,7 @@ char bossminepower;
 void (*bossdraw)();
 unsigned char bosscnt=0;
 unsigned char enginer[3], enginec[3];   // offsets
+const unsigned char *bossShape;
 
 // boss draw functions
 void draw1();
@@ -94,11 +144,11 @@ void boss()
 	BNC=BOSTAB[p++];
 	switch (level) {
 		default:
-		case 1:	bossdraw = draw1; break;
-		case 2:	bossdraw = draw2; break;
-		case 3:	bossdraw = draw3; break;
-		case 4:	bossdraw = draw4; break;
-		case 5:	bossdraw = draw5; break;
+		case 1:	bossdraw = draw1; bossShape=bossShape1; break;
+		case 2:	bossdraw = draw2; bossShape=bossShape2; break;
+		case 3:	bossdraw = draw3; bossShape=bossShape3; break;
+		case 4:	bossdraw = draw4; bossShape=bossShape4; break;
+		case 5:	bossdraw = draw5; bossShape=bossShape5; break;
 	}
 
 	// try to mask the graphics prep a little
@@ -127,10 +177,10 @@ void boss()
 	for (i=3; i<12; i++) {
 		ent[i]=ENEMY_NONE;
 	}
-	// clear shot table (todo: why do we clear shots?)
-	for (i=0; i<=NUM_SHOTS; i++) {
-		shr[i]=0;	// note: ONLY shr is legal in this loop because it includes NUM_SHOTS
-	}
+	// clear shot table (Seems okay with this disabled!)
+	//for (i=0; i<=NUM_SHOTS; i++) {
+	//	shr[i]=0;	// note: ONLY shr is legal in this loop because it includes NUM_SHOTS
+	//}
 	// no powerup either (should already be gone though)
 	ptp4=POWERUP_NONE;
 	
@@ -298,19 +348,16 @@ void drboss() {
 	}
 
 	// move cockpit 'bullet' as close to player as we are allowed to go (so if they overwrite us, we get them)
-	// row max = (BNR-1)*8
-	// col = (BNC*2) to (BNC*2)+(BNC-1)*4-12
-	// Couple of small bugs - on narrower bosses, if you sit on the right edge, the sprite
-	// briefly wraps to the left of the boss when it's all the way left. This is of no consequence
-	// because it does not hit you and could not have hit you at that point anyway.
-	// Secondly, the final boss is so wide that you can sit on either edge and not be hit. Not
-	// too important because you still have to dodge mines, and you will still take a hit if you
-	// try to sweep across the boss.
+    // there are some minor bugs when boss is near the edges that cause incorrect lookups, but I don't think it's
+    // exploitable... and I don't care if it is. More power to you!
 	enr[6] = SHIP_R;
-	if (enr[6] > ((BNR-1)<<3)+roff) enr[6]=((BNR-1)<<3)+roff;
+	if (enr[6] > ((BNR-1)<<3)) enr[6]=((BNR-1)<<3);
 	enc[6] = SHIP_C;
-	if (enc[6] < (BNC<<1)+coff-12) enc[6]=(BNC<<1)+coff-12;
-	else if (enc[6] > (BNC<<1)+((BNC-1)<<2)+coff) enc[6]=(BNC<<1)+((BNC-1)<<2)+coff;
+    {
+        unsigned char bossr = ((enr[6])>>3)<<1;
+        if (enc[6] < coff+bossShape[bossr]) enc[6] = coff+bossShape[bossr];
+        else if (enc[6] > coff+bossShape[bossr+1]) enc[6] = coff+bossShape[bossr+1];
+    }
 
 	if (br >= 1) {
 		// some events delete bullets, so just add it back (if it's active)
@@ -640,7 +687,7 @@ void whoded() {
                 cd = abs(c-shc[a]);
                 if (cd <= 15) {
 					//VDP_SET_ADDRESS(0x830f);		// CT at >03C0 (makes boss flash white, everything else already is)
-                    VDP_SET_REGISTER(VDP_REG_CT, 0x0e);
+                    VDP_SET_REGISTER(VDP_REG_CT, 0x0f);
 					bosscnt=3;						// how many cycles to stay white (should be 3 frames per cycle)
 					ep[b]-=damage[pwrlvl&0x07];
 					if (ep[b]<=0) { 
@@ -760,6 +807,38 @@ void byboss() {
         centr(13, "10000 FOR USING THE FORCE");
         addscore(100);
        	delaystars(20);
+    }
+
+    // check for end of game bonus
+    if ((level == 5)&&(nDifficulty > DIFFICULTY_EASY)) {
+        if (playership == SHIP_SELENA) {
+            centr(14, "10000 BEST PRINCESS BONUS");
+            addscore(100);
+            delaystars(120);
+        } else if ((playership == SHIP_SNOWBALL)||(playership==SHIP_LADYBUG)||(playership==SHIP_GNAT)) {
+            centr(14, "SPARE LIVES BONUS 0x100");
+            for (x=0; x<=lives; ++x) {
+                delaystars(30);
+                vdpchar((int)(gIMAGE+448+22), x+'0');
+                vdpchar((int)(gIMAGE+738+(lives-x)), ' ');
+                addscore(100);
+            }
+            delaystars(120);
+        } else if (playership == SHIP_CRUISER) {
+            // 0,25,50,75 are only valid values
+            x=0;
+            centr(14, "SPARE SHIELD BONUS 0x100");
+            while (shield >= 25) {
+                delaystars(30);
+                ++x;
+                vdpchar((int)(gIMAGE+448+22), x+'0');
+                vdpchar((int)(gIMAGE+738+(lives-x)), ' ');
+                addscore(100);
+                shield -= 25;
+                playmv();   // force a shield image update
+            }
+            delaystars(120);
+        }
     }
 
     // fly off screen
