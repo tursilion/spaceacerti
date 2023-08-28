@@ -48,9 +48,9 @@ slightly by a buggy rand() function (my fault), and poorly documented code,
 but it came up pretty quickly, and in general I'm tickled to play the game 
 again on the Coleco.
 
-Many, many things have changed now. New graphics, included boss graphics
-from the Tyrian project, better behaviours, better power ups, multiple
-ships with multiple game modes, and more yet to come!
+Many, many things have changed now. New graphics, new boss graphics,
+better behaviours, better power ups, multiple ships with multiple 
+game modes, and more yet to come!
 
 As such, please do not redistribute this ROM, please do not burn it to carts. 
 It's not finished yet. But please feel free to share links and keep it for 
@@ -62,7 +62,6 @@ Art Credits
 -----------
 
 - Title graphics originally by Brendan Wiese - http://starbow.com - converted by Tursi
-- Boss graphics originally by Dan C, from the Tyrian project, released - http://lostgarden.com/2007/04/free-game-graphics-tyrian-ships-and.html - converted by Tursi
 - Other graphics by Tursi
 
 Music Credits

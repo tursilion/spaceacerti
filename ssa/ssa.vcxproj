@@ -107,6 +107,8 @@
     <ClCompile Include="outfile2.c" />
     <ClCompile Include="outfile3.c" />
     <ClCompile Include="sfxs.c" />
+    <ClCompile Include="snowballbase_c.c" />
+    <ClCompile Include="snowballbase_p.c" />
     <ClCompile Include="ssd_inc.c" />
     <ClCompile Include="string.c" />
     <ClCompile Include="superspaceacer.c" />
@@ -135,6 +137,7 @@
     <ClInclude Include="..\..\..\..\coleco\libti99coleco\string.h" />
     <ClInclude Include="..\..\..\..\coleco\libti99coleco\vdp.h" />
     <ClInclude Include="attract.h" />
+    <ClInclude Include="boss.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="human.h" />

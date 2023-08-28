@@ -214,42 +214,55 @@ void initSound() {
     AY_DATA_WRITE = 0x1C;
 }
 
+// hit an armored enemy
 void playsfx_armor() {
-    pSfx = sfx_armor;
-    blockSfx = 1;
+    if (blockSfx < 2) {
+        pSfx = sfx_armor;
+        blockSfx = 1;
+    }
 }
+// boss engine explodes
 void playsfx_explosion() {
     pSfx = sfx_explosion;
-    blockSfx = 1;
+    blockSfx = 2;
 }
+// hit boss body
 void playsfx_hitboss() {
-    if (!blockSfx) pSfx = sfx_hitboss;
+    if (!blockSfx) {
+        pSfx = sfx_hitboss;
+    }
 }
+// blow up a nuke
 void playsfx_nukebomb() {
     pSfx = sfx_nukebomb;
-    blockSfx = 1;
+    blockSfx = 2;
 }
+// enemy ship dead
 void playsfx_shipdead() {
-    if (!blockSfx) pSfx = sfx_shipdead;
+    if (!blockSfx) {
+        pSfx = sfx_shipdead;
+    }
 }
 
 // player sfxs run separately and sparingly
+
+// shield offline
 void playsfx_shielddown() {
     pShoot = sfx_shielddown;
 }
-
+// shield powerup
 void playsfx_shieldup() {
     pShoot = sfx_shieldup;
 }
-
+// shield about to expire
 void playsfx_shieldwarn() {
     pShoot = sfx_shieldwarn;
 }
-
+// pulse weapon powerup
 void playsfx_pwrpulse() {
     pShoot = sfx_pwrpulse;
 }
-
+// wide shot powerup
 void playsfx_pwrwide() {
     pShoot = sfx_pwrwide;
 }

@@ -40,11 +40,6 @@ char shotOffset;
 #define CHEAT_KILLBOSS	'7'
 #define CHEAT_OFF		'8'
 
-// these are now just flags, though FLAME_BIG is used to init the sprite
-// pattern 104 is no longer related though
-#define FLAME_BIG 100
-#define FLAME_SMALL 104
-
 unsigned char joynum;
 uint8 killedby,flst;		// enemy who hit us, flame status
 uint8 pwrlvl;				// pwrlvl: 0-2 = pulse wave level 1,2,3, 4-6=3-way level 1,2,3  (3 is gnat)
@@ -153,7 +148,20 @@ void player()
 		xcnt+=3;    // must be odd
 		ycnt+=7;
 
-		// but if there is a powerup, move towards that instead
+        // if we are the ladybug and we have a shield, move towards enemies
+        if ((playership == SHIP_LADYBUG) && (shield > 0)) {
+            // find the first available enemy
+            unsigned char en = 0;
+            while ((en<6)&&(ent[en]==ENEMY_NONE)) ++en;
+            if (en < 6) {
+			    if (enr[en] > SHIP_R+8) KSCAN_JOYY=-4;
+			    if (enr[en] < SHIP_R-8) KSCAN_JOYY=4;
+			    if (enc[en] > SHIP_C+8) KSCAN_JOYX=4;
+			    if (enc[en] < SHIP_C-8) KSCAN_JOYX=-4;
+            }
+        }
+        
+        // but if there is a powerup, move towards that instead
 		// we're on easy, so it might be safe ;)
 		if (ptp4 != POWERUP_NONE) {
 			if (pr4 > SHIP_R+8) KSCAN_JOYY=-4;

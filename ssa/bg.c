@@ -58,8 +58,7 @@ void background() {
 	}
 }
  
-void stars()
-{ 
+void stars() { 
 	// animate the background graphics
 	background();
 	

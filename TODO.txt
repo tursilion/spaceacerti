@@ -14,7 +14,7 @@
 - bosses can be drawn using the bitmap layer of F18A, though I'll need to implement emulation of it. I believe you get
   3 colors normal or 15 colors fat - we can dedicate a palette to this layer
 - and dedicate a palette to the player?
-- for the screens we can stay with bitmap, but do a scanline palette, perhaps? We have the following screens:
+- for the screens we can stay with bitmap, but do a palette, perhaps? We have the following screens:
     - title page
     - 4 frames of animated ship (approximately 1/4 screen each)
     - ladybug end (2 screens)
@@ -28,9 +28,7 @@
     = if we did normal 15-color palette instead, that's only 32 extra bytes per picture, so 132k.
 - there are also 5 bosses to be converted to 4 color bitmap. At existing sizes (88x64,88x88,88x56,88x96,120x72) that's 
   1408 + 1936 + 1232 + 2112 + 2160 bytes = 8848 bytes unpacked.
-- So figure about 12k for expanded in-game graphics, no biggie, and 198k for screens in scanline palette mode, or if not 
-  scanline palette, we can do regular palette for just 32 bytes extra (negligable), so the screens then need 132k.
-- Given that it's much closer to what is left, I think the regular palette option is the way to go.
+- So figure about 12k for expanded in-game graphics, no biggie, and 132k for screens with palettes (32 bytes extra each).
 
 VRAM map (except for ending scroll)
 --------
@@ -137,6 +135,8 @@ Hold UP when starting for cheat mode. You are invincible, plus each key does som
 (Game mode '9' on score last digit)
 
 Press '*' on the difficulty screen for music test
+
+Press '#' anytime except title page to mute/unmute music (muted music will play sfx on the stock hardware).
 
 Interesting gotcha: Ladybug, once it has shields, extends the shields with collisions, so bosses that drop mines 
 can essentially give it infinite shields (till the mines stop). That really helps on the final boss, once you know it!

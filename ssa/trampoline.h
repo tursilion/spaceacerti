@@ -38,5 +38,9 @@ void wraploadgnat2();
 void wraploadgnat3();
 void wraploadgnat4();
 void wraploadgnat5();
+void wrapwarpout();
+void wrapLoadFinalSnowball();
+void wrapFinalSnowballBig();
+void wrapFinalSnowballSmall();
 
 #endif

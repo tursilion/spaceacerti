@@ -1,5 +1,6 @@
 // libti99
 #include <vdp.h>
+#include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
 #include <ColecoSNPlay.h>
@@ -8,6 +9,11 @@
 #include "game.h"
 #include "trampoline.h"
 #include "music.h"
+#include "human.h"
+
+#define BIN2INC_HEADER_ONLY
+#include "snowballbase_c.c"
+#include "snowballbase_p.c"
 
 extern const unsigned char colecofont[];
 unsigned char bottomsprite, bottomrow;
@@ -143,6 +149,39 @@ const signed char gnathop[] = {
 	0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+const char snowBallTxt1[] = "          *";  // just for a simple delay
+const char snowBallTxt2[] = 
+//	012345678901234567890123456789012
+    "                                "
+    "                                "
+    "    Safely returning to the     "
+	" mothership, Bob celebrated the "
+	" hero's welcome that he always  "
+    "           dreamt of.           "
+    "                                "
+    "*";
+const char snowBallTxt3[] = 
+//	012345678901234567890123456789012
+    "                                "
+    "                                "
+    "     But was it truly over?     "
+    "                                "
+	"      Only time will tell!!     "
+    "                                "
+    "                                "
+    "*";
+
+unsigned int rndnum13(void);
+void cleanexit(void);
+void selenascroll(void);
+void selenawin(void);
+void ladybugwin(void);
+static void delayText(unsigned char frames);
+static void runText(const char *pTxt);
+static void bmpsprite(unsigned char n, unsigned char ch, unsigned char col, unsigned char r, unsigned char c);
+void gnatwin(void);
+void snowballwin(void);
+
 unsigned int rndnum13()
 {
 	static unsigned int seed = 1;
@@ -194,6 +233,28 @@ unsigned int rndnum13()
 	}
 
 	return seed;
+}
+
+void cleanexit() {
+    unsigned char i;
+
+	// wait for music to end
+	while (isSNPlaying) {
+		VDP_WAIT_VBLANK_CRU;
+		musicsync();	// clears it
+	}
+
+	// set graphics mode back before we exit
+	i = grf1();
+	
+	/*load VDP data */
+	loadcharset();
+	
+	spdall();	// clears sprite table
+	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
+	sgrint();	// fix color table
+	VDP_SET_REGISTER(VDP_REG_MODE1, i);	// Switch screen on
+	FIX_KSCAN(i);
 }
 
 void selenascroll() {
@@ -513,17 +574,7 @@ void selenawin() {
 		selenascroll();
 	}
 
-	// set graphics mode back before we exit
-	i = grf1();
-	
-	/*load VDP data */
-	loadcharset();
-	
-	spdall();	// clears sprite table
-	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
-	sgrint();	// fix color table
-	VDP_SET_REGISTER(VDP_REG_MODE1, i);	// Switch screen on
-	FIX_KSCAN(i);
+    cleanexit();
 }
 
 void ladybugwin() {
@@ -648,23 +699,7 @@ void ladybugwin() {
 		}
 	}
 
-    // wait for music to end
-	while (isSNPlaying) {
-		VDP_WAIT_VBLANK_CRU;
-		musicsync();	// clears it
-	}
-
-	// set graphics mode back before we exit
-	i2 = grf1();
-	
-	/*load VDP data */
-	loadcharset();
-	
-	spdall();	// clears sprite table
-	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
-	sgrint();	// fix color table
-	VDP_SET_REGISTER(VDP_REG_MODE1, i2);	// Switch screen on
-	FIX_KSCAN(i2);
+    cleanexit();
 }
 
 static void delayText(unsigned char frames) {
@@ -695,8 +730,7 @@ static void runText(const char *pTxt) {
 	// first clear the bottom third of the screen
 	vdpmemset(scrn, ' ', 32*8);
 
-	// now loop, displaying characters and checking fire until
-	// we get an asterisk.
+	// now loop, displaying characters until we get an asterisk.
 	while (*pTxt != '*') {
 		delayText(2);
 		vdpchar(scrn++, *(pTxt++));
@@ -797,7 +831,7 @@ void gnatwin() {
 	}
 
 	// player to the right behind the ship
-	for (unsigned char i=112; i<126; ++i) {
+	for (unsigned char i=112; i<128; ++i) {
 		for (unsigned char i2=0; i2<4; ++i2) {
 			VDP_WAIT_VBLANK_CRU;
 			musicsync();	// clears it
@@ -817,29 +851,156 @@ void gnatwin() {
 	musicsync();	// clears it
 	vdpmemset(0x1800+512, ' ', 32*8);
 
-	// wait for music to end
-	while (isSNPlaying) {
-		VDP_WAIT_VBLANK_CRU;
-		musicsync();	// clears it
-	}
+    cleanexit();
+}
 
-	// set graphics mode back before we exit
-	i2 = grf1();
-	
-	/*load VDP data */
-	loadcharset();
-	
-	spdall();	// clears sprite table
-	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
-	sgrint();	// fix color table
-	VDP_SET_REGISTER(VDP_REG_MODE1, i2);	// Switch screen on
-	FIX_KSCAN(i2);
+void snowballwin() {
+    unsigned char i;
+	const unsigned char DELAYT = 180;
+
+    level = 6;  // flag end music
+    shield = 0; // clear any remaining shield
+    
+    initSnowball(); // needed if we shortcutted to the ending
+    wrapispace();   // it does a lot of banking, so we need to wrap it
+
+    // warp in, pause...
+    for (i=0; i<90; ++i) {
+        // animation is only every 3 frames
+        delaystars(3);
+
+        // player flame
+	    if (flst == FLAME_SMALL) {
+            flst=FLAME_BIG; 
+            wrapPlayerFlameBig();
+	    } else {
+            flst=FLAME_SMALL;
+            wrapPlayerFlameSmall();
+	    }
+    }
+
+    // warp out
+    shield=0;
+    wrapwarpout();
+
+    // prepare the story text screen
+	i=intpic();     // remember: this disables interrupts, so, we'll turn ints back on for now
+	VDP_SET_REGISTER(VDP_REG_MODE1, i&0xaf);    // don't enable the screen though
+	FIX_KSCAN(i&0xaf);
+
+    // we need sprite flicker in here, so enable it if needed
+    if (f18a) {
+        VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
+    }
+
+    RLEUnpackInt(SNOWBALLBASEP, SNOWBALLBASEC, 6144);
+    screen(COLOR_BLACK);    // make sure the screen is black
+    musicsync();
+
+	// load the character set down into the third half of the screen
+	// yes, three halves. Blame TI. ;)
+	wrapLoadStoryFont();
+    musicsync();
+
+    // and fix the colors to white on transparent
+	vdpmemset(gColor+4096, 0xf0, 2048);
+    musicsync();
+
+    // load the sprite patterns for the snowball - sprite table is at >3800 here
+    wrapLoadFinalSnowball();
+    musicsync();
+
+	// first clear the bottom third of the screen
+	vdpmemset(0x1800+512, ' ', 32*8);
+    musicsync();
+
+	// enable the screen
+	VDP_SET_REGISTER(VDP_REG_MODE1, i);
+	FIX_KSCAN(i);
+
+    // we're going to basically do a warp up and slip the ship inside the mothership
+    // however, since everything is at a non-standard address, we're going to just do it inline
+    gnaty = 0xd0;   // so we can reuse its text functions
+
+    // Sprite layout:
+    // 0-3 - dummy sprites to hide the ship entry
+    // 4-11 - visible ship (interleaved with shield)
+    // 12 - flame
+#define CUTLINE 81
+    bmpsprite(0, 36, 1, CUTLINE, 255);  // should be char 36, color 1, x 255
+    bmpsprite(1, 36, 1, CUTLINE, 255);
+    bmpsprite(2, 36, 1, CUTLINE, 255);
+    bmpsprite(3, 36, 1, CUTLINE, 255);
+
+    // 50 is high enough for even the flame to vanish - 1 extra frame to hide all the sprites
+    for (i=192; i>CUTLINE-33; --i) {
+        // we'll only render the sprites that are visible
+	    VDP_WAIT_VBLANK_CRU;
+	    musicsync();	// clears it
+
+        if ((i&0x03)==0) {
+            // animate the flame
+            if (i&0x04) {
+                // small flame
+                wrapFinalSnowballSmall();
+            } else {
+                // big flame
+                wrapFinalSnowballBig();
+            }
+        }
+
+        if (i>CUTLINE) {
+            // first row of sprites
+	        bmpsprite(4,0,playerColor,i,112);
+	        bmpsprite(5,4,playerColor,i,128);
+	        bmpsprite(6,16,COLOR_BLACK,i,112);
+	        bmpsprite(7,20,COLOR_BLACK,i,128);
+        } else {
+	        bmpsprite(4,0,0,193,112);
+	        bmpsprite(5,0,0,193,112);
+	        bmpsprite(6,0,0,193,112);
+	        bmpsprite(7,0,0,193,112);
+        }
+
+        if ((i>CUTLINE-16)&&(i<192-16)) {
+            // second row of sprites
+	        bmpsprite(8,8,playerColor,i+16,112);
+	        bmpsprite(9,12,playerColor,i+16,128);
+	        bmpsprite(10,24,COLOR_BLACK,i+16,112);
+	        bmpsprite(11,28,COLOR_BLACK,i+16,128);
+        } else {
+	        bmpsprite(8,0,0,193,112);
+	        bmpsprite(9,0,0,193,112);
+	        bmpsprite(10,0,0,193,112);
+	        bmpsprite(11,0,0,193,112);
+        }
+
+        if ((i>CUTLINE-32)&&(i<192-32)) {
+            // flame
+            bmpsprite(12,32,11,i+32,120);
+        } else {
+            bmpsprite(12,0,0,193,112);
+        }
+    }
+#undef CUTLINE
+
+    // hold here for a second by printing some spaces
+    runText(snowBallTxt1);
+    runText(snowBallTxt2);
+    delayText(DELAYT);
+    runText(snowBallTxt3);
+    
+    cleanexit();
+    if (f18a) {
+        // re-disable flicker
+        VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);
+    }
 }
 
 void gamewinhard() {
-	// just returns for now
 	if (playership == SHIP_SELENA) selenawin();
 	else if (playership == SHIP_LADYBUG) ladybugwin();
 	else if (playership == SHIP_GNAT) gnatwin();
+    else if (playership == SHIP_SNOWBALL) snowballwin();
 
 }

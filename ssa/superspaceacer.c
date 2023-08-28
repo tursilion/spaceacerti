@@ -3,6 +3,7 @@
 
 // libti99
 #include <vdp.h>
+#include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
 #include <ColecoSNPlay.h>
@@ -14,6 +15,7 @@
 #include "human.h"
 #include "music.h"
 #include "attract.h"
+#include "boss.h"
 
 // full software reboot vector (warning: hard coded but defined by the crt0)
 static void (* const hwreboot)()=0x802c;
@@ -49,6 +51,9 @@ uint8 playerOffset;
 uint8 oldshield = 0;
 // force bonus - if you never shoot except during the boss, and never miss, you get it
 uint8 force = 0;
+
+// holds whether the F18A was detected
+uint8 f18a = 0;
 
 // function pointers for shield graphics swap functions
 // these functions MUST exist in the fixed bank
@@ -787,17 +792,6 @@ extern void selenawin();
 void main() {
 	unsigned char i;
 
-#if 0
-	// test performance of boss damage code
-	unsigned int bigi;
-	score=0;
-	VDP_SET_REGISTER(VDP_REG_MODE1,VDP_MODE1_INT|VDP_MODE1_16K);
-	for (bigi=0; bigi<15000; bigi++) {
-		AddDamage(0);
-		i=VDPST;
-	}
-#endif
-
 	// init this just once (why doesn't auto-init work? Probably because my CRT0 isn't loading it... and this still does not work.)
 	playership = 255;
 
@@ -813,12 +807,30 @@ void main() {
 		attractShip = *SAVEDATTRACT;
 		*SAVEDATTRACT = attractShip & 1;
 		attractShip >>= 4;
+        f18a=*SAVEDF18A;
 	} else {
 		// it was junk
 		score = 0;
 		scoremode = 0;
+
+        f18a = detect_f18a();
+        if (f18a) {
+            // check keypad for 0 - this will disable F18A
+            kscanfast(1);
+            if (KSCAN_KEY == '0') {
+                // enable flicker before we lock the F18A
+                VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
+                lock_f18a();
+                f18a=0;
+            }
+        }
 	}
 	if (seed == 0) ++seed;
+
+    if (f18a) {
+        // go ahead and disable flicker, we don't need it
+        VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);
+    }
 
     initSound();
 
@@ -1087,6 +1099,7 @@ void ispace() {
 	case 3:	StartMusic(STAGE3MUS, 1); break;
 	case 4:	StartMusic(STAGE4MUS, 1); break;
 	case 5:	StartMusic(STAGE5MUS, 1); break;
+    case 6: StartMusic(WINANIMMUS, 0); break;
 	}
 
 	SWITCH_IN_BANK2;
@@ -1286,6 +1299,9 @@ void reboot() {
 	x = *SAVEDATTRACT;
 	x = (attractShip<<4)|(x&1);
 	*SAVEDATTRACT = x;
+
+    // save off the detected F18A state (partly to save redetect, mostly to save if it was disabled)
+    *SAVEDF18A = f18a;
 
 	hwreboot();	// never returns
 }

@@ -8,6 +8,7 @@
 #include "trampoline.h"
 #include "enemy.h"
 #include "human.h"
+#include "boss.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "selena_end_c.c"
@@ -359,4 +360,48 @@ void wraploadgnat5() {
 	SWITCH_IN_BANK13;
 	RLEUnpackInt(gnat5rlep, gnat5rlec, 4096);
 	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapwarpout() {
+	unsigned int old = nBank;
+	SWITCH_IN_BANK7;
+    warpout();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapLoadFinalSnowball() {
+    unsigned int old = nBank;
+
+	SWITCH_IN_BANK5;
+
+    // straight ship and shields (0-15, 16-31)
+	vdpmemcpy(0x3800, SNOWBALL, 8*4*8);
+    // flame big (32-35)
+    vdpmemcpy(0x3800+8*4*8, SPRITES+100*8, 4*8);
+    // empty sprite (36-39)
+    vdpmemset(0x3800+36*8, 0, 4*8);
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapFinalSnowballBig() {
+    unsigned int old = nBank;
+
+	SWITCH_IN_BANK5;
+
+    // flame big (32-35)
+    vdpmemcpy(0x3800+8*4*8, SPRITES+100*8, 4*8);
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapFinalSnowballSmall() {
+    unsigned int old = nBank;
+
+	SWITCH_IN_BANK5;
+
+    // flame big (32-35)
+    vdpmemcpy(0x3800+8*4*8, PLAYERFLAMESMALL, 4*8);
+
+    SWITCH_IN_PREV_BANK(old);
 }

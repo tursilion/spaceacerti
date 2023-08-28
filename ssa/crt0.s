@@ -64,6 +64,8 @@
 		.area _wineasy
 		.area _winmed
 		.area _winhard
+        .area _snowballbasep
+        .area _snowballbasec
 
 	.area _bank9
 		.ascii "LinkTag:Bank9\0"
@@ -169,7 +171,7 @@ _startprog:
 	; clear RAM before starting (except last 6 bytes)
 	ld hl,#0x7000			; set copy source
 	ld de,#0x7001			; set copy dest
-	ld bc,#0x03f9			; set bytes to copy (1 less than size)
+	ld bc,#0x03f8			; set bytes to copy (1 less than size)
 	ld (hl),#0				; set initial value (this gets copied through)
 	ldir					; do it
 
@@ -181,7 +183,7 @@ _startprog:
 	; 73FE - saved score mode
 	; 73FF - attract mode flag
 
-	ld  sp, #0x73FA			; Set stack pointer directly above top of memory, reserving 6 bytes.
+	ld  sp, #0x73F9			; Set stack pointer directly above top of memory, reserving 7 bytes.
 	ld	bc,#0xFFFE			; switch in code bank
    	ld	a,(bc)				; note that this does NOT set the local pBank variable, user code still must do that!
 	;call gsinit			; Initialize global variables (linker is not setting this up?)
@@ -195,20 +197,11 @@ _vdpLimi:					; 0x80 - interrupt set, 0x01 - enabled, other bits used by library
 
     .area _CODE
 nmi:
-; all we do is set the MSB of _vdpLimi, and then check
-; if the LSB is set. If so, we call user code now. if
-; not, the library will deal with it when enabled.
+; we check the LSB first. If its set, we can call the NMI now.
+; otherwise, we set the MSB and let the library handle it on enable.
 	push af					; save flags (none affected, but play safe!)
 	push hl
 
-; increment score for timing
-;	ld hl,#_score
-;	inc (hl)
-;	jp nz,skip
-;	inc hl
-;	inc (hl)
-;skip: 
-	
 	ld hl,#_vdpLimi
 	bit 0,(hl)				; check LSb (enable)
 	jp z,notokay

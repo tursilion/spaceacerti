@@ -13,7 +13,7 @@ objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel e
 		font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel ship2_c.rel ship2_p.rel \
 		ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel ladybugc.rel ladybugp.rel \
 		ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel gnat3rlec.rel gnat3rlep.rel \
-		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel 
+		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel
 
 all: buildcol
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
@@ -38,7 +38,7 @@ ssd_inc.rel: ssd_inc.c
 bg.rel: bg.c game.h
 	$(CC) $(CFLAGS) -o bg.rel bg.c --codeseg bg --constseg bg
 
-boss.rel: boss.c game.h
+boss.rel: boss.c game.h boss.h
 	$(CC) $(CFLAGS) -o boss.rel boss.c --codeseg boss --constseg boss
 
 enemy.rel: enemy.c game.h
@@ -50,7 +50,7 @@ music.rel: music.c game.h
 human.rel: human.c game.h
 	$(CC) $(CFLAGS) -o human.rel human.c --codeseg human --constseg human
 
-superspaceacer.rel: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h
+superspaceacer.rel: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h
 	$(CC) $(CFLAGS) -o superspaceacer.rel superspaceacer.c --codeseg ssa --constseg ssa
 
 titlepage.rel: titlepage.c game.h
@@ -65,7 +65,7 @@ wineasy.rel: wineasy.c game.h
 winmed.rel: winmed.c game.h
 	$(CC) $(CFLAGS) -o winmed.rel winmed.c --codeseg winmed --constseg winmed
 
-winhard.rel: winhard.c game.h
+winhard.rel: winhard.c game.h boss.h trampoline.h music.h human.h
 	$(CC) $(CFLAGS) -o winhard.rel winhard.c --codeseg winhard --constseg winhard
 
 title_c.rel: title_c.c
@@ -93,24 +93,6 @@ boss4.rel: boss4.bmp
 boss5.rel: boss5.bmp
 	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss5.bmp boss5.c BOSS5
 	$(CC) $(CFLAGS) -oboss5.rel boss5.c --codeseg boss5 --constseg boss5
-
-#songpack1.rel: songpack1.c
-#	$(CC) $(CFLAGS) -o songpack1.rel songpack1.c --codeseg songpack1 --constseg songpack1
-#
-#songpack2.rel: songpack2.c
-#	$(CC) $(CFLAGS) -o songpack2.rel songpack2.c --codeseg songpack2 --constseg songpack2
-#
-#songpack3.rel: songpack3.c
-#	$(CC) $(CFLAGS) -o songpack3.rel songpack3.c --codeseg songpack3 --constseg songpack3
-#
-#songpack4.rel: songpack4.c
-#	$(CC) $(CFLAGS) -o songpack4.rel songpack4.c --codeseg songpack4 --constseg songpack4
-#
-#songpack5.rel: songpack5.c
-#	$(CC) $(CFLAGS) -o songpack5.rel songpack5.c --codeseg songpack5 --constseg songpack5
-#
-#songpack6.rel: songpack6.c
-#	$(CC) $(CFLAGS) -o songpack6.rel songpack6.c --codeseg songpack6 --constseg songpack6
 
 outfile0.rel: outfile0.c
 	$(CC) $(CFLAGS) -o outfile0.rel outfile0.c --codeseg outfile0 --constseg outfile0
@@ -149,13 +131,11 @@ difficulty.rel: difficulty.c
 
 selena_end_c.rel: selena_end_c.c
 	$(CC) $(CFLAGS) -o selena_end_c.rel selena_end_c.c --codeseg selenac --constseg selenac
-
 selena_end_p.rel: selena_end_p.c
 	$(CC) $(CFLAGS) -o selena_end_p.rel selena_end_p.c --codeseg selenap --constseg selenap
 
 qwertianp.rel: qwertianp.c
 	$(CC) $(CFLAGS) -o qwertianp.rel qwertianp.c --codeseg qwertianp --constseg qwertianp
-
 qwertianc.rel: qwertianc.c
 	$(CC) $(CFLAGS) -o qwertianc.rel qwertianc.c --codeseg qwertianc --constseg qwertianc
 
@@ -167,13 +147,11 @@ sfxs.rel: sfxs.c
 
 ladybugc.rel : ladybugc.c
 	$(CC) $(CFLAGS) -o ladybugc.rel ladybugC.c --codeseg ladybugc --constseg ladybugc
-
 ladybugp.rel : ladybugp.c
 	$(CC) $(CFLAGS) -o ladybugp.rel ladybugP.c --codeseg ladybugp --constseg ladybugp
 
 ladybugscreenc.rel : ladybugscreenc.c
 	$(CC) $(CFLAGS) -o ladybugscreenc.rel ladybugscreenc.c --codeseg ladybugscreenc --constseg ladybugscreenc
-
 ladybugscreenp.rel : ladybugscreenp.c
 	$(CC) $(CFLAGS) -o ladybugscreenp.rel ladybugscreenp.c --codeseg ladybugscreenp --constseg ladybugscreenp
 
@@ -197,6 +175,11 @@ gnat5rlec.rel : gnat5rlec.c
 	$(CC) $(CFLAGS) -o gnat5rlec.rel gnat5rlec.c --codeseg gnat5rlec --constseg gnat5rlec
 gnat5rlep.rel : gnat5rlep.c
 	$(CC) $(CFLAGS) -o gnat5rlep.rel gnat5rlep.c --codeseg gnat5rlep --constseg gnat5rlep
+
+snowballbasec.rel : snowballbase_c.c
+	$(CC) $(CFLAGS) -o snowballbasec.rel snowballbase_c.c --codeseg snowballbasec --constseg snowballbasec
+snowballbasep.rel : snowballbase_p.c
+	$(CC) $(CFLAGS) -o snowballbasep.rel snowballbase_p.c --codeseg snowballbasep --constseg snowballbasep
 
 # libti99 crt0 copied into folder
 crt0.rel: crt0.s

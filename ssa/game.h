@@ -78,9 +78,6 @@ extern const unsigned char SELENA[],ALTSELENA[],HOMING[];
 // Address of Coleco ROM font
 extern const unsigned char colecofont[];
 
-// boss smooth scroll pattern table offset
-#define SCROLL_OFFSET 0x0800
-
 // player ships
 #define SHIP_CRUISER 0
 #define SHIP_SNOWBALL 1
@@ -134,10 +131,6 @@ extern const unsigned char colecofont[];
 // shield is 4 sprites
 #define PLAYER_SHIELD 18
 
-// boss data (BOSS start for ships, POD start for level 2 pods)
-#define BOSS_START 121
-extern const unsigned char BOSS1[],BOSS2[],BOSS3[],BOSS4[],BOSS5[];
-
 // player ships
 // function pointers are used for the init, set shield and set normal copies
 // also define color 
@@ -167,6 +160,7 @@ extern struct _sprite SpriteTab[32];
 #define SAVEDSCORE ((unsigned char*)0x73fa)
 #define SAVEDMODE ((unsigned char*)0x73fe)
 #define SAVEDATTRACT ((unsigned char*)0x73ff)
+#define SAVEDF18A ((unsigned char*)0x73f9)
 
 // functions
 //void memset(char *p, unsigned char ch, int cnt);
@@ -197,13 +191,6 @@ void scrolltext();
 void gamewineasy();
 void gamewinmedium();
 void gamewinhard();
-void boss();
-void drboss();
-void erboss();
-void mboss();
-uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr);
-void whoded();
-void byboss();
 void DoWinMusic() ;
 void mainwin();
 void read();
@@ -211,9 +198,6 @@ void centr(unsigned char row, const char *out);
 void scroll();
 void pause();
 void nmi(void);
-void AddDamage(unsigned int vptr);
-void AddDestroyed(unsigned int vptr);
-void PrepareBoss(unsigned char idx, unsigned char r);
 void addscore(unsigned char val);
 void getDifficulty();
 void initstars();
@@ -303,6 +287,7 @@ extern unsigned char playerXspeed, playerYspeed;
 extern uint8 oldshield;
 extern unsigned char seed;
 extern unsigned char force;
+extern uint8 f18a;
 
 
 #endif

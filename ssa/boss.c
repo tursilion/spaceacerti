@@ -11,6 +11,7 @@
 #include "enemy.h"
 #include "music.h"
 #include "human.h"
+#include "boss.h"
 
 // enemy array usage:
 // 0-2	engines
@@ -21,7 +22,6 @@
 // a scaled difficulty level for the boss motion
 uint8 scaledLevel;
 #define HOMINGFRAMES 10
-
 
 // some graphics copies so we don't need to page flip for graphics during the final boss
 const unsigned char beamleftgfx[] = {
@@ -708,6 +708,33 @@ void whoded() {
 		}
 	}
 }
+
+void warpout() {
+    int qw, tmp;
+    uint8 a, x;
+
+	for (qw=0; qw<81; qw++){ 
+		x=11186/(qw+200);
+		a=x&0xf;	// low nibble of freq
+
+		tmp=(x>>4)+(a<<8)+0xc000;
+		SOUND=0xf0;
+		SOUND=(tmp>>8);
+		SOUND=tmp&0xff;
+		SOUND=0xe7;
+		SOUND=0xdf;
+
+		wrapPlayerFlameBig();
+		if ((SHIP_R<192)||(SHIP_R>200)) { 
+			SHIP_R-=6; 
+            playmv(); 
+		} else {
+			spdall();
+		}
+		wrapstars();
+		SOUND=0xff;
+	}
+}
  
 void byboss() { 
 	/*boss is dead...blow him up!*/
@@ -842,26 +869,7 @@ void byboss() {
     }
 
     // fly off screen
-	for (qw=0; qw<81; qw++){ 
-		x=11186/(qw+200);
-		a=x&0xf;	// low nibble of freq
-
-		tmp=(x>>4)+(a<<8)+0xc000;
-		SOUND=0xf0;
-		SOUND=(tmp>>8);
-		SOUND=tmp&0xff;
-		SOUND=0xe7;
-		SOUND=0xdf;
-
-		wrapPlayerFlameBig();
-		if ((SHIP_R<192)||(SHIP_R>200)) { 
-			SHIP_R-=6; playmv(); 
-		} else {
-			spdall();
-		}
-		wrapstars();
-		SOUND=0xff;
-	}
+    warpout();
 	flag=MAIN_LOOP_ACTIVE;
 }
  
