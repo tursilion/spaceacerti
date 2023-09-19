@@ -298,6 +298,13 @@ void wrapLoadLadyScreen() {
 	SWITCH_IN_PREV_BANK(old);
 }
 
+void wrapldpic() {
+	unsigned int old = nBank;
+	SWITCH_IN_BANK9;
+	ldpic();
+	SWITCH_IN_PREV_BANK(old);
+}
+
 // copies one byte over
 void wrapLadyBugByte(int off) {
 	if (off < 6144) {

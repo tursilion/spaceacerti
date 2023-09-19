@@ -997,10 +997,174 @@ void snowballwin() {
     }
 }
 
+void cruiserwin() {
+    unsigned char i;
+	unsigned char idx, idx2;
+	const unsigned char DELAYT = 255;
+	const unsigned char DELAYFAST = 1;
+
+	// so we can use DelayText
+	gnaty = 0xd0;	// flag it as not available
+
+    // prepare the story text screen
+	i=intpic();     // remember: this disables interrupts, so, we'll turn ints back on for now
+	VDP_SET_REGISTER(VDP_REG_MODE1, i&0xaf);    // don't enable the screen though
+	FIX_KSCAN(i&0xaf);
+
+	wrapldpic();
+    screen(COLOR_BLACK);    // make sure the screen is black
+
+	// zero out the screen table. To do this the first cell of each
+	// third needs to be empty. If we can't make that work, we can
+	// just find an empty black cell in each to use or re-arrange to
+	// make it true (easier if it just is though)
+	vdpmemset(0x1800, 0, 768);
+
+	// enable the screen
+	VDP_SET_REGISTER(VDP_REG_MODE1, i);
+	FIX_KSCAN(i);
+
+	// start the music
+	StartMusic(WINANIMMUS, 0);
+
+	// we're going to just slide out the image
+	// as if it were 6 small ones, with accompanying
+	// delays. Assume number 1-6, across then down.
+	// first animate out 1,4,5. We assume the 
+	// screen layout is indeed numbered per normal
+	// bitmap mode and that 0 is space.
+	// there is a single byte overflow, but it should overflow
+	// into the color table for empty space and not show up
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// top third <--
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			vdpwriteinc(0x1800+(off)+(31-idx), off, cnt);
+			VDPWD=0;  // remove any trail, don't care about wraparound
+		}
+
+		delayText(DELAYFAST);
+	}
+
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// middle -->
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			off += (32*8);
+			if (idx > 15) {
+				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
+				VDPWD=0;
+				VDP_SAFE_DELAY();
+				for (i=0; i<16; ++i) {
+					VDPWD=off+i+16;
+					VDP_SAFE_DELAY();
+				}
+			} else {
+				vdpwriteinc(0x1800+(off), (off&0xff)+31-idx, idx+1);
+			}
+		}
+
+		delayText(DELAYFAST);
+	}
+
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// bottom <--
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			off += (32*16);
+			vdpwriteinc(0x1800+(off)+(31-idx), off&0xff, cnt);
+			VDPWD=0;
+		}
+
+		delayText(DELAYFAST);
+	}
+
+	// one full screen up
+	delayText(DELAYT);
+	delayText(DELAYT);
+	delayText(DELAYT);
+
+	// now do the other half
+
+	// clear screen
+	vdpmemset(0x1800,0,768);
+	musicsync();
+
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// top -->
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			if (idx > 15) {
+				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
+				VDPWD=0;
+				VDP_SAFE_DELAY();
+				for (i=0; i<16; ++i) {
+					VDPWD=off+i+16;
+					VDP_SAFE_DELAY();
+				}
+			} else {
+				vdpwriteinc(0x1800+(off), (off&0xff)+31-idx, idx+1);
+			}
+		}
+
+		delayText(DELAYFAST);
+	}
+
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// middle <--
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			off += (32*8);
+			vdpwriteinc(0x1800+(off)+(31-idx), off&0xff, cnt);
+			VDPWD=0;
+		}
+
+		delayText(DELAYFAST);
+	}
+
+	for (idx=0; idx<32; ++idx) {
+		for (idx2=0; idx2<8; ++idx2) {
+			// bottom -->
+			int off = idx2 << 5;
+			int cnt = idx+1;
+			if (cnt > 16) cnt = 16;
+			off += (32*16);
+			if (idx > 15) {
+				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
+				VDPWD=0;
+				VDP_SAFE_DELAY();
+				for (i=0; i<16; ++i) {
+					VDPWD=off+i+16;
+					VDP_SAFE_DELAY();
+				}
+			} else {
+				vdpwriteinc(0x1800+(off), (off&0xff)+31-idx, idx+1);
+			}
+		}
+
+		delayText(DELAYFAST);
+	}
+
+
+
+	// and wrap it up
+    cleanexit();
+}
+
 void gamewinhard() {
 	if (playership == SHIP_SELENA) selenawin();
 	else if (playership == SHIP_LADYBUG) ladybugwin();
 	else if (playership == SHIP_GNAT) gnatwin();
     else if (playership == SHIP_SNOWBALL) snowballwin();
-
+    else if (playership == SHIP_CRUISER) cruiserwin();
 }

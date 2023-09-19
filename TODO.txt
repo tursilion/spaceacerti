@@ -118,6 +118,8 @@ SPRITES
 Secret Game Modes
 -----------------
 
+Hold 0 when powering on to disable F18A enhancements. Only works from cold start.
+
 Hold fire when moving left and right to access the ships GNAT and PRINCESS
 	-GNAT is tiny and has only a single gun with no powerups (game mode '1' on score last digit)
 	-PRINCESS has fully powered homing shots but has only one life (game mode '2' on score last digit)

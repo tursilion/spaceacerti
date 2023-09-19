@@ -152,22 +152,26 @@ void player()
         if ((playership == SHIP_LADYBUG) && (shield > 0)) {
             // find the first available enemy
             unsigned char en = 0;
-            while ((en<6)&&(ent[en]==ENEMY_NONE)) ++en;
+            while ((en<6)&&(ent[en]<=ENEMY_ENGINE)) ++en;
             if (en < 6) {
-			    if (enr[en] > SHIP_R+8) KSCAN_JOYY=-4;
-			    if (enr[en] < SHIP_R-8) KSCAN_JOYY=4;
-			    if (enc[en] > SHIP_C+8) KSCAN_JOYX=4;
-			    if (enc[en] < SHIP_C-8) KSCAN_JOYX=-4;
+			    if (enr[en] > SHIP_R+playerOffset+8) KSCAN_JOYY=-4;
+			    if (enr[en] < SHIP_R+playerOffset-8) KSCAN_JOYY=4;
+			    if (enc[en] > SHIP_C+8+8) KSCAN_JOYX=4;
+			    if (enc[en] < SHIP_C-8+8) KSCAN_JOYX=-4;
+            }
+            if (flag!=BOSS_LOOP_ACTIVE) {
+                // don't shoot unless we are at a boss
+                KSCAN_KEY = 0xff;
             }
         }
         
         // but if there is a powerup, move towards that instead
 		// we're on easy, so it might be safe ;)
 		if (ptp4 != POWERUP_NONE) {
-			if (pr4 > SHIP_R+8) KSCAN_JOYY=-4;
-			if (pr4 < SHIP_R-8) KSCAN_JOYY=4;
-			if (pc4 > SHIP_C+8) KSCAN_JOYX=4;
-			if (pc4 < SHIP_C-8) KSCAN_JOYX=-4;
+			if (pr4 > SHIP_R+playerOffset+8) KSCAN_JOYY=-4;
+			if (pr4 < SHIP_R+playerOffset-8) KSCAN_JOYY=4;
+			if (pc4 > SHIP_C+8+8) KSCAN_JOYX=4;
+			if (pc4 < SHIP_C+8-8) KSCAN_JOYX=-4;
 		}
 
         // don't move up when boss is approaching, only down
@@ -437,7 +441,7 @@ void homingshot() {
 
     // find the first available enemy
     unsigned char en = 0;
-    while ((en<6)&&(ent[en]==ENEMY_NONE)) ++en;
+    while ((en<6)&&(ent[en]<ENEMY_ENGINE)) ++en;
     if (en >= 6) {
 	    MOVE_JUST_UP(0);
 	    MOVE_JUST_UP(1);
@@ -602,7 +606,7 @@ void plycol() {
 	/*enemies?*/
 	if (playership != SHIP_GNAT) {
 		for (a=0; a<12; a++) {
-			if ((ent[a]>ENEMY_EXPLOSION)&&(ent[a]<ENEMY_MAX)) { 
+			if ((ent[a]>ENEMY_EXPLOSION)&&(ent[a]<ENEMY_MAX)&&(ent[a]!=ENEMY_ENGINE)) { 
 				y=abs(enr[a]-r); x=abs(enc[a]-c);
 				if ((x<=8)&&(y<=8)&&(hittime==0)) {
 					if (shield < 1) {
