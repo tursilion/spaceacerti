@@ -148,6 +148,12 @@
     <ClCompile Include="snowballbase_p.c">
       <Filter>Gfx</Filter>
     </ClCompile>
+    <ClCompile Include="cruiserend_c.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="cruiserend_p.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

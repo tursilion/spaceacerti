@@ -43,5 +43,6 @@ void wrapLoadFinalSnowball();
 void wrapFinalSnowballBig();
 void wrapFinalSnowballSmall();
 void wrapldpic();
+void wrapldcruiserend();
 
 #endif

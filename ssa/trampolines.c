@@ -27,6 +27,8 @@
 #include "gnat4rlep.c"
 #include "gnat5rlec.c"
 #include "gnat5rlep.c"
+#include "cruiserend_c.c"
+#include "cruiserend_p.c"
 
 // I don't THINK these need to be recursive, but just in case
 #pragma nooverlay
@@ -410,5 +412,15 @@ void wrapFinalSnowballSmall() {
     // flame big (32-35)
     vdpmemcpy(0x3800+8*4*8, PLAYERFLAMESMALL, 4*8);
 
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapldcruiserend() {
+    unsigned int old = nBank;
+
+    SWITCH_IN_BANK3;
+	RLEUnpack(0x2000, cruiserend_c, 6144);
+    SWITCH_IN_BANK4;
+    RLEUnpack(0x0000, cruiserend_p, 6144);
     SWITCH_IN_PREV_BANK(old);
 }

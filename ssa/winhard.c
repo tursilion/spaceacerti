@@ -1001,7 +1001,7 @@ void cruiserwin() {
     unsigned char i;
 	unsigned char idx, idx2;
 	const unsigned char DELAYT = 255;
-	const unsigned char DELAYFAST = 1;
+	const unsigned char DELAYFAST = 2;
 
 	// so we can use DelayText
 	gnaty = 0xd0;	// flag it as not available
@@ -1011,14 +1011,17 @@ void cruiserwin() {
 	VDP_SET_REGISTER(VDP_REG_MODE1, i&0xaf);    // don't enable the screen though
 	FIX_KSCAN(i&0xaf);
 
-	wrapldpic();
+	wrapldcruiserend();     // manually checked where a blank cell was
     screen(COLOR_BLACK);    // make sure the screen is black
 
-	// zero out the screen table. To do this the first cell of each
-	// third needs to be empty. If we can't make that work, we can
-	// just find an empty black cell in each to use or re-arrange to
-	// make it true (easier if it just is though)
-	vdpmemset(0x1800, 0, 768);
+    // top is char 2
+    // middle is char 16
+    // bottom is char 14
+
+    // clear the screen in three pieces cause of the above
+	vdpmemset(0x1800, 2, 256);
+	vdpmemset(0x1900, 16, 256);
+	vdpmemset(0x1a00, 14, 256);
 
 	// enable the screen
 	VDP_SET_REGISTER(VDP_REG_MODE1, i);
@@ -1042,11 +1045,14 @@ void cruiserwin() {
 			int cnt = idx+1;
 			if (cnt > 16) cnt = 16;
 			vdpwriteinc(0x1800+(off)+(31-idx), off, cnt);
-			VDPWD=0;  // remove any trail, don't care about wraparound
+			VDPWD=2;  // remove any trail, don't care about wraparound
 		}
+        vdpchar(0x1900,16); // remove the broken char we snuck down there - seems like only this one matters
 
 		delayText(DELAYFAST);
 	}
+
+    delayText(DELAYT/2);
 
 	for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
@@ -1057,7 +1063,7 @@ void cruiserwin() {
 			off += (32*8);
 			if (idx > 15) {
 				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
-				VDPWD=0;
+				VDPWD=16;
 				VDP_SAFE_DELAY();
 				for (i=0; i<16; ++i) {
 					VDPWD=off+i+16;
@@ -1071,6 +1077,8 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
+    delayText(DELAYT/2);
+
 	for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
 			// bottom <--
@@ -1079,7 +1087,7 @@ void cruiserwin() {
 			if (cnt > 16) cnt = 16;
 			off += (32*16);
 			vdpwriteinc(0x1800+(off)+(31-idx), off&0xff, cnt);
-			VDPWD=0;
+			VDPWD=14;
 		}
 
 		delayText(DELAYFAST);
@@ -1088,12 +1096,15 @@ void cruiserwin() {
 	// one full screen up
 	delayText(DELAYT);
 	delayText(DELAYT);
-	delayText(DELAYT);
 
 	// now do the other half
 
-	// clear screen
-	vdpmemset(0x1800,0,768);
+    // clear the screen in three pieces cause of the above
+	vdpmemset(0x1800, 2, 256);
+	musicsync();
+	vdpmemset(0x1900, 16, 256);
+	musicsync();
+	vdpmemset(0x1a00, 14, 256);
 	musicsync();
 
 	for (idx=0; idx<32; ++idx) {
@@ -1104,7 +1115,7 @@ void cruiserwin() {
 			if (cnt > 16) cnt = 16;
 			if (idx > 15) {
 				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
-				VDPWD=0;
+				VDPWD=2;    // erase
 				VDP_SAFE_DELAY();
 				for (i=0; i<16; ++i) {
 					VDPWD=off+i+16;
@@ -1118,7 +1129,9 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
-	for (idx=0; idx<32; ++idx) {
+	delayText(DELAYT/2);
+
+    for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
 			// middle <--
 			int off = idx2 << 5;
@@ -1126,13 +1139,15 @@ void cruiserwin() {
 			if (cnt > 16) cnt = 16;
 			off += (32*8);
 			vdpwriteinc(0x1800+(off)+(31-idx), off&0xff, cnt);
-			VDPWD=0;
+			VDPWD=16;   // erase
 		}
 
 		delayText(DELAYFAST);
 	}
 
-	for (idx=0; idx<32; ++idx) {
+	delayText(DELAYT/2);
+
+    for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
 			// bottom -->
 			int off = idx2 << 5;
@@ -1141,7 +1156,7 @@ void cruiserwin() {
 			off += (32*16);
 			if (idx > 15) {
 				VDP_SET_ADDRESS_WRITE(0x1800+off+idx-16);
-				VDPWD=0;
+				VDPWD=14;   // erase
 				VDP_SAFE_DELAY();
 				for (i=0; i<16; ++i) {
 					VDPWD=off+i+16;
@@ -1154,8 +1169,6 @@ void cruiserwin() {
 
 		delayText(DELAYFAST);
 	}
-
-
 
 	// and wrap it up
     cleanexit();

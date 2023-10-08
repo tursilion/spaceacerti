@@ -33,11 +33,13 @@
 		.area _outfile1
 		.area _selenac
 		.area _selenap
+        .area _cruiserendc
 
 	.area _bank4
 		.ascii "LinkTag:Bank4\0"
 		.area _difficulty
 		.area _outfile0
+        .area _cruiserendp
 
 	.area _bank5
 		.ascii "LinkTag:Bank5\0"

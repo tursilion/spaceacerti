@@ -13,7 +13,7 @@ objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel e
 		font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel ship2_c.rel ship2_p.rel \
 		ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel ladybugc.rel ladybugp.rel \
 		ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel gnat3rlec.rel gnat3rlep.rel \
-		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel
+		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel cruiserendc.rel cruiserendp.rel
 
 all: buildcol
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
@@ -180,6 +180,16 @@ snowballbasec.rel : snowballbase_c.c
 	$(CC) $(CFLAGS) -o snowballbasec.rel snowballbase_c.c --codeseg snowballbasec --constseg snowballbasec
 snowballbasep.rel : snowballbase_p.c
 	$(CC) $(CFLAGS) -o snowballbasep.rel snowballbase_p.c --codeseg snowballbasep --constseg snowballbasep
+
+cruiserendc.rel : cruiserend_c.c
+	$(CC) $(CFLAGS) -o cruiserendc.rel cruiserend_c.c --codeseg cruiserendc --constseg cruiserendc
+cruiserendp.rel : cruiserend_p.c
+	$(CC) $(CFLAGS) -o cruiserendp.rel cruiserend_p.c --codeseg cruiserendp --constseg cruiserendp
+
+cruiserfinalc.rel : cruiserfinal_c.c
+	$(CC) $(CFLAGS) -o cruiserfinalc.rel cruiserfinal_c.c --codeseg cruiserfinalc --constseg cruiserfinalc
+cruiserfinalp.rel : cruiserfinal_p.c
+	$(CC) $(CFLAGS) -o cruiserfinalp.rel cruiserfinal_p.c --codeseg cruiserfinalp --constseg cruiserfinalp
 
 # libti99 crt0 copied into folder
 crt0.rel: crt0.s
