@@ -23,6 +23,8 @@
 	.area _bank1
 		.ascii "LinkTag:Bank1\0"
 		.area _enemy
+        .area _snowballbasep
+        .area _snowballbasec
 
 	.area _bank2
 		.ascii "LinkTag:Bank2\0"
@@ -66,8 +68,6 @@
 		.area _wineasy
 		.area _winmed
 		.area _winhard
-        .area _snowballbasep
-        .area _snowballbasec
 
 	.area _bank9
 		.ascii "LinkTag:Bank9\0"

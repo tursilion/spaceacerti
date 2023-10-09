@@ -11,10 +11,6 @@
 #include "music.h"
 #include "human.h"
 
-#define BIN2INC_HEADER_ONLY
-#include "snowballbase_c.c"
-#include "snowballbase_p.c"
-
 extern const unsigned char colecofont[];
 unsigned char bottomsprite, bottomrow;
 unsigned char gnaty;
@@ -170,6 +166,66 @@ const char snowBallTxt3[] =
     "                                "
     "                                "
     "*";
+
+// letters for the cruiser win
+const unsigned char letterA[] = {
+    0x38,0x6c,0xc6,0xc6,0xc6,0xc6,0xc6,0xfe,
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6
+};
+const unsigned char letterC[] = {
+    0x38,0x6c,0xc6,0xc6,0xc0,0xc0,0xc0,0xc0,
+    0xc0,0xc0,0xc0,0xc0,0xc6,0xc6,0x6c,0x38
+};
+const unsigned char letterG[] = {
+    0x38,0x6c,0xc6,0xc6,0xc0,0xc0,0xc0,0xce,
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0x6c,0x38
+};
+const unsigned char letterI[] = {
+    0x7e,0x18,0x18,0x18,0x18,0x18,0x18,0x18,
+    0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x7e
+};
+const unsigned char letterL[] = {
+    0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,
+    0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xc0,0xfe
+};
+const unsigned char letterN[] = {
+    0xc6,0xc6,0xe6,0xe6,0xe6,0xe6,0xd6,0xd6,
+    0xd6,0xd6,0xce,0xce,0xce,0xce,0xc6,0xc6
+};
+const unsigned char letterO[] = {
+    0x38,0x6c,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0x6c,0x38
+};
+const unsigned char letterR[] = {
+    0x38,0x6c,0xc6,0xc6,0xc6,0xc6,0xc6,0xf8,
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6
+};
+const unsigned char letterS[] = {
+    0x38,0x6c,0xc6,0xc0,0xc0,0xc0,0xc0,0x38,
+    0x06,0x06,0x06,0x06,0x06,0xc6,0x6c,0x38
+};
+const unsigned char letterT[] = {
+    0x7e,0x18,0x18,0x18,0x18,0x18,0x18,0x18,
+    0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18
+};
+const unsigned char letterU[] = {
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,
+    0xc6,0xc6,0xc6,0xc6,0xc6,0xc6,0x6c,0x38
+};
+const unsigned char letterX[] = {   // exclamation point
+    0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,
+    0x18,0x18,0x18,0x18,0x18,0x00,0x18,0x18
+};
+
+// double table - nibble to byte - remember to 
+// also write each one twice
+const unsigned char scale[] = {
+    0x00,0x03,0x0c,0x0f,0x30,0x33,0x3c,0x3f,
+    0xc0,0xc3,0xcc,0xcf,0xf0,0xf3,0xfc,0xff
+};
+const unsigned char * const congrats[] = {
+    letterC,letterO,letterN,letterG,letterR,letterA,letterT,letterU,letterL,letterA,letterT,letterI,letterO,letterN,letterS,letterX,0
+};
 
 unsigned int rndnum13(void);
 void cleanexit(void);
@@ -893,7 +949,7 @@ void snowballwin() {
         VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
     }
 
-    RLEUnpackInt(SNOWBALLBASEP, SNOWBALLBASEC, 6144);
+    wrapLoadSnowballBase();
     screen(COLOR_BLACK);    // make sure the screen is black
     musicsync();
 
@@ -1023,7 +1079,23 @@ void cruiserwin() {
 	vdpmemset(0x1900, 16, 256);
 	vdpmemset(0x1a00, 14, 256);
 
-	// enable the screen
+    // set up the sprite patterns before we start the music
+    vdpmemset(0x3800, 0, 640);  // wipe the sprite patterns (80 character patterns used for 20 sprites (0-19))
+    for (unsigned char i=0; i<20; ++i) {
+        sprite(i, i*4, COLOR_CYAN, 0xc1, 0);
+    }
+    VDP_SAFE_DELAY();
+    VDPWD=0xd0;                 // and re-terminate the list
+
+    // we can load the patterns to sprites 4-19 now
+    for (unsigned char i=4; i<20; ++i) {
+        // we only use half of each sprite, so just 16 bytes
+        // but, there are still 4 characters per sprite, at 8 bytes each, so 32
+        vdpmemcpy(0x3800+i*32, congrats[i-4], 16);
+    }
+
+	// enable the screen, but with sprites mag 4
+    i |= VDP_MODE1_SPRMODE16x16|VDP_MODE1_SPRMAG;
 	VDP_SET_REGISTER(VDP_REG_MODE1, i);
 	FIX_KSCAN(i);
 
@@ -1052,7 +1124,7 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
-    delayText(DELAYT/2);
+    delayText(DELAYT/3);
 
 	for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
@@ -1077,7 +1149,7 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
-    delayText(DELAYT/2);
+    delayText(DELAYT/3);
 
 	for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
@@ -1095,7 +1167,7 @@ void cruiserwin() {
 
 	// one full screen up
 	delayText(DELAYT);
-	delayText(DELAYT);
+	delayText(DELAYT-80);
 
 	// now do the other half
 
@@ -1129,7 +1201,7 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
-	delayText(DELAYT/2);
+	delayText(DELAYT/3);
 
     for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
@@ -1145,7 +1217,7 @@ void cruiserwin() {
 		delayText(DELAYFAST);
 	}
 
-	delayText(DELAYT/2);
+	delayText(DELAYT/3);
 
     for (idx=0; idx<32; ++idx) {
 		for (idx2=0; idx2<8; ++idx2) {
@@ -1169,6 +1241,112 @@ void cruiserwin() {
 
 		delayText(DELAYFAST);
 	}
+
+    delayText(DELAYT);
+
+    // now write congratulations! We have to do half sprites and half bitmap to make this work,
+    // and we need to use magified sprites to boot.
+
+    // first, clear the right half of the center block and set it up like normal bitmap
+    for (int i=0x800; i<0x1000; i+=256) {
+        vdpmemset(i+128, 0, 128);           // zero out patterns
+        vdpmemset(i+0x2000+128, 0x71, 128); // cyan on black
+        musicsync();
+    }
+    // now the SIT
+    for (int i=0; i<256; i+=32) {
+        vdpwriteinc(i+0x1900+16, i+16, 16);
+        musicsync();
+    }
+    // none of that should have been visible, but now the middle block is set up as bitmap
+    // we'll land the sprites as we need them to reduce flicker
+    // sprites 0-3 will be the fake bitmap area, and sprites 4-18 will be the animated ones
+    // Sprites are at 3800 so we get 256 chars. Each sprite uses 4 chars, so we'll literally
+    // just use chars 0-71
+    musicsync();
+
+    // now rain the sprites down from offscreen. As they settle, we'll render them
+    // into their final location. Remember to rez the render sprites for the first half
+    {
+        unsigned char c=0;
+        while (c!=255) {
+            ++c;
+            for (unsigned char i=4; i<20; ++i) {
+                if (SpriteTab[i].y == 0xc1) {
+                    // not moved yet - is it time to start?
+                    if (c >= (23-i)*4) {
+                        sploct(i, 0xee, (i-4)*16);   // just off screen
+                    }
+                } else {
+                    // it's moving, drop it (if not finished - 0xc2 flags done)
+                    if (SpriteTab[i].y != 0xc2) SpriteTab[i].y+=3;
+                    if ((SpriteTab[i].y < 192) && (SpriteTab[i].y > 80)) {
+                        if (i==4) c=255;   // flag done
+
+                        // this sprite is finished, remove it
+                        SpriteTab[i].y=0xc2;
+
+                        // now we have to render it permanently
+                        if (SpriteTab[i].x < 128) {
+                            // on this side, we render to a new sprite so it can overlap the picture
+                            unsigned char idx = (i-4)/2;    // which sprite are we working with?
+                            if ((i&1)==1) {
+                                sprite(idx, idx*4, COLOR_CYAN, 80, (i-5)*16);   // put it onscreen, in case it wasn't
+                            }
+
+                            // now we can just copy the pattern to the appropriate side
+                            vdpmemcpy(0x3800+idx*32+(i&1)*16, congrats[i-4], 16);
+                        } else {
+                            // on this side, we render to the bitmap - this is a fair bit harder cause we
+                            // also have to double the bitmap manually - but we'll use the lookup table
+                            // to speed that up a bit.
+                            unsigned int adr = 0x800+(2*256);   // pattern table for row 10
+                            const unsigned char *pat;
+
+                            adr+=(i-4)*16;
+
+                            // so we should be able to just do two passes, one for the left column
+                            // and one for the right. Would be slightly faster to do characters in
+                            // order, but this is much simpler code and should be fast enough?
+                            pat=congrats[i-4];
+                            for (unsigned char idx=0; idx<16; ++idx) {
+                                if ((idx&0x03)==0) {
+                                    VDP_SET_ADDRESS_WRITE(adr);
+                                    adr+=256;
+                                }
+                                unsigned char x = scale[(*(pat++)&0xf0)>>4];
+                                VDPWD=x;
+                                VDP_SAFE_DELAY();
+                                VDPWD=x;
+                            }
+
+                            pat=congrats[i-4];
+                            adr-=(1024-8);
+                            for (unsigned char idx=0; idx<16; ++idx) {
+                                if ((idx&0x03)==0) {
+                                    VDP_SET_ADDRESS_WRITE(adr);
+                                    adr+=256;
+                                }
+                                unsigned char x = scale[(*(pat++)&0x0f)];
+                                VDPWD=x;
+                                VDP_SAFE_DELAY();
+                                VDPWD=x;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // next frame
+            vdpwaitvint();
+
+            // we have to do sprites here as the table is at a different address, and we don't need flicker
+            vdpmemcpy(0x1b00, &SpriteTab[0].y, 20*4);
+
+            // and music
+            doMusic();
+        }
+    }
 
 	// and wrap it up
     cleanexit();

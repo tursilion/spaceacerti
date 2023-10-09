@@ -29,6 +29,8 @@
 #include "gnat5rlep.c"
 #include "cruiserend_c.c"
 #include "cruiserend_p.c"
+#include "snowballbase_c.c"
+#include "snowballbase_p.c"
 
 // I don't THINK these need to be recursive, but just in case
 #pragma nooverlay
@@ -422,5 +424,13 @@ void wrapldcruiserend() {
 	RLEUnpack(0x2000, cruiserend_c, 6144);
     SWITCH_IN_BANK4;
     RLEUnpack(0x0000, cruiserend_p, 6144);
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapLoadSnowballBase() {
+    unsigned int old = nBank;
+
+    SWITCH_IN_BANK1;
+    RLEUnpackInt(SNOWBALLBASEP, SNOWBALLBASEC, 6144);
     SWITCH_IN_PREV_BANK(old);
 }

@@ -44,5 +44,6 @@ void wrapFinalSnowballBig();
 void wrapFinalSnowballSmall();
 void wrapldpic();
 void wrapldcruiserend();
+void wrapLoadSnowballBase();
 
 #endif
