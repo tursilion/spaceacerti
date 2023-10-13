@@ -1,5 +1,6 @@
 // libti99
 #include <vdp.h>
+#include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
 

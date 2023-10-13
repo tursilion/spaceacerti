@@ -182,14 +182,14 @@ void enout() {
                 switch (gentype[idx]) {
 				    // minimum player damage is 2 for spread, 3 for pulse
                     default:    //for (;;) { } // not sure why we need a default, but we seem to. So make it a saucer.
-					case ENEMY_SAUCER:		eec[k]=0; esc[k]=0; ep[k]=2; if (f18a) c=COLOR_MEDGREEN; else c=4; en_func[k]=enemysaucer; if (enc[k]<32) enc[k]+=32; if (enc[k]>216) enc[k]-=48; break;
-					case ENEMY_JET:			eec[k]=4; esc[k]=4; ep[k]=3; ecs[k]=0; if (f18a) c=COLOR_LTBLUE; else c=5; en_func[k]=enemyjet; break;
-					case ENEMY_MINE:		eec[k]=8; esc[k]=8; ep[k]=10; if (f18a) c=COLOR_CYAN; else c=1; en_func[k]=enemymine; break;
-					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (f18a) c=COLOR_MAGENTA; else c=6; ers[k]=(rndnum()&0x7f)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
-					case ENEMY_SWIRLY:		eec[k]=40; esc[k]=28; ep[k]=8; if (f18a) c=COLOR_MEDRED; else c=7; en_func[k]=enemyswirly; break;
-					case ENEMY_BOMB:		eec[k]=44; esc[k]=44; ep[k]=20; if (f18a) c=COLOR_DKYELLOW; else c=7; en_func[k]=enemybomb; break;
+					case ENEMY_SAUCER:		eec[k]=0; esc[k]=0; ep[k]=2; if (!f18a) c=COLOR_MEDGREEN; else c=4; en_func[k]=enemysaucer; if (enc[k]<32) enc[k]+=32; if (enc[k]>216) enc[k]-=48; break;
+					case ENEMY_JET:			eec[k]=4; esc[k]=4; ep[k]=3; ecs[k]=0; if (!f18a) c=COLOR_LTBLUE; else c=5; en_func[k]=enemyjet; break;
+					case ENEMY_MINE:		eec[k]=8; esc[k]=8; ep[k]=10; if (!f18a) c=COLOR_CYAN; else c=1; en_func[k]=enemymine; break;
+					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (!f18a) c=COLOR_MAGENTA; else c=6; ers[k]=(rndnum()&0x7f)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
+					case ENEMY_SWIRLY:		eec[k]=40; esc[k]=28; ep[k]=8; if (!f18a) c=COLOR_MEDRED; else c=7; en_func[k]=enemyswirly; break;
+					case ENEMY_BOMB:		eec[k]=44; esc[k]=44; ep[k]=20; if (!f18a) c=COLOR_DKYELLOW; else c=7; en_func[k]=enemybomb; break;
 					case ENEMY_BEAMGEN:		
-						eec[k]=80; esc[k]=76; ep[k]=14; if (f18a) c=COLOR_GRAY; else c=4; en_func[k]=enemybeamgen; 
+						eec[k]=80; esc[k]=76; ep[k]=14; if (!f18a) c=COLOR_GRAY; else c=4; en_func[k]=enemybeamgen; 
 						if (enc[k] > 144) enc[k]-=128;
 						break;
 				} 
@@ -476,8 +476,6 @@ void enemyshot(uint8 x) {
             VDPWD=0x00;
             VDPWD=0xd0; // green
         	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
-        }
-        if (cnt&4) {
         }
     } else {
         // change the color

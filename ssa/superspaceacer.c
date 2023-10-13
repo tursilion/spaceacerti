@@ -1150,6 +1150,8 @@ void ispace() {
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &F18SPRITES[84*8], 4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18ELECTRICWALL2, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8+0x800, &F18SPRITES2[84*8], 4*8);
+        // turn on the extended sprite mode - 2 bitplanes
+        VDP_SET_REGISTER(F18A_REG_ECM, 2);
     } else {
     	SWITCH_IN_BANK5;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, ELECTRICWALL, 2*4*8);
