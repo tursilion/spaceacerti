@@ -13,7 +13,8 @@ objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel e
 		font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel ship2_c.rel ship2_p.rel \
 		ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel ladybugc.rel ladybugp.rel \
 		ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel gnat3rlec.rel gnat3rlep.rel \
-		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel cruiserendc.rel cruiserendp.rel
+		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel cruiserendc.rel cruiserendp.rel \
+        f18sprites.rel
 
 all: buildcol
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
@@ -144,6 +145,9 @@ attract.rel: attract.c attract.h
 
 sfxs.rel: sfxs.c
 	$(CC) $(CFLAGS) -o sfxs.rel sfxs.c --codeseg sfxs --constseg sfxs
+
+f18sprites.rel: f18sprites.c
+	$(CC) $(CFLAGS) -o f18sprites.rel f18sprites.c --codeseg f18sprites --constseg f18sprites
 
 ladybugc.rel : ladybugc.c
 	$(CC) $(CFLAGS) -o ladybugc.rel ladybugC.c --codeseg ladybugc --constseg ladybugc

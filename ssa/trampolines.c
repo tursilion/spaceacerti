@@ -1,5 +1,6 @@
 // libti99
 #include <vdp.h>
+#include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
 
@@ -31,6 +32,7 @@
 #include "cruiserend_p.c"
 #include "snowballbase_c.c"
 #include "snowballbase_p.c"
+#include "f18sprites.c"
 
 // I don't THINK these need to be recursive, but just in case
 #pragma nooverlay
@@ -231,8 +233,14 @@ void wrapLoadEngineSprites() {
 	// load up the engine sprites
 	unsigned int old = nBank;
 
-	SWITCH_IN_BANK5;
-	vdpmemcpy(gSPRITE_PATTERNS+76*8, SPRITES+76*8, 2*4*8);
+    if (f18a) {
+    	SWITCH_IN_BANK14;
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8, F18SPRITES+76*8, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18SPRITES2+76*8, 2*4*8);
+    } else {
+    	SWITCH_IN_BANK5;
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8, SPRITES+76*8, 2*4*8);
+    }
 	SWITCH_IN_PREV_BANK(old);
 }
 
@@ -242,10 +250,16 @@ void wrapPlayerFlameBig() {
 	unsigned int old = nBank;
 
     if (playership == SHIP_GNAT) {
-        vdpchar(100*8+0x0800, 0x01);						// 1 pixel on for high flame
+        vdpchar(100*8+0x0800, 0x01);						// 1 pixel on for high flame (we'll try it for F18A too)
     } else if (playership != SHIP_SELENA) {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(gSPRITE_PATTERNS+100*8, SPRITES+100*8, 4*8);
+        if (f18a) {
+    	    SWITCH_IN_BANK14;
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18SPRITES+100*8, 4*8);
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18SPRITES2+100*8, 4*8);
+        } else {
+    	    SWITCH_IN_BANK5;
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8, SPRITES+100*8, 4*8);
+        }
 	    SWITCH_IN_PREV_BANK(old);
     }
 } 
@@ -383,7 +397,12 @@ void wrapwarpout() {
 void wrapLoadFinalSnowball() {
     unsigned int old = nBank;
 
-	SWITCH_IN_BANK5;
+    if (f18a) {
+        // lock it down to single color sprite mode
+        VDP_SET_REGISTER(F18A_REG_ECM, 0);
+    }
+
+    SWITCH_IN_BANK5;
 
     // straight ship and shields (0-15, 16-31)
 	vdpmemcpy(0x3800, SNOWBALL, 8*4*8);
@@ -397,6 +416,8 @@ void wrapLoadFinalSnowball() {
 
 void wrapFinalSnowballBig() {
     unsigned int old = nBank;
+
+    // F18A not used in this end sequence
 
 	SWITCH_IN_BANK5;
 

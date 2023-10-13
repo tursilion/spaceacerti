@@ -242,7 +242,7 @@ void boss()
 		ent[i]=ENEMY_ENGINE; ers[i]=0; ecs[i]=0;
 		en_func[i]=enemyengine;     // just animates
 		ep[i]=level*5;		// hit points (engine power)
-		sprite(i+ENEMY_SPRITE,76,8,enr[i],enc[i]);
+		sprite(i+ENEMY_SPRITE,76,f18a?8:COLOR_MEDRED,enr[i],enc[i]);
 	}
 
 	// load up the engine sprites
@@ -418,8 +418,8 @@ void mboss() {
 			enc[7]=(bc<<1)+16; enc[8]=enc[7]+40;
 			ecs[7]=0; ecs[8]=0;
 			ers[7]=3+scaledLevel; ers[8]=ers[7];
-			sprite(ENEMY_SPRITE+6+1,84,12,enr[7],enc[7]);
-			sprite(ENEMY_SPRITE+6+2,84,12,enr[8],enc[8]);
+			sprite(ENEMY_SPRITE+6+1,84,f18a?9:COLOR_DKGREEN,enr[7],enc[7]);
+			sprite(ENEMY_SPRITE+6+2,84,f18a?9:COLOR_DKGREEN,enr[8],enc[8]);
 		}
 	} else if (level == 2) {
 		if ((ent[8]==ENEMY_NONE) && ((rndnum()&7)<3)) { 
@@ -439,7 +439,7 @@ void mboss() {
 					ecs[7]=-2;
 					ecs[10]=2;
 				}
-				sprite(a+ENEMY_SPRITE,84,12,enr[a],enc[a]); 
+				sprite(a+ENEMY_SPRITE,84,f18a?9:COLOR_DKGREEN,enr[a],enc[a]); 
 			}
 		}
 	} else if (level==3) { 
@@ -465,9 +465,9 @@ void mboss() {
 				eec[x]=8; esc[x]=8; ech[x]=8;
 				if (scoremode == 3) {
 					// invisible enemies
-					sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);
+					sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);     // todo: bgColor is a problem for F18A
 				} else {
-					sprite(x+ENEMY_SPRITE,8,COLOR_CYAN,enr[x],enc[x]);
+					sprite(x+ENEMY_SPRITE,8,f18a?1:COLOR_CYAN,enr[x],enc[x]);
 				}
 			}
 		}
@@ -501,7 +501,7 @@ void mboss() {
 						ech[a]=HOMINGFRAMES;
 						enr[a]=71+(br<<3); 
 						enc[a]=(bc<<1)+35;
-						sprite(a+ENEMY_SPRITE,84,COLOR_WHITE,enr[a],enc[a]);
+						sprite(a+ENEMY_SPRITE,84,f18a?4:COLOR_WHITE,enr[a],enc[a]);
 						break;
 					}
 				}
@@ -561,7 +561,7 @@ void mboss() {
 								ers[11]=3+scaledLevel;
 								break;
 						}
-						sprite(a+ENEMY_SPRITE,84,12,enr[a],enc[a]);
+						sprite(a+ENEMY_SPRITE,84,f18a?9:COLOR_DKGREEN,enr[a],enc[a]);
 					}
 					break;
 
@@ -590,7 +590,7 @@ void mboss() {
 							// invisible enemies
 							sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);
 						} else {
-							sprite(x+ENEMY_SPRITE,8,COLOR_CYAN,enr[x],enc[x]);
+							sprite(x+ENEMY_SPRITE,8,f18a?1:COLOR_CYAN,enr[x],enc[x]);
 						}
 					}
 				}
@@ -614,7 +614,11 @@ void mboss() {
 						en_func[a]=enemynull;
 						enr[a]=enr[7]; 
 						enc[a]=enc[7];
-						sprite(a+ENEMY_SPRITE,104,a<10?COLOR_LTBLUE:COLOR_DKBLUE,enr[a],enc[a]);
+                        if (f18a) {
+    						sprite(a+ENEMY_SPRITE,104,a<10?14:15,enr[a],enc[a]);
+                        } else {
+    						sprite(a+ENEMY_SPRITE,104,a<10?COLOR_LTBLUE:COLOR_DKBLUE,enr[a],enc[a]);
+                        }
 					}
 					break;
 			}

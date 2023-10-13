@@ -366,6 +366,11 @@ void getDifficulty() {
 	// update default
 	if (playership == 255) playership = SHIP_CRUISER;
 
+    if (f18a) {
+        // turn off the extended sprite mode
+        VDP_SET_REGISTER(F18A_REG_ECM, 0);
+    }
+
 	// the schematic should be gray
 	vdpchar(gCOLOR+16, 0xe0);
 	VDP_SAFE_DELAY();

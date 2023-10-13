@@ -232,13 +232,13 @@ void noen(uint8 x);
 #define xchar(r, c, ch) vdpchar(gIMAGE+((r)<<5)+(c), ch)
 // read a character from the screen
 #define gchar(r, c) vdpreadchar(gIMAGE+((r)<<5)+(c))
-// set up a new sprite
+// set up a new sprite - (or in the magnify bit for F18A, ignored on 9918A)
 #define sprite(nn, chr, color, yy, xx) SpriteTab[nn].y=yy; SpriteTab[nn].x=xx; SpriteTab[nn].pat=chr; SpriteTab[nn].col=color
 // get sprite position (note: not pointers anymore)
 #define spposn(nn, rr, cc) rr=SpriteTab[nn].y; cc=SpriteTab[nn].x
 // set sprite location
 #define sploct(nn, rr, cc) SpriteTab[nn].y=rr; SpriteTab[nn].x=cc
-// set sprite color (uses assembly color)
+// set sprite color (uses assembly color - or in the magnify bit for F18A, ignored on 9918A)
 #define spcolr(n,c) SpriteTab[n].col = c
 // set sprite pattern
 #define sppat(n,chr) SpriteTab[n].pat=chr

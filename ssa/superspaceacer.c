@@ -17,6 +17,9 @@
 #include "attract.h"
 #include "boss.h"
 
+#define BIN2INC_HEADER_ONLY
+#include "f18sprites.c"
+
 // full software reboot vector (warning: hard coded but defined by the crt0)
 static void (* const hwreboot)()=0x802c;
 
@@ -444,6 +447,11 @@ unsigned char intpic() {
 	// one difference
 	VDP_SET_REGISTER(VDP_REG_SDT, 0x07);	gSpritePat = 0x3800;
 
+    if (f18a) {
+        // turn off the extended sprite mode
+        VDP_SET_REGISTER(F18A_REG_ECM, 0);
+    }
+
     // we do use the variables here, not the macros
 
 	// disable sprite table
@@ -572,6 +580,10 @@ unsigned char grf1() {
 	// we separate sprites and patterns
 	VDP_SET_REGISTER(VDP_REG_PDT, 0x03);    gPattern = 0x1800;  // set it, but we usually use the macro version
 
+    if (f18a) {
+        VDP_SET_REGISTER(F18A_REG_ECM, 2);  // sprites have 2 bitplanes
+    }
+
 	// clear the screen
 	cls();
 
@@ -594,19 +606,60 @@ void DelSprButPlayer(unsigned char x) {
 	}
 }
 
+void f18_loadshippal(const unsigned char *p) {
+    VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|49);
+    // Reg 47, value: 1111 0001, DPM = 1, AUTO INC = 1, palreg 49 (48 is transparent)
+
+    // it's F18, so we know that no delay is needed
+    for (unsigned char idx=0; idx<3; ++idx) {
+        VDPWD=*(p++);
+        VDPWD=*(p++);
+    }
+	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
+}
+void f18_loadshieldpal(const unsigned char *p) {
+    VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|53);
+    // Reg 47, value: 1111 0101, DPM = 1, AUTO INC = 1, palreg 53 (52 is transparent)
+
+    // it's F18, so we know that no delay is needed
+    for (unsigned char idx=0; idx<3; ++idx) {
+        VDPWD=*(p++);
+        VDPWD=*(p++);
+    }
+	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
+}
+// even counts only!
+void f18_vdpmemcpy(int pAddr, const unsigned char *pSrc, int cnt) {
+	VDP_SET_ADDRESS_WRITE(pAddr);
+    cnt >>= 1;
+	while (cnt--) {
+		VDPWD=*(pSrc++);
+		VDPWD=*(pSrc++);
+	}
+}
+
 // these are in here instead of in player to avoid the bank switch overhead when copying
 // graphics swap functions for the player ships.
 void initCruiser() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
-	SWITCH_IN_PREV_BANK(old);
+
+    if (f18a) {
+        SWITCH_IN_BANK14;
+        vdpmemcpy(108*8+0x0800, &F18SPRITES[108*8], 24*4*8);	// ship sprites layer 1
+        vdpmemcpy(108*8+0x1000, &F18SPRITES2[108*8], 24*4*8);	// ship sprites layer 2
+        playerColor = 12;   // player is always on palette 12
+        f18_loadshippal(F18CRUISERPAL);
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
+	    SWITCH_IN_PREV_BANK(old);
+    	playerColor = COLOR_MEDRED;
+    }
 
     wrapPlayerFlameSmall();
 	
 	shieldsOn = shieldCruiser;
 	shieldsOff = deShieldCruiser;
-	playerColor = COLOR_MEDRED;
 	playerOffset = 8;
 	shotOffset = -7;
 	playerXspeed = 10;
@@ -687,11 +740,17 @@ void initSelena() {
 
 void shieldCruiser() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(124*8+0x0800, ALTSHIELDS, 4*4*8);			// straight
-	vdpmemcpy(156*8+0x0800, &ALTSHIELDS[4*4*8], 4*4*8);	// left
-	vdpmemcpy(188*8+0x0800, &ALTSHIELDS[8*4*8], 4*4*8);	// right
-	SWITCH_IN_PREV_BANK(old);
+    if (f18a) {
+        // TODO: we don't have to change the pattern anymore, we just turn the sprite on and off
+        // this should automatically be handled in the palette stuff now, no?
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(124*8+0x0800, ALTSHIELDS, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x0800, &ALTSHIELDS[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &ALTSHIELDS[8*4*8], 4*4*8);	// right
+    }
+    
+    SWITCH_IN_PREV_BANK(old);
 }
 
 void shieldSnowball() {
@@ -732,11 +791,17 @@ void shieldSelena() {
 
 void deShieldCruiser() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(124*8+0x0800, &SPRITES[124*8], 4*4*8);	// straight
-	vdpmemcpy(156*8+0x0800, &SPRITES[156*8], 4*4*8);	// left
-	vdpmemcpy(188*8+0x0800, &SPRITES[188*8], 4*4*8);	// right
-	SWITCH_IN_PREV_BANK(old);
+    if (f18a) {
+        // TODO: we don't have to change the pattern anymore, we just turn the sprite on and off
+        // this should automatically be handled in the palette stuff now, no?
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(124*8+0x0800, &SPRITES[124*8], 4*4*8);	// straight
+	    vdpmemcpy(156*8+0x0800, &SPRITES[156*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &SPRITES[188*8], 4*4*8);	// right
+    }
+
+    SWITCH_IN_PREV_BANK(old);
 }
 
 void deShieldSnowball() {
@@ -822,14 +887,19 @@ void main() {
                 VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
                 lock_f18a();
                 f18a=0;
+            } else {
+                // load the palette we plan to use
+                SWITCH_IN_BANK14;
+                loadpal_f18a(F18PALETTE, 64);
             }
         }
 	}
 	if (seed == 0) ++seed;
 
     if (f18a) {
-        // go ahead and disable flicker, we don't need it
-        VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);
+        VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);  // go ahead and disable flicker, we don't need it
+        VDP_SET_REGISTER(F18A_REG_EXTRAPAL, 0); // default modes use the default palette
+        VDP_SET_REGISTER(F18A_REG_SIZES, 0);    // 2k table sizes for pattern tables
     }
 
     initSound();
@@ -891,10 +961,19 @@ titleagain:
 	screen(COLOR_BLACK);
 
 	// load in the sprites (patterns were modified by getDifficulty)
-	SWITCH_IN_BANK5;
-	vdpmemcpy(gSPRITE_PATTERNS, SPRITES, SIZE_OF_SPRITES);
-	// also, manually clear out sprite patterns 248-251 (powerup,etc)
-	vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
+    if (f18a) {
+        SWITCH_IN_BANK14;
+	    vdpmemcpy(gSPRITE_PATTERNS, F18SPRITES, SIZE_OF_SPRITES);
+	    vdpmemcpy(gSPRITE_PATTERNS+0x800, F18SPRITES2, SIZE_OF_SPRITES);
+	    // also, manually clear out sprite patterns 248-251 (powerup,etc)
+	    vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
+	    vdpmemset(gSPRITE_PATTERNS+(248*8)+0x800, 0, 32);
+    } else {
+    	SWITCH_IN_BANK5;
+	    vdpmemcpy(gSPRITE_PATTERNS, SPRITES, SIZE_OF_SPRITES);
+	    // also, manually clear out sprite patterns 248-251 (powerup,etc)
+	    vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
+    }
 	spdall();	// clears sprite table
 	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
 
@@ -1065,9 +1144,17 @@ void ispace() {
 	screenFlashCnt = 0;
 
 	// load the electric wall sprites and normal shots
-	SWITCH_IN_BANK5;
-	vdpmemcpy(gSPRITE_PATTERNS+76*8, ELECTRICWALL, 2*4*8);
-	vdpmemcpy(gSPRITE_PATTERNS+84*8, &SPRITES[84*8], 4*8);
+    if (f18a) {
+    	SWITCH_IN_BANK14;
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8, F18ELECTRICWALL, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &F18SPRITES[84*8], 4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18ELECTRICWALL2, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+84*8+0x800, &F18SPRITES2[84*8], 4*8);
+    } else {
+    	SWITCH_IN_BANK5;
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8, ELECTRICWALL, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &SPRITES[84*8], 4*8);
+    }
 
 	// small stars first
 	SWITCH_IN_BANK6;

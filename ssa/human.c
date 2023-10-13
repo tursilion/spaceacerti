@@ -883,7 +883,7 @@ void dyen(unsigned char x) {
 			eec[x+6]=72;
 			esc[x+6]=52;
 			en_func[x+6] = enemyexplosion;
-			sprite(x+6+ENEMY_SPRITE,ech[x+6],9, enr[x+6], enc[x+6]);
+			sprite(x+6+ENEMY_SPRITE,ech[x+6], f18a?8:COLOR_LTRED, enr[x+6], enc[x+6]);
 
 			if (ech[x] == 76) {
 				// left destroyed
@@ -905,7 +905,7 @@ void dyen(unsigned char x) {
 			eec[x]=72;
 			esc[x]=52;
 			en_func[x] = enemyexplosion;
-			spcolr(x+ENEMY_SPRITE,9);
+			spcolr(x+ENEMY_SPRITE,f18a?8:COLOR_LTRED);
 		} else {
 			playsfx_nukebomb(); // overrides previous
 			spposn(x+ENEMY_SPRITE,r,c);
@@ -922,7 +922,7 @@ void dyen(unsigned char x) {
 				ech[k]=84;
 				eec[k]=84;
 				esc[k]=84;
-				sprite(k+ENEMY_SPRITE,84,11,r,c);
+				sprite(k+ENEMY_SPRITE,84,f18a?2:COLOR_LTYELLOW,r,c);
 				if (k<3) {
 					ers[k]=-9;
 				}
@@ -947,7 +947,7 @@ void dyen(unsigned char x) {
 			ech[4]=52;
 			eec[4]=72;
 			esc[4]=52;
-			sprite(ENEMY_SPRITE+4,52,9,r,c);
+			sprite(ENEMY_SPRITE+4,52,f18a?8:COLOR_LTRED,r,c);
 
 			SOUND=0xff;
 		}

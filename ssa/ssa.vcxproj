@@ -96,6 +96,7 @@
     <ClCompile Include="cruiserend_p.c" />
     <ClCompile Include="difficulty.c" />
     <ClCompile Include="enemy.c" />
+    <ClCompile Include="f18sprites.c" />
     <ClCompile Include="font.c" />
     <ClCompile Include="human.c" />
     <ClCompile Include="ladybugc.c" />

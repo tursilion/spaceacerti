@@ -30,7 +30,7 @@
   1408 + 1936 + 1232 + 2112 + 2160 bytes = 8848 bytes unpacked.
 - So figure about 12k for expanded in-game graphics, no biggie, and 132k for screens with palettes (32 bytes extra each).
 
-VRAM map (except for ending scroll)
+VRAM map (except for ending routines)
 --------
  >0000	Screen Image Table
  >0300	Sprite Descriptor Table
@@ -80,6 +80,35 @@ SPRITE PATTERNS
 232-247 - helicopter leaving (4 frames)
 248-251	- powerup and player explosion (copied from character patterns, not initialized)
 252-255 - jet tilt right
+
+SPRITE PALETTES
+---------------
+0   standard TI palette     (x, black, m.green, l.green)
+1   standard TI palette/mine(x, l.blue, d.red, cyan / cyan)
+2   standard TI palette/beam/mine tip     (x, l.red, d.yellow, l.yellow)
+3   standard TI palette     (x, magenta, gray, white)
+4   saucer / beamgen        (gray)
+5   jet                     (l.blue)
+6   copter / selena home    (magenta)
+7   swirly / bomb           (m.red)
+8   explosion / flame       (l.red / l.yellow player, m.red boss)
+9   enemy shot              (cycles d.green/m.red - swap first two palette colors)
+10  player shot pulse       (magenta)
+11  player shot spread      (d.green)
+12  player ship             (dynamic)
+13  player shields          (dynamic - white/d.yellow/d.red)
+14  boss homing light       (lt blue)
+15  boss homing dark        (dk blue)
+
+Shield bright:      fff, eee, ccc
+Shield Med:         ff0, ee0, cc0
+Shield Low:         f00, e00, c00
+
+Cruiser palette:    000, e00, c00
+Snowball Palette:   000, fff, c00
+Ladybug palette:    000, a00, d00
+Gnat palette:       000, 2f0, 0c0
+Selena palette:     000, 00c, 008
 
 CHARACTER PATTERNS
 ------------------
