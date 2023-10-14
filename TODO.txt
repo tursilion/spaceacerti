@@ -165,7 +165,9 @@ Hold UP when starting for cheat mode. You are invincible, plus each key does som
 	8 - disable cheats
 (Game mode '9' on score last digit)
 
-Press '*' on the difficulty screen for music test
+Press '*' on the difficulty screen for music test. 
+
+Press JOY_DOWN+'0' on music test for end sequence for currently selected ship. (Might delete this.)
 
 Press '#' anytime except title page to mute/unmute music (muted music will play sfx on the stock hardware).
 

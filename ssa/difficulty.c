@@ -327,13 +327,14 @@ void soundtest() {
 			}
 			break;
 
-		// TODO: this is probably too obvious to keep it?
 		case '0':
 			if (KSCAN_JOYY == JOY_UP) {
 				playsfx_pwrwide();
 			} else {
-				nDifficulty = DIFFICULTY_HARD;
-				wrapGamWin();
+                if (KSCAN_JOYY == JOY_DOWN) {
+    				nDifficulty = DIFFICULTY_HARD;
+	    			wrapGamWin();
+                }
 			}
 		}
 

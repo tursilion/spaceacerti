@@ -5,14 +5,14 @@
 
 Value     Size      Global                        Module
 --------  --------  ----------------------------  ----------------------------
-0000D211  00001C04  _outpack0                     outfile0                    
+0000D218  00001C04  _outpack0                     outfile0                    
 0000C00E  00001BB4  _outpack1                     outfile1                    
 0000DA07  00001A70  _outpack3                     outfile3                    
 0000C1E7  00001820  _outpack2                     outfile2                    
 0000D80F  00001800  _LADYBUGP                     ladybugP                    
 0000C00F  00001800  _LADYBUGC                     ladybugC                    
 0000E00C  00000FEC  _SNOWBALLBASEP                snowballbase_p              
-0000EE15  00000FA2  _cruiserend_p                 cruiserend_p                
+0000EE1C  00000FA2  _cruiserend_p                 cruiserend_p                
 0000F099  00000E64  _cruiserend_c                 cruiserend_c                
 0000CCAF  00000C72  _gnat1rlec                    gnat1rlec                   
 0000E153  00000C38  _gnat2rlec                    gnat2rlec                   
@@ -36,7 +36,7 @@ Value     Size      Global                        Module
 0000EA8F  00000880  _SHIP4P                       ship4_p                     
 0000D887  00000880  _SHIP1C                       ship1_c                     
 0000D98F  00000880  _SHIP3P                       ship3_p                     
-0000C8D5  0000085B  _getDifficulty                difficulty                  
+0000C8DC  0000085B  _getDifficulty                difficulty                  
 0000D921  00000832  _gnat1rlep                    gnat1rlep                   
 0000CAA2  00000800  _SPRITES                      ssd_inc                     
 0000C80F  00000800  _F18SPRITES2                  f18sprites                  
@@ -44,7 +44,7 @@ Value     Size      Global                        Module
 0000E752  000007C3  _TXTDAT                       ssd_inc                     
 0000ED8B  000007C1  _gnat2rlep                    gnat2rlep                   
 0000E762  00000717  _gnat5rlep                    gnat5rlep                   
-0000C1E7  000006EE  _SCHEMATICS                   difficulty                  
+0000C1EE  000006EE  _SCHEMATICS                   difficulty                  
 0000E6CA  00000598  _draw4                        boss                        
 0000C4F0  00000596  _QWERTP                       qwertianp                   
 0000D757  0000057F  _gnat4rlep                    gnat4rlep                   
@@ -87,7 +87,7 @@ Value     Size      Global                        Module
 0000A754  000001CB  _ispace                       superspaceacer              
 0000D0F5  000001BB  _whoded                       boss                        
 0000AFD5  000001BA  _wrapspritescore              trampolines                 
-0000C00E  0000019F  _soundtest                    difficulty                  
+0000C00E  000001A6  _soundtest                    difficulty                  
 0000D28F  00000180  _F18ALTSHIELDS2               f18sprites                  
 0000D40F  00000180  _F18SNOWBALL                  f18sprites                  
 0000E30F  00000180  _F18ALTGNAT                   f18sprites                  
@@ -145,7 +145,7 @@ Value     Size      Global                        Module
 0000CB58  000000E2  _gnatstory1                   winhard                     
 0000CFAC  000000E2  _snowBallTxt3                 winhard                     
 0000B7B8  000000E1  _wrapAYcmd                    music                       
-0000D130  000000E1  _sSkillText                   difficulty                  
+0000D137  000000E1  _sSkillText                   difficulty                  
 0000CD9E  000000E0  _gnatSprites                  winhard                     
 0000D041  000000E0  _enemyhelileave               enemy                       
 0000C03B  000000E0  _smallcapsfont                wineasy                     
@@ -380,17 +380,17 @@ Value     Size      Global                        Module
 0000BA41  0000000C  _playsfx_nukebomb             music                       
 0000CEBE  0000000C  _snowBallTxt1                 winhard                     
 00008655  0000000A  _set_graphics                 vdp_setgraphics             
-0000C1B7  0000000A  _snowballText                 difficulty                  
-0000C1C1  0000000A  _ladybugText                  difficulty                  
-0000C1CB  0000000A  _gnatText                     difficulty                  
-0000C1D5  0000000A  _selenaText                   difficulty                  
+0000C1BE  0000000A  _snowballText                 difficulty                  
+0000C1C8  0000000A  _ladybugText                  difficulty                  
+0000C1D2  0000000A  _gnatText                     difficulty                  
+0000C1DC  0000000A  _selenaText                   difficulty                  
 00009605  0000000A  _stage_distns                 superspaceacer              
 00008CB8  0000000A  __get_remainder                                           
 00008C53  0000000A  ___sdcc_enter_ix                                          
 00008B77  0000000A  _GPUTEST                      f18a_detect                 
-0000C1AD  0000000A  _cruiserText                  difficulty                  
+0000C1B4  0000000A  _cruiserText                  difficulty                  
 00008A54  00000009  _lock_f18a                    f18a_lock                   
-0000C1DF  00000008  _musText                      difficulty                  
+0000C1E6  00000008  _musText                      difficulty                  
 0000C057  00000008  _mincnt                       enemy                       
 00008C7A  00000008  __modschar                                                
 000095FD  00000008  _damage                       superspaceacer              
