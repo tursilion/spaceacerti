@@ -86,7 +86,7 @@ SPRITE PALETTES
 0   standard TI palette     (x, black, m.green, l.green)
 1   standard TI palette/mine(x, l.blue, d.red, cyan / cyan)
 2   standard TI palette/beam/mine tip     (x, l.red, d.yellow, l.yellow)
-3   standard TI palette     (x, magenta, gray, white)
+3   standard TI palette/homing shot tip   (x, magenta, gray, white)
 4   saucer / beamgen        (gray)
 5   jet                     (l.blue)
 6   copter / selena home    (magenta)

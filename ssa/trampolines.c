@@ -271,8 +271,14 @@ void wrapPlayerFlameSmall() {
     if (playership == SHIP_GNAT) {
         vdpchar(100*8+0x0800, 0x00);						// turn the 1 pixel off for low flame
     } else if (playership != SHIP_SELENA) {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(gSPRITE_PATTERNS+100*8, PLAYERFLAMESMALL, 4*8);
+        if (f18a) {
+            SWITCH_IN_BANK14;
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18PLAYERFLAMESMALL, 4*8);
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18PLAYERFLAMESMALL2, 4*8);
+        } else {
+    	    SWITCH_IN_BANK5;
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8, PLAYERFLAMESMALL, 4*8);
+        }
 	    SWITCH_IN_PREV_BANK(old);
     }
 } 

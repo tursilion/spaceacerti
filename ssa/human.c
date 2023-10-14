@@ -307,8 +307,8 @@ void shoot()
 			r+=shotOffset;
 			if (a2 == a) {
 				// only two slightly angled shots
-				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT1,12,r,c);
-				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT1,12,r,c);
+				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT1,f18a?11:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT1,f18a?11:COLOR_DKGREEN,r,c);
 				shd[a]=-2;
 				shd[a3]=2;
 				shr[a]=r;
@@ -322,9 +322,9 @@ void shoot()
 				shd[a3]=4;
 				shr[a]=shr[a2]=shr[a3]=r;
 				shc[a]=shc[a2]=shc[a3]=c;
-				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT2,12,r,c);
-				sprite(PLAYER_SHOT+a2,PLAYER_SHOT_3WAY_STRAIGHT,12,r,c);
-				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT2,12,r,c);
+				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT2,f18a?11:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a2,PLAYER_SHOT_3WAY_STRAIGHT,f18a?11:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT2,f18a?11:COLOR_DKGREEN,r,c);
 			}
 		}
 	} else {
@@ -339,7 +339,7 @@ void shoot()
 			shc[a]=c;
             shrd[a]=-4;
 			shd[a]=0;
-			sprite(PLAYER_SHOT+a,PLAYER_SHOT_PULSE_BASE+(truepwr<<2),13,r,c);
+			sprite(PLAYER_SHOT+a,PLAYER_SHOT_PULSE_BASE+(truepwr<<2),f18a?10:COLOR_MAGENTA,r,c);
 		}
 	}
 }
@@ -826,15 +826,26 @@ void playerright()
 void playerinit() {
 	unsigned char a;
 
+    // playerColor is already adjusted for the sake of F18A,
+    // and the patterns are copied in as per normal, but the
+    // presence of absence of the shield sprites differs
 	sprite(PLAYER_SPRITE,108,playerColor,192,112);
 	sprite(PLAYER_SPRITE+1,112,playerColor,192,128);
 	sprite(PLAYER_SPRITE+2,116,playerColor,208,112);
 	sprite(PLAYER_SPRITE+3,120,playerColor,208,128);
-	sprite(PLAYER_FLAME,FLAME_BIG,11,224,120);
-	sprite(PLAYER_SHIELD,124,COLOR_BLACK,192,112);
-	sprite(PLAYER_SHIELD+1,128,COLOR_BLACK,192,128);
-	sprite(PLAYER_SHIELD+2,132,COLOR_BLACK,208,112);
-	sprite(PLAYER_SHIELD+3,136,COLOR_BLACK,208,128);
+    if (f18a) {
+        spdel(PLAYER_SHIELD);
+        spdel(PLAYER_SHIELD+1);
+        spdel(PLAYER_SHIELD+2);
+        spdel(PLAYER_SHIELD+3);
+    	sprite(PLAYER_FLAME,FLAME_BIG,8,224,120);
+    } else {
+	    sprite(PLAYER_SHIELD,124,COLOR_BLACK,192,112);
+	    sprite(PLAYER_SHIELD+1,128,COLOR_BLACK,192,128);
+	    sprite(PLAYER_SHIELD+2,132,COLOR_BLACK,208,112);
+	    sprite(PLAYER_SHIELD+3,136,COLOR_BLACK,208,128);
+    	sprite(PLAYER_FLAME,FLAME_BIG,COLOR_LTYELLOW,224,120);
+    }
 	oldshield = 0;		// force an update for cruiser
 
 	for (a=1; a<10; a++)	{ 

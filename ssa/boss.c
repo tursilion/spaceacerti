@@ -606,7 +606,7 @@ void mboss() {
 					ech[7]=HOMINGFRAMES+HOMINGFRAMES;
 					enr[7]=50+(br<<3); 
 					enc[7]=(bc<<1)+48;
-					sprite(7+ENEMY_SPRITE,104,COLOR_WHITE,enr[7],enc[7]);
+					sprite(7+ENEMY_SPRITE,104,f18a?3:COLOR_WHITE,enr[7],enc[7]);
 					for (unsigned char a=8; a<12; ++a) {
 						ers[a]=0;	// start static
 						ecs[a]=0;

@@ -794,6 +794,7 @@ static void runText(const char *pTxt) {
 }
 
 // replacement sprite for the bitmap address of SAL
+// no F18A stuff in here
 static void bmpsprite(unsigned char n, unsigned char ch, unsigned char col, unsigned char r, unsigned char c) {
 	VDP_SET_ADDRESS_WRITE(n*4+0x1B00);
 	VDP_SAFE_DELAY();
@@ -1082,6 +1083,7 @@ void cruiserwin() {
     // set up the sprite patterns before we start the music
     vdpmemset(0x3800, 0, 640);  // wipe the sprite patterns (80 character patterns used for 20 sprites (0-19))
     for (unsigned char i=0; i<20; ++i) {
+        // Standard sprite palette, no F18A
         sprite(i, i*4, COLOR_CYAN, 0xc1, 0);
     }
     VDP_SAFE_DELAY();
@@ -1291,6 +1293,7 @@ void cruiserwin() {
                             // on this side, we render to a new sprite so it can overlap the picture
                             unsigned char idx = (i-4)/2;    // which sprite are we working with?
                             if ((i&1)==1) {
+                                // Standard sprite palette, no F18A
                                 sprite(idx, idx*4, COLOR_CYAN, 80, (i-5)*16);   // put it onscreen, in case it wasn't
                             }
 

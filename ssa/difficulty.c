@@ -595,6 +595,7 @@ redraw2:
 					vdpchar(gSPRITE_PATTERNS+(6*8), tmp | (tmp<<1) | (tmp>>1));
 					vdpchar(gSPRITE_PATTERNS+(6*8)+1, tmp | (tmp<<1) | (tmp>>1));
 
+                    // no F18A here, use the stock palette
 					sprite(0,0,COLOR_WHITE,gfxCnt+143,152);
 					sprite(1,4,COLOR_WHITE,gfxCnt+143,168);
 
@@ -675,6 +676,7 @@ redraw2:
 						}
 					}
 
+                    // still no F18A here, use the stock palette
 					sprite(0,0,COLOR_WHITE,143,200+(gfxCnt-47));
 					sprite(1,4,COLOR_WHITE,159,200+(gfxCnt-47));
 

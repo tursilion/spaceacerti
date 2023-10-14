@@ -649,17 +649,26 @@ void initCruiser() {
         vdpmemcpy(108*8+0x1000, &F18SPRITES2[108*8], 24*4*8);	// ship sprites layer 2
         playerColor = 12;   // player is always on palette 12
         f18_loadshippal(F18CRUISERPAL);
+	    shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+        // shields
+        vdpmemcpy(124*8+0x0800, F18ALTSHIELDS, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x0800, &F18ALTSHIELDS[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &F18ALTSHIELDS[8*4*8], 4*4*8);	// right
+        vdpmemcpy(124*8+0x1000, F18ALTSHIELDS2, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x1000, &F18ALTSHIELDS2[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x1000, &F18ALTSHIELDS2[8*4*8], 4*4*8);	// right
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
 	    SWITCH_IN_PREV_BANK(old);
     	playerColor = COLOR_MEDRED;
+	    shieldsOn = shieldCruiser;
+	    shieldsOff = deShieldCruiser;
     }
 
     wrapPlayerFlameSmall();
 	
-	shieldsOn = shieldCruiser;
-	shieldsOff = deShieldCruiser;
 	playerOffset = 8;
 	shotOffset = -7;
 	playerXspeed = 10;
@@ -668,15 +677,34 @@ void initCruiser() {
 
 void initSnowball() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
-	SWITCH_IN_PREV_BANK(old);
+
+    if (f18a) {
+        SWITCH_IN_BANK14;
+    	vdpmemcpy(108*8+0x0800, F18SNOWBALL, 24*4*8);			// ship sprites
+    	vdpmemcpy(108*8+0x1000, F18SNOWBALL2, 24*4*8);			// ship sprites
+    	playerColor = 12;
+        f18_loadshippal(F18SNOWBALLPAL);
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+        // shields
+	    vdpmemcpy(124*8+0x0800, F18ALTSNOWBALL, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x0800, &F18ALTSNOWBALL[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &F18ALTSNOWBALL[8*4*8], 4*4*8);	// right
+	    vdpmemcpy(124*8+0x1000, F18ALTSNOWBALL2, 4*4*8);		// straight
+	    vdpmemcpy(156*8+0x1000, &F18ALTSNOWBALL2[4*4*8], 4*4*8);// left
+	    vdpmemcpy(188*8+0x1000, &F18ALTSNOWBALL2[8*4*8], 4*4*8);// right
+    } else {
+    	SWITCH_IN_BANK5;
+    	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
+        shieldsOn = shieldSnowball;
+	    shieldsOff = deShieldSnowball;
+    	playerColor = COLOR_GRAY;
+    }
+
+   	SWITCH_IN_PREV_BANK(old);
 	
     wrapPlayerFlameSmall();
 
-    shieldsOn = shieldSnowball;
-	shieldsOff = deShieldSnowball;
-	playerColor = COLOR_GRAY;
 	playerOffset = 8;
 	shotOffset = -8;
 	playerXspeed = 12;
@@ -685,15 +713,32 @@ void initSnowball() {
 
 void initLadybug() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
+
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+	    vdpmemcpy(108*8+0x0800, F18LADYBUG, 24*4*8);			// ship sprites
+	    vdpmemcpy(108*8+0x1000, F18LADYBUG2, 24*4*8);			// ship sprites
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+	    vdpmemcpy(124*8+0x0800, F18ALTLADYBUG, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x0800, &F18ALTLADYBUG[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &F18ALTLADYBUG[8*4*8], 4*4*8);	// right
+	    vdpmemcpy(124*8+0x1000, F18ALTLADYBUG2, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x1000, &F18ALTLADYBUG2[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x1000, &F18ALTLADYBUG2[8*4*8], 4*4*8);	// right
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
+        shieldsOn = shieldLadybug;
+	    shieldsOff = deShieldLadybug;
+	    playerColor = COLOR_MEDRED;
+    }
+
 	SWITCH_IN_PREV_BANK(old);
-	
+
     wrapPlayerFlameSmall();
 
-    shieldsOn = shieldLadybug;
-	shieldsOff = deShieldLadybug;
-	playerColor = COLOR_MEDRED;
 	playerOffset = 16;
 	shotOffset = 16;
 
@@ -703,16 +748,35 @@ void initLadybug() {
 
 void initGnat() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
-	SWITCH_IN_PREV_BANK(old);
-	
-	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
 
-	shieldsOn = shieldGnat;
-	shieldsOff = deShieldGnat;
-	playerColor = COLOR_MEDGREEN;
-	playerOffset = 22;
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+	    vdpmemcpy(108*8+0x0800, F18GNAT, 24*4*8);				// ship sprites
+	    vdpmemcpy(108*8+0x1000, F18GNAT2, 24*4*8);				// ship sprites
+	    shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
+    	vdpmemset(100*8+0x1000, 0, 4*8);					// zero the flame sprites by default
+
+        vdpmemcpy(124*8+0x0800, F18ALTGNAT, 4*4*8);			    // straight
+	    vdpmemcpy(156*8+0x0800, &F18ALTGNAT[4*4*8], 4*4*8);	    // left
+	    vdpmemcpy(188*8+0x0800, &F18ALTGNAT[8*4*8], 4*4*8);	    // right
+        vdpmemcpy(124*8+0x1000, F18ALTGNAT2, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x1000, &F18ALTGNAT2[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x1000, &F18ALTGNAT2[8*4*8], 4*4*8);	// right
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
+	    shieldsOn = shieldGnat;
+	    shieldsOff = deShieldGnat;
+	    playerColor = COLOR_MEDGREEN;
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
+    }
+
+    SWITCH_IN_PREV_BANK(old);
+
+    playerOffset = 22;
 	shotOffset = 23;
 
 	playerXspeed = 12;
@@ -721,16 +785,37 @@ void initGnat() {
 
 void initSelena() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
-	vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
-    vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
-	SWITCH_IN_PREV_BANK(old);
-	
-	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
 
-    shieldsOn = shieldSelena;
-	shieldsOff = deShieldSelena;
-	playerColor = COLOR_LTBLUE;
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+	    vdpmemcpy(108*8+0x0800, F18SELENA, 24*4*8);			// ship sprites
+	    vdpmemcpy(108*8+0x1000, F18SELENA2, 24*4*8);		// ship sprites
+        vdpmemcpy(96*8+0x0800, F18HOMING, 4*8);             // homing shot
+        vdpmemcpy(96*8+0x1000, F18HOMING2, 4*8);            // homing shot
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
+    	vdpmemset(100*8+0x1000, 0, 4*8);					// zero the flame sprites
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+
+        vdpmemcpy(124*8+0x0800, F18ALTSELENA, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x0800, &F18ALTSELENA[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x0800, &F18ALTSELENA[8*4*8], 4*4*8);	// right
+        vdpmemcpy(124*8+0x1000, F18ALTSELENA2, 4*4*8);			// straight
+	    vdpmemcpy(156*8+0x1000, &F18ALTSELENA2[4*4*8], 4*4*8);	// left
+	    vdpmemcpy(188*8+0x1000, &F18ALTSELENA2[8*4*8], 4*4*8);	// right
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
+        vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
+        shieldsOn = shieldSelena;
+	    shieldsOff = deShieldSelena;
+	    playerColor = COLOR_LTBLUE;
+    }
+
+	SWITCH_IN_PREV_BANK(old);
+
 	playerOffset = 8;
 	shotOffset = -8;
 
@@ -740,16 +825,10 @@ void initSelena() {
 
 void shieldCruiser() {
 	unsigned int old = nBank;
-    if (f18a) {
-        // TODO: we don't have to change the pattern anymore, we just turn the sprite on and off
-        // this should automatically be handled in the palette stuff now, no?
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(124*8+0x0800, ALTSHIELDS, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x0800, &ALTSHIELDS[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &ALTSHIELDS[8*4*8], 4*4*8);	// right
-    }
-    
+	SWITCH_IN_BANK5;
+	vdpmemcpy(124*8+0x0800, ALTSHIELDS, 4*4*8);			// straight
+	vdpmemcpy(156*8+0x0800, &ALTSHIELDS[4*4*8], 4*4*8);	// left
+	vdpmemcpy(188*8+0x0800, &ALTSHIELDS[8*4*8], 4*4*8);	// right
     SWITCH_IN_PREV_BANK(old);
 }
 
@@ -791,16 +870,10 @@ void shieldSelena() {
 
 void deShieldCruiser() {
 	unsigned int old = nBank;
-    if (f18a) {
-        // TODO: we don't have to change the pattern anymore, we just turn the sprite on and off
-        // this should automatically be handled in the palette stuff now, no?
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(124*8+0x0800, &SPRITES[124*8], 4*4*8);	// straight
-	    vdpmemcpy(156*8+0x0800, &SPRITES[156*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &SPRITES[188*8], 4*4*8);	// right
-    }
-
+	SWITCH_IN_BANK5;
+	vdpmemcpy(124*8+0x0800, &SPRITES[124*8], 4*4*8);	// straight
+	vdpmemcpy(156*8+0x0800, &SPRITES[156*8], 4*4*8);	// left
+	vdpmemcpy(188*8+0x0800, &SPRITES[188*8], 4*4*8);	// right
     SWITCH_IN_PREV_BANK(old);
 }
 
@@ -838,6 +911,20 @@ void deShieldSelena() {
 	vdpmemcpy(156*8+0x0800, &SELENA[48*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &SELENA[80*8], 4*4*8);	// right
 	SWITCH_IN_PREV_BANK(old);
+}
+
+// for the F18 we can just turn the sprites on and off
+void shieldf18() {
+	sprite(PLAYER_SHIELD,124,13,192,112);
+	sprite(PLAYER_SHIELD+1,128,13,192,128);
+	sprite(PLAYER_SHIELD+2,132,13,208,112);
+	sprite(PLAYER_SHIELD+3,136,13,208,128);
+}
+void deshieldf18() {
+    spdel(PLAYER_SHIELD);
+    spdel(PLAYER_SHIELD+1);
+    spdel(PLAYER_SHIELD+2);
+    spdel(PLAYER_SHIELD+3);
 }
 
 extern void draw1();

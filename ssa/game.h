@@ -117,9 +117,9 @@ extern const unsigned char colecofont[];
 // powerup is 1 sprite
 #define POWERUP_SPRITE 4
 
-// powerup colors
+// powerup colors - hand tuned to also work in F18A 3 color mode
 #define POWERUP_FIRST_COLOR 2
-#define POWERUP_LAST_COLOR 15
+#define POWERUP_LAST_COLOR 12
 // powerup change time in frames
 #define POWERUP_TIME 30
 
@@ -220,6 +220,8 @@ void deShieldSnowball();
 void deShieldLadybug();
 void deShieldGnat();
 void deShieldSelena();
+void shieldf18();
+void deshieldf18();
 void handleTitlePage();
 void reboot();
 void noen(uint8 x);

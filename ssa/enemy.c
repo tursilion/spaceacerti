@@ -195,7 +195,7 @@ void enout() {
 				} 
 				if (scoremode == 3) c=bgColor;	// invisible enemies
 				ech[k]=esc[k];
-				sprite(k+ENEMY_SPRITE,ech[k],c,enr[k],enc[k]);
+				sprite(k+ENEMY_SPRITE,ech[k],c,enr[k],enc[k]);  // c is F18A adjust above
             }
         }
     }
@@ -675,7 +675,7 @@ void enemybeamgen(uint8 x) {
 
 		if (ent[x+6] != ENEMY_BEAM) {
 			// we don't have both sprites available, just draw the one we have
-			sprite(x+ENEMY_SPRITE, ech[x], c, enr[x], enc[x]);
+			sprite(x+ENEMY_SPRITE, ech[x], c, enr[x], enc[x]);  // c is F18A adjusted above
 		} else {
 			// we have a 4 frame cycle to flicker the two sprites over 3 positions
 			// the beam alternates every frame, while the generators get 2
