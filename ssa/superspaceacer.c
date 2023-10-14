@@ -16,6 +16,7 @@
 #include "music.h"
 #include "attract.h"
 #include "boss.h"
+#include "f18load.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "f18sprites.c"
@@ -628,15 +629,6 @@ void f18_loadshieldpal(const unsigned char *p) {
     }
 	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
 }
-// even counts only!
-void f18_vdpmemcpy(int pAddr, const unsigned char *pSrc, int cnt) {
-	VDP_SET_ADDRESS_WRITE(pAddr);
-    cnt >>= 1;
-	while (cnt--) {
-		VDPWD=*(pSrc++);
-		VDPWD=*(pSrc++);
-	}
-}
 
 // these are in here instead of in player to avoid the bank switch overhead when copying
 // graphics swap functions for the player ships.
@@ -645,27 +637,20 @@ void initCruiser() {
 
     if (f18a) {
         SWITCH_IN_BANK14;
-        vdpmemcpy(108*8+0x0800, &F18SPRITES[108*8], 24*4*8);	// ship sprites layer 1
-        vdpmemcpy(108*8+0x1000, &F18SPRITES2[108*8], 24*4*8);	// ship sprites layer 2
+        initCruiserf18();
         playerColor = 12;   // player is always on palette 12
         f18_loadshippal(F18CRUISERPAL);
 	    shieldsOn = shieldf18;
 	    shieldsOff = deshieldf18;
-        // shields
-        vdpmemcpy(124*8+0x0800, F18ALTSHIELDS, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x0800, &F18ALTSHIELDS[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &F18ALTSHIELDS[8*4*8], 4*4*8);	// right
-        vdpmemcpy(124*8+0x1000, F18ALTSHIELDS2, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x1000, &F18ALTSHIELDS2[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x1000, &F18ALTSHIELDS2[8*4*8], 4*4*8);	// right
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
-	    SWITCH_IN_PREV_BANK(old);
     	playerColor = COLOR_MEDRED;
 	    shieldsOn = shieldCruiser;
 	    shieldsOff = deShieldCruiser;
     }
+
+    SWITCH_IN_PREV_BANK(old);
 
     wrapPlayerFlameSmall();
 	
@@ -680,19 +665,11 @@ void initSnowball() {
 
     if (f18a) {
         SWITCH_IN_BANK14;
-    	vdpmemcpy(108*8+0x0800, F18SNOWBALL, 24*4*8);			// ship sprites
-    	vdpmemcpy(108*8+0x1000, F18SNOWBALL2, 24*4*8);			// ship sprites
+        initSnowballf18();
     	playerColor = 12;
         f18_loadshippal(F18SNOWBALLPAL);
         shieldsOn = shieldf18;
 	    shieldsOff = deshieldf18;
-        // shields
-	    vdpmemcpy(124*8+0x0800, F18ALTSNOWBALL, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x0800, &F18ALTSNOWBALL[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &F18ALTSNOWBALL[8*4*8], 4*4*8);	// right
-	    vdpmemcpy(124*8+0x1000, F18ALTSNOWBALL2, 4*4*8);		// straight
-	    vdpmemcpy(156*8+0x1000, &F18ALTSNOWBALL2[4*4*8], 4*4*8);// left
-	    vdpmemcpy(188*8+0x1000, &F18ALTSNOWBALL2[8*4*8], 4*4*8);// right
     } else {
     	SWITCH_IN_BANK5;
     	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
@@ -716,17 +693,11 @@ void initLadybug() {
 
     if (f18a) {
 	    SWITCH_IN_BANK14;
-	    vdpmemcpy(108*8+0x0800, F18LADYBUG, 24*4*8);			// ship sprites
-	    vdpmemcpy(108*8+0x1000, F18LADYBUG2, 24*4*8);			// ship sprites
+        initLadybugf18();
         shieldsOn = shieldf18;
 	    shieldsOff = deshieldf18;
 	    playerColor = 12;
-	    vdpmemcpy(124*8+0x0800, F18ALTLADYBUG, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x0800, &F18ALTLADYBUG[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &F18ALTLADYBUG[8*4*8], 4*4*8);	// right
-	    vdpmemcpy(124*8+0x1000, F18ALTLADYBUG2, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x1000, &F18ALTLADYBUG2[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x1000, &F18ALTLADYBUG2[8*4*8], 4*4*8);	// right
+        f18_loadshippal(F18LADYBUGPAL);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
@@ -751,20 +722,11 @@ void initGnat() {
 
     if (f18a) {
 	    SWITCH_IN_BANK14;
-	    vdpmemcpy(108*8+0x0800, F18GNAT, 24*4*8);				// ship sprites
-	    vdpmemcpy(108*8+0x1000, F18GNAT2, 24*4*8);				// ship sprites
+        initGnatf18();
 	    shieldsOn = shieldf18;
 	    shieldsOff = deshieldf18;
 	    playerColor = 12;
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
-    	vdpmemset(100*8+0x1000, 0, 4*8);					// zero the flame sprites by default
-
-        vdpmemcpy(124*8+0x0800, F18ALTGNAT, 4*4*8);			    // straight
-	    vdpmemcpy(156*8+0x0800, &F18ALTGNAT[4*4*8], 4*4*8);	    // left
-	    vdpmemcpy(188*8+0x0800, &F18ALTGNAT[8*4*8], 4*4*8);	    // right
-        vdpmemcpy(124*8+0x1000, F18ALTGNAT2, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x1000, &F18ALTGNAT2[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x1000, &F18ALTGNAT2[8*4*8], 4*4*8);	// right
+        f18_loadshippal(F18GNATPAL);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
@@ -788,22 +750,11 @@ void initSelena() {
 
     if (f18a) {
 	    SWITCH_IN_BANK14;
-	    vdpmemcpy(108*8+0x0800, F18SELENA, 24*4*8);			// ship sprites
-	    vdpmemcpy(108*8+0x1000, F18SELENA2, 24*4*8);		// ship sprites
-        vdpmemcpy(96*8+0x0800, F18HOMING, 4*8);             // homing shot
-        vdpmemcpy(96*8+0x1000, F18HOMING2, 4*8);            // homing shot
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
-    	vdpmemset(100*8+0x1000, 0, 4*8);					// zero the flame sprites
+        initSelenaf18();
         shieldsOn = shieldf18;
 	    shieldsOff = deshieldf18;
 	    playerColor = 12;
-
-        vdpmemcpy(124*8+0x0800, F18ALTSELENA, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x0800, &F18ALTSELENA[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x0800, &F18ALTSELENA[8*4*8], 4*4*8);	// right
-        vdpmemcpy(124*8+0x1000, F18ALTSELENA2, 4*4*8);			// straight
-	    vdpmemcpy(156*8+0x1000, &F18ALTSELENA2[4*4*8], 4*4*8);	// left
-	    vdpmemcpy(188*8+0x1000, &F18ALTSELENA2[8*4*8], 4*4*8);	// right
+        f18_loadshippal(F18SELENAPAL);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
@@ -1334,14 +1285,18 @@ void playmv()
 	uint8 x;
 
 	//sploct(PLAYER_SPRITE,r,c);
-	sploct(PLAYER_SHIELD,SHIP_R,SHIP_C);
 	sploct(PLAYER_SPRITE+1,SHIP_R,SHIP_C+16);
-	sploct(PLAYER_SHIELD+1,SHIP_R,SHIP_C+16);
 	sploct(PLAYER_SPRITE+2,SHIP_R+16,SHIP_C);
-	sploct(PLAYER_SHIELD+2,SHIP_R+16,SHIP_C);
 	sploct(PLAYER_SPRITE+3,SHIP_R+16,SHIP_C+16);
-	sploct(PLAYER_SHIELD+3,SHIP_R+16,SHIP_C+16);
-	sploct(PLAYER_FLAME,SHIP_R+32,SHIP_C+8);
+
+    if ((!f18a)||(shield > 0)) {
+        sploct(PLAYER_SHIELD,SHIP_R,SHIP_C);
+	    sploct(PLAYER_SHIELD+1,SHIP_R,SHIP_C+16);
+	    sploct(PLAYER_SHIELD+2,SHIP_R+16,SHIP_C);
+	    sploct(PLAYER_SHIELD+3,SHIP_R+16,SHIP_C+16);
+    }
+	
+    sploct(PLAYER_FLAME,SHIP_R+32,SHIP_C+8);
 	
 	// set shield color
 	if (shield != oldshield) {
@@ -1350,23 +1305,41 @@ void playmv()
 			shieldsOn();
 		}
 
-		if (shield > 70) {
-			x=COLOR_WHITE;
-		} else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
-			x=COLOR_DKYELLOW;
-		} else if (shield > 0) {
-			x=COLOR_DKRED;
-		} else {
-			x=COLOR_BLACK;
+        if (f18a) {
+            unsigned int old = nBank;
+            SWITCH_IN_BANK14;
 
-			// done with shield, back to normal
-			shieldsOff();
-		}
+		    if (shield > 70) {
+                f18_loadshieldpal(F18SHIELDMAX);
+		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
+                f18_loadshieldpal(F18SHIELDMED);
+		    } else if (shield > 0) {
+                f18_loadshieldpal(F18SHIELDLOW);
+		    } else {
+			    // done with shield, back to normal
+			    shieldsOff();
+		    }
 
-		spcolr(PLAYER_SHIELD,x); 
-		spcolr(PLAYER_SHIELD+1,x); 
-		spcolr(PLAYER_SHIELD+2,x); 
-		spcolr(PLAYER_SHIELD+3,x);
+            SWITCH_IN_PREV_BANK(old);
+        } else {
+		    if (shield > 70) {
+			    x=COLOR_WHITE;
+		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
+			    x=COLOR_DKYELLOW;
+		    } else if (shield > 0) {
+			    x=COLOR_DKRED;
+		    } else {
+			    x=COLOR_BLACK;
+
+			    // done with shield, back to normal
+			    shieldsOff();
+		    }
+
+		    spcolr(PLAYER_SHIELD,x); 
+		    spcolr(PLAYER_SHIELD+1,x); 
+		    spcolr(PLAYER_SHIELD+2,x); 
+		    spcolr(PLAYER_SHIELD+3,x);
+        }
 
 		oldshield = shield;
 	}

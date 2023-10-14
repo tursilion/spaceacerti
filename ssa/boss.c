@@ -501,7 +501,7 @@ void mboss() {
 						ech[a]=HOMINGFRAMES;
 						enr[a]=71+(br<<3); 
 						enc[a]=(bc<<1)+35;
-						sprite(a+ENEMY_SPRITE,84,f18a?4:COLOR_WHITE,enr[a],enc[a]);
+						sprite(a+ENEMY_SPRITE,84,f18a?14:COLOR_WHITE,enr[a],enc[a]);
 						break;
 					}
 				}

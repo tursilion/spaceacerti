@@ -115,6 +115,7 @@
 	.area _bank14
 		.ascii "LinkTag:Bank14\0"
         .area _f18sprites
+        .area _f18load
 
 	.area _bank15
 		.ascii "LinkTag:Bank15\0"

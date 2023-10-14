@@ -157,6 +157,9 @@
     <ClCompile Include="f18sprites.c">
       <Filter>Gfx</Filter>
     </ClCompile>
+    <ClCompile Include="f18load.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -193,6 +196,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="boss.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="f18load.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
