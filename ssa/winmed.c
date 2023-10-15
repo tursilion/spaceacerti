@@ -1,5 +1,6 @@
 // libti99
 #include <vdp.h>
+#include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
 #include <ColecoSNPlay.h>
@@ -134,6 +135,11 @@ void gamewinmedium() {
 	VDP_SET_REGISTER(VDP_REG_SAL, 0x0f);	// SAL at >0780
 	VDP_SET_REGISTER(VDP_REG_SDT, 0x02);	// SDT at >1000
     screen(COLOR_BLACK);
+
+    if (f18a) {
+        // lock it down to single color sprite mode
+        VDP_SET_REGISTER(F18A_REG_ECM, 0);
+    }
 
 	// We can't use most of the helper facilities, so we do the VDP work inline
 	// we can't use waitforstep either because the sprite table's in the wrong place

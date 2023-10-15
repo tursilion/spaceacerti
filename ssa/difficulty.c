@@ -323,7 +323,7 @@ void soundtest() {
 			if (KSCAN_JOYY == JOY_UP) {
 				playsfx_pwrpulse();
 			} else {
-				// nothing
+    			StartMusic(WINANIMMUS, 0);
 			}
 			break;
 

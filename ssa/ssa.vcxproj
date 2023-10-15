@@ -99,6 +99,16 @@
     <ClCompile Include="f18load.c" />
     <ClCompile Include="f18sprites.c" />
     <ClCompile Include="font.c" />
+    <ClCompile Include="gnat1rlec.c" />
+    <ClCompile Include="gnat1rlep.c" />
+    <ClCompile Include="gnat2rlec.c" />
+    <ClCompile Include="gnat2rlep.c" />
+    <ClCompile Include="gnat3rlec.c" />
+    <ClCompile Include="gnat3rlep.c" />
+    <ClCompile Include="gnat4rlec.c" />
+    <ClCompile Include="gnat4rlep.c" />
+    <ClCompile Include="gnat5rlec.c" />
+    <ClCompile Include="gnat5rlep.c" />
     <ClCompile Include="human.c" />
     <ClCompile Include="ladybugc.c" />
     <ClCompile Include="ladybugp.c" />
@@ -140,6 +150,7 @@
     <ClInclude Include="..\..\..\..\coleco\libti99coleco\sound.h" />
     <ClInclude Include="..\..\..\..\coleco\libti99coleco\string.h" />
     <ClInclude Include="..\..\..\..\coleco\libti99coleco\vdp.h" />
+    <ClInclude Include="..\..\..\libti99coleco\f18a.h" />
     <ClInclude Include="attract.h" />
     <ClInclude Include="boss.h" />
     <ClInclude Include="enemy.h" />

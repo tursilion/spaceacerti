@@ -506,21 +506,17 @@ void RLEUnpackInt(unsigned char *bufp, unsigned char *bufc, unsigned int nMax) {
 	while ((pCnt>0)||(cCnt>0)) {
 		// color
 		while ((cCnt > 0)&&(cAdr <= pAdr+0x2000)) {
-			VDP_SET_ADDRESS_WRITE(cAdr);
-			z=*bufc;
+			z=*(bufc++);
 			if (z&0x80) {
 				// run of bytes
-				bufc++;
 				z&=0x7f;
 				if (z>cCnt) z=cCnt;
-				raw_vdpmemset(*bufc, z);
-				bufc++;
+				vdpmemset(cAdr, *(bufc++), z);
 				cAdr+=z;
 			} else {
 				// sequence of data
-				bufc++;
 				if (z>cCnt) z=cCnt;
-				raw_vdpmemcpy(bufc, z);
+				vdpmemcpy(cAdr, bufc, z);
 				bufc+=z;
 				cAdr+=z;
 			}
@@ -532,21 +528,17 @@ void RLEUnpackInt(unsigned char *bufp, unsigned char *bufc, unsigned int nMax) {
 
 		// pattern
 		while ((pCnt > 0)&&(cAdr-0x2000 >= pAdr)) {
-			VDP_SET_ADDRESS_WRITE(pAdr);
-			z=*bufp;
+			z=*(bufp++);
 			if (z&0x80) {
 				// run of bytes
-				bufp++;
 				z&=0x7f;
 				if (z > pCnt) z=pCnt;
-				raw_vdpmemset(*bufp, z);
-				bufp++;
+				vdpmemset(pAdr, *(bufp++), z);
 				pAdr+=z;
 			} else {
 				// sequence of data
-				bufp++;
 				if (z > pCnt) z=pCnt;
-				raw_vdpmemcpy(bufp, z);
+				vdpmemcpy(pAdr, bufp, z);
 				bufp+=z;
 				pAdr+=z;
 			}
@@ -935,9 +927,8 @@ void main() {
 	if (seed == 0) ++seed;
 
     if (f18a) {
-        VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);  // go ahead and disable flicker, we don't need it
-        VDP_SET_REGISTER(F18A_REG_EXTRAPAL, 0); // default modes use the default palette
-        VDP_SET_REGISTER(F18A_REG_SIZES, 0);    // 2k table sizes for pattern tables
+        SWITCH_IN_BANK14;
+        initF18GPU();                           // and load the GPU code and init the graphics
     }
 
     initSound();
@@ -1453,4 +1444,15 @@ void reboot() {
     *SAVEDF18A = f18a;
 
 	hwreboot();	// never returns
+}
+
+void myvdpmemset(int pAddr, unsigned char ch, int cnt) {
+    if ((f18a)&&(cnt>6)) {
+
+    } else {
+	    VDP_SET_ADDRESS_WRITE(pAddr);
+	    while (cnt--) {
+		    VDPWD = ch;
+	    }
+    }
 }

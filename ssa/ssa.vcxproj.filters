@@ -160,6 +160,36 @@
     <ClCompile Include="f18load.c">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="gnat1rlec.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat1rlep.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat2rlec.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat2rlep.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat3rlec.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat3rlep.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat4rlec.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat4rlep.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat5rlec.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="gnat5rlep.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -200,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="f18load.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99coleco\f18a.h">
+      <Filter>libti99</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

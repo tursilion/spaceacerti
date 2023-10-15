@@ -914,6 +914,7 @@ void gnatwin() {
 void snowballwin() {
     unsigned char i;
 	const unsigned char DELAYT = 180;
+    unsigned char playerColor;
 
     level = 6;  // flag end music
     shield = 0; // clear any remaining shield
@@ -988,6 +989,9 @@ void snowballwin() {
     bmpsprite(1, 36, 1, CUTLINE, 255);
     bmpsprite(2, 36, 1, CUTLINE, 255);
     bmpsprite(3, 36, 1, CUTLINE, 255);
+
+    // set the player color for non-F18A sprites
+    playerColor = COLOR_GRAY;
 
     // 50 is high enough for even the flame to vanish - 1 extra frame to hide all the sprites
     for (i=192; i>CUTLINE-33; --i) {

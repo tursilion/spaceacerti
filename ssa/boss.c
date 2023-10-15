@@ -12,6 +12,7 @@
 #include "music.h"
 #include "human.h"
 #include "boss.h"
+#include "f18load.h"
 
 // enemy array usage:
 // 0-2	engines
@@ -664,13 +665,11 @@ uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr) {
 		b=gchar(rd,cd);
 		if (b>=BOSS_START) {
 			// potential - check the character pattern
-			p=(b<<3)+gPATTERN+4;
-			tmpbuf[0] = vdpreadchar(p);
+			p=(b<<3)+gPATTERN;
+			tmpbuf[0] = vdpreadchar(p+4);
 			if (tmpbuf[0]) {
 				// this block is solid, nuke it
 				// need to read the whole block
-				//p=(b<<3)+gPATTERN;
-				p-=4;
 				AddDamage(p);
 				addscore(1);
 				if (pwr==PWRPULSE+2) {
@@ -905,43 +904,54 @@ void byboss() {
  
 // damage pattern for smooth horizontal scrolling for the boss
 void AddDamage(unsigned int ptr) {
- 	// add 8 bytes of random noise at ptr, but we
- 	// also need to shift it through the other 3 tables
- 	unsigned short *mask;	// needs 16 bytes
- 	unsigned char idx,idx2;
+    if (f18a) {
+        // we have a GPU program to do this
+        VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
+        VDPWD = (ptr>>8);   // no need for delays either!
+        VDPWD = (ptr&0xff);
+        VDPWD = 0;          // no data
+        VDPWD = 0;
+        VDPWD = 0;
+        VDPWD = 1;          // command to go
+    } else {
+ 	    // add 8 bytes of random noise at ptr, but we
+ 	    // also need to shift it through the other 3 tables
+ 	    unsigned short *mask;	// needs 16 bytes
+ 	    unsigned char idx,idx2;
 
-	// Tried unrolling and making this explicit - but it was exactly
-	// the same speed, even over 15,000 iterations. So left the loops.
+	    // Tried unrolling and making this explicit - but it was exactly
+	    // the same speed, even over 15,000 iterations. So left the loops.
 
-	// alias mask to the second half of tmpbuf, which is 32 bytes
-	mask=(unsigned short*)&tmpbuf[16];
+	    // alias mask to the second half of tmpbuf, which is 32 bytes
+	    mask=(unsigned short*)&tmpbuf[16];
 
-	// do initial pattern
-	vdpmemread(ptr, tmpbuf, 8);
-	tmpbuf[4]=0;
+	    // do initial pattern
+	    vdpmemread(ptr, tmpbuf, 8);
+	    tmpbuf[4]=0;
 
-	for (idx=0; idx<8; idx++) {
- 		mask[idx]=rndnum()&0xff;
- 		tmpbuf[idx]&=mask[idx];
-		mask[idx]<<=8;
-		mask[idx]|=0xff;
- 	}
- 	mask[4]=0x00ff;				// test line, wipe it
+	    for (idx=0; idx<8; idx++) {
+ 		    mask[idx]=rndnum()&0xff;
+ 		    tmpbuf[idx]&=mask[idx];
+		    mask[idx]<<=8;
+		    mask[idx]|=0xff;
+ 	    }
+ 	    mask[4]=0x00ff;				// test line, wipe it
 
- 	vdpmemcpy(ptr, tmpbuf, 8);
+ 	    vdpmemcpy(ptr, tmpbuf, 8);
 
-	// do the rest of the patterns
-	for (idx=0; idx<3; idx++) {
- 		ptr+=SCROLL_OFFSET;				// offset is to the next table
- 		vdpmemread(ptr, tmpbuf, 16);
- 		for (idx2=0; idx2<8; idx2++) {
- 			mask[idx2]>>=2;		// shift 2 pixels right
- 			mask[idx2]|=0xc000;	// preserve shifted in pixels
- 			tmpbuf[idx2]&=(mask[idx2]>>8)&0xff;
- 			tmpbuf[idx2+8]&=mask[idx2]&0xff;
- 		}
- 		vdpmemcpy(ptr,tmpbuf,16);
- 	}
+	    // do the rest of the patterns
+	    for (idx=0; idx<3; idx++) {
+ 		    ptr+=SCROLL_OFFSET;				// offset is to the next table
+ 		    vdpmemread(ptr, tmpbuf, 16);
+ 		    for (idx2=0; idx2<8; idx2++) {
+ 			    mask[idx2]>>=2;		// shift 2 pixels right
+ 			    mask[idx2]|=0xc000;	// preserve shifted in pixels
+ 			    tmpbuf[idx2]&=(mask[idx2]>>8)&0xff;
+ 			    tmpbuf[idx2+8]&=mask[idx2]&0xff;
+ 		    }
+ 		    vdpmemcpy(ptr,tmpbuf,16);
+ 	    }
+    }
 }
 
 // handle smooth horizontal scrolling for the boss

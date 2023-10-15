@@ -1,19 +1,9 @@
-- ending for Snowball
-- ending for cruiser
--- add intersital animations flying to a planet - every other stage on a planet level:
-       space, jungle, space, water, space, [secret warp stage?]
-       
--If I need another music for ending music - the stage 1 music sounds /awesome/ at 50% speed (once it gets into it) ;)
--Ground on levels after the first (air (clouds), earth, water, fire? see what works with bosses)
-
 ==F18A alternate version (better sprite graphics at least)==
-- The ROM has about 96k free total right now
-- I have made enough room in VDP for the second graphics layer, we can do 2 layer (3 color) sprites.
-- Need to redraw all sprites in the expanded colors, for 4 more k of data plus the extra for dynamic graphics like ships.
-  We can dedicate a palette to these as well, though all will have to share 15 colors
+- F18A GPU code for AddDamage function to remove slowdown
+- F18A GPU code (maybe?) for the GnatWin scaling function
+- F18A GPU code (maybe?) for SelenaWin scroll
 - bosses can be drawn using the bitmap layer of F18A, though I'll need to implement emulation of it. I believe you get
   3 colors normal or 15 colors fat - we can dedicate a palette to this layer
-- and dedicate a palette to the player?
 - for the screens we can stay with bitmap, but do a palette, perhaps? We have the following screens:
     - title page
     - 4 frames of animated ship (approximately 1/4 screen each)
@@ -29,6 +19,7 @@
 - there are also 5 bosses to be converted to 4 color bitmap. At existing sizes (88x64,88x88,88x56,88x96,120x72) that's 
   1408 + 1936 + 1232 + 2112 + 2160 bytes = 8848 bytes unpacked.
 - So figure about 12k for expanded in-game graphics, no biggie, and 132k for screens with palettes (32 bytes extra each).
+- Add F18A Enhanced logo if room
 
 VRAM map (except for ending routines)
 --------
@@ -45,6 +36,7 @@ VRAM map (except for ending routines)
  >2800	Pattern table (scroll 4)
  >3000	Pattern table (scroll 6)
  >3800	(unused)
+ >3C80  Reserved for register writes to F18A GPU
  >3D00	wraparound memory overwritten by boss draw code
 
 SPRITE PATTERNS
