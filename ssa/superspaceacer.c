@@ -1445,14 +1445,3 @@ void reboot() {
 
 	hwreboot();	// never returns
 }
-
-void myvdpmemset(int pAddr, unsigned char ch, int cnt) {
-    if ((f18a)&&(cnt>6)) {
-
-    } else {
-	    VDP_SET_ADDRESS_WRITE(pAddr);
-	    while (cnt--) {
-		    VDPWD = ch;
-	    }
-    }
-}
