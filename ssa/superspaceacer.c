@@ -1048,6 +1048,8 @@ titleagain:
 		}
 
 		distns=stage_distns[0];
+        if (nDifficulty == DIFFICULTY_EASY) distns-=300;
+        if (nDifficulty == DIFFICULTY_MEDIUM) distns-=150;
 		if (joynum == 0) {
 			// start at an offset to make attract mode a little more random
 			distns -= rndnum();
@@ -1080,6 +1082,8 @@ titleagain:
 			if ((flag != PLAYER_DIED) && (flag != PLAYER_DIED_DURING_BOSS)) {
 				// Boss was defeated!
 				distns=stage_distns[level];		// do this BEFORE we increment, cause it's -1
+                if (nDifficulty == DIFFICULTY_EASY) distns-=300;
+                if (nDifficulty == DIFFICULTY_MEDIUM) distns-=150;
 				level++; 
 			}
 		}

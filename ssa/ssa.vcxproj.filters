@@ -190,6 +190,9 @@
     <ClCompile Include="gnat5rlep.c">
       <Filter>Gfx</Filter>
     </ClCompile>
+    <ClCompile Include="f18abosses.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -233,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\libti99coleco\f18a.h">
       <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="f18abosses.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

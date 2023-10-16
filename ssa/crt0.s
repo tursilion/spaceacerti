@@ -119,6 +119,7 @@
 
 	.area _bank15
 		.ascii "LinkTag:Bank15\0"
+        .area _f18bosses
 
 	;; end of list - needed for makemegacart. Must go before RAM areas.
 	; This isn't used by anything else and should not contain data

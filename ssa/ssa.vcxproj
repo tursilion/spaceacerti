@@ -96,6 +96,7 @@
     <ClCompile Include="cruiserend_p.c" />
     <ClCompile Include="difficulty.c" />
     <ClCompile Include="enemy.c" />
+    <ClCompile Include="f18abosses.c" />
     <ClCompile Include="f18load.c" />
     <ClCompile Include="f18sprites.c" />
     <ClCompile Include="font.c" />
@@ -154,6 +155,7 @@
     <ClInclude Include="attract.h" />
     <ClInclude Include="boss.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="f18abosses.h" />
     <ClInclude Include="f18load.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="human.h" />
