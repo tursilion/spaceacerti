@@ -10,6 +10,7 @@
 #include "enemy.h"
 #include "human.h"
 #include "boss.h"
+#include "f18load.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "selena_end_c.c"
@@ -33,6 +34,7 @@
 #include "snowballbase_c.c"
 #include "snowballbase_p.c"
 #include "f18sprites.c"
+#include "f18abosses.c"
 
 // I don't THINK these need to be recursive, but just in case
 #pragma nooverlay
@@ -460,4 +462,158 @@ void wrapLoadSnowballBase() {
     SWITCH_IN_BANK1;
     RLEUnpackInt(SNOWBALLBASEP, SNOWBALLBASEC, 6144);
     SWITCH_IN_PREV_BANK(old);
+}
+
+// returns 0 if finished
+unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
+    unsigned int old = nBank;
+    unsigned char ret = 1;
+
+    SWITCH_IN_BANK15;
+
+    // we load the F18A boss one scanline at a time in place of the shifting code
+    // the largest boss only needs about 2k of data
+    // Output width is always 128 pixels (32 bytes). Min stride is 64 bytes
+    // and doing that will allow us to scroll the boss onscreen by changing the offset
+    // This means the largest boss will actually take 3k in VRAM! But, we have that much. ;)
+
+    switch (n) {
+        case 1: 
+            if (scanline < F18BOSS1H) {
+                vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat1[scanline*(F18BOSS1W/4)], F18BOSS1W/4);
+                vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS1W/4), 0, 32-(F18BOSS1W/4));
+            } else {
+                loadpal_f18a(f18bosspal1, 16, 16);
+                ret = 0;
+            }
+            break;
+
+        case 2: 
+            if (scanline < F18BOSS2H) {
+                vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat2[scanline*(F18BOSS2W/4)], F18BOSS2W/4);
+                vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS2W/4), 0, 32-(F18BOSS2W/4));
+            } else {
+                loadpal_f18a(f18bosspal2, 16, 16);
+                ret = 0;
+            }
+            break;
+
+        case 3: 
+            if (scanline < F18BOSS3H) {
+                vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat3[scanline*(F18BOSS3W/4)], F18BOSS3W/4);
+                vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS3W/4), 0, 32-(F18BOSS3W/4));
+            } else {
+                loadpal_f18a(f18bosspal3, 16, 16);
+                ret = 0;
+            }
+            break;
+
+        case 4: 
+            if (scanline < F18BOSS4H) {
+                vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat4[scanline*(F18BOSS4W/4)], F18BOSS4W/4);
+                vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS4W/4), 0, 32-(F18BOSS4W/4));
+            } else {
+                loadpal_f18a(f18bosspal4, 16, 16);
+                ret = 0;
+            }
+            break;
+
+        case 5: 
+            if (scanline < F18BOSS5H) {
+                vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat5[scanline*(F18BOSS5W/4)], F18BOSS5W/4);
+                vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS5W/4), 0, 32-(F18BOSS5W/4));
+            } else {
+                loadpal_f18a(f18bosspal5, 16, 16);
+                ret = 0;
+            }
+            break;
+    }
+
+    SWITCH_IN_PREV_BANK(old);
+    return ret;
+}
+
+void wrapLoadF18MainPalette() {
+    unsigned int old = nBank;
+
+    // just the palette overwritten by the boss
+    SWITCH_IN_BANK14;
+    loadpal_f18a(&F18PALETTE[16], 16, 16);
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapInitCruiser() {
+	unsigned int old = nBank;
+
+    if (f18a) {
+        SWITCH_IN_BANK14;
+        initCruiserf18();
+        loadpal_f18a(F18CRUISERPAL, 49, 3);
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
+    }
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapInitSnowball() {
+	unsigned int old = nBank;
+
+    if (f18a) {
+        SWITCH_IN_BANK14;
+        initSnowballf18();
+        loadpal_f18a(F18SNOWBALLPAL, 49, 3);
+    } else {
+    	SWITCH_IN_BANK5;
+    	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
+    }
+
+   	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapInitLadybug() {
+	unsigned int old = nBank;
+
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+        initLadybugf18();
+        loadpal_f18a(F18LADYBUGPAL, 49, 3);
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
+    }
+
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapInitGnat() {
+	unsigned int old = nBank;
+
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+        initGnatf18();
+        loadpal_f18a(F18GNATPAL, 49, 3);
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
+    }
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapInitSelena() {
+	unsigned int old = nBank;
+
+    if (f18a) {
+	    SWITCH_IN_BANK14;
+        initSelenaf18();
+        loadpal_f18a(F18SELENAPAL, 49, 3);
+    } else {
+	    SWITCH_IN_BANK5;
+	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
+        vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
+    }
+
+	SWITCH_IN_PREV_BANK(old);
 }

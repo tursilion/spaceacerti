@@ -451,6 +451,9 @@ void enemybomb(uint8 x) {
 	}
 }
 
+const unsigned int bulletColor1[4] = { 0x00d0, 0x0e22 };   // green on red
+const unsigned int bulletColor2[4] = { 0x0e22, 0x00d0 };   // red on green
+
 void enemyshot(uint8 x) {
 	static unsigned char cnt=0;
 
@@ -460,22 +463,10 @@ void enemyshot(uint8 x) {
 	// flash the enemy bullets
     if (f18a) {
         if (cnt == 4) {
-            VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|37);
-            // Reg 47, value: 1111 0001, DPM = 1, AUTO INC = 1, palreg 37 (36 is transparent)
-            VDPWD=0x00;
-            VDPWD=0xd0; // green
-            VDPWD=0x0e;
-            VDPWD=0x22; // red
-        	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
+            loadpal_f18a(bulletColor1, 37, 2);
         } else if (cnt == 8) {
             cnt = 0;
-            VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|37);
-            // Reg 47, value: 1111 0001, DPM = 1, AUTO INC = 1, palreg 37 (36 is transparent)
-            VDPWD=0x0e;
-            VDPWD=0x22; // red
-            VDPWD=0x00;
-            VDPWD=0xd0; // green
-        	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
+            loadpal_f18a(bulletColor2, 37, 2);
         }
     } else {
         // change the color

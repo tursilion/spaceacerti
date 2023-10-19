@@ -56,6 +56,10 @@ uint8 pcr4,ptp4,pr4,pc4,p4Time;		// powerup settings
 unsigned char CanNotShoot;
 unsigned char playerXspeed, playerYspeed;
 
+// superspaceacer.c
+extern void (*shieldsOn)();
+extern void (*shieldsOff)();
+
 // kind of a sine table, generated with blassic to look like joystick outputs
 const signed char SINEISH[128] = {
 	0,0,0,0,4,4,4,4,4,0,0,0,0,4,4,4,4,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
@@ -967,3 +971,108 @@ void dyen(unsigned char x) {
     }
 }
  
+void initCruiser() {
+    wrapInitCruiser();
+
+    if (f18a) {
+        playerColor = 12;   // player is always on palette 12
+	    shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+    } else {
+    	playerColor = COLOR_MEDRED;
+	    shieldsOn = shieldCruiser;
+	    shieldsOff = deShieldCruiser;
+    }
+
+    wrapPlayerFlameSmall();
+	
+	playerOffset = 8;
+	shotOffset = -7;
+	playerXspeed = 10;
+	playerYspeed = 6;
+}
+
+void initSnowball() {
+    wrapInitSnowball();
+
+    if (f18a) {
+    	playerColor = 12;
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+    } else {
+        shieldsOn = shieldSnowball;
+	    shieldsOff = deShieldSnowball;
+    	playerColor = COLOR_GRAY;
+    }
+
+    wrapPlayerFlameSmall();
+
+	playerOffset = 8;
+	shotOffset = -8;
+	playerXspeed = 12;
+	playerYspeed = 8;
+}
+
+void initLadybug() {
+    wrapInitLadybug();
+
+    if (f18a) {
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+    } else {
+        shieldsOn = shieldLadybug;
+	    shieldsOff = deShieldLadybug;
+	    playerColor = COLOR_MEDRED;
+    }
+
+    wrapPlayerFlameSmall();
+
+	playerOffset = 16;
+	shotOffset = 16;
+
+	playerXspeed = 12;
+	playerYspeed = 8;
+}
+
+void initGnat() {
+    wrapInitGnat();
+
+    if (f18a) {
+	    shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+    } else {
+	    shieldsOn = shieldGnat;
+	    shieldsOff = deShieldGnat;
+	    playerColor = COLOR_MEDGREEN;
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
+    }
+
+    playerOffset = 22;
+	shotOffset = 23;
+
+	playerXspeed = 12;
+	playerYspeed = 8;
+}
+
+void initSelena() {
+    wrapInitSelena();
+
+    if (f18a) {
+        shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
+	    playerColor = 12;
+    } else {
+    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
+        shieldsOn = shieldSelena;
+	    shieldsOff = deShieldSelena;
+	    playerColor = COLOR_LTBLUE;
+    }
+
+	playerOffset = 8;
+	shotOffset = -8;
+
+	playerXspeed = 12;
+	playerYspeed = 8;
+}

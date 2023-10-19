@@ -599,173 +599,6 @@ void DelSprButPlayer(unsigned char x) {
 	}
 }
 
-void f18_loadshippal(const unsigned char *p) {
-    VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|49);
-    // Reg 47, value: 1111 0001, DPM = 1, AUTO INC = 1, palreg 49 (48 is transparent)
-
-    // it's F18, so we know that no delay is needed
-    for (unsigned char idx=0; idx<3; ++idx) {
-        VDPWD=*(p++);
-        VDPWD=*(p++);
-    }
-	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
-}
-void f18_loadshieldpal(const unsigned char *p) {
-    VDP_SET_REGISTER(F18A_REG_DPM, F18A_DPM_ENABLE|F18A_DPM_INC|53);
-    // Reg 47, value: 1111 0101, DPM = 1, AUTO INC = 1, palreg 53 (52 is transparent)
-
-    // it's F18, so we know that no delay is needed
-    for (unsigned char idx=0; idx<3; ++idx) {
-        VDPWD=*(p++);
-        VDPWD=*(p++);
-    }
-	VDP_SET_REGISTER(F18A_REG_DPM, 0x00);	// Turn off the DPM mode
-}
-
-// these are in here instead of in player to avoid the bank switch overhead when copying
-// graphics swap functions for the player ships.
-void initCruiser() {
-	unsigned int old = nBank;
-
-    if (f18a) {
-        SWITCH_IN_BANK14;
-        initCruiserf18();
-        playerColor = 12;   // player is always on palette 12
-        f18_loadshippal(F18CRUISERPAL);
-	    shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
-    	playerColor = COLOR_MEDRED;
-	    shieldsOn = shieldCruiser;
-	    shieldsOff = deShieldCruiser;
-    }
-
-    SWITCH_IN_PREV_BANK(old);
-
-    wrapPlayerFlameSmall();
-	
-	playerOffset = 8;
-	shotOffset = -7;
-	playerXspeed = 10;
-	playerYspeed = 6;
-}
-
-void initSnowball() {
-	unsigned int old = nBank;
-
-    if (f18a) {
-        SWITCH_IN_BANK14;
-        initSnowballf18();
-    	playerColor = 12;
-        f18_loadshippal(F18SNOWBALLPAL);
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-    } else {
-    	SWITCH_IN_BANK5;
-    	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
-        shieldsOn = shieldSnowball;
-	    shieldsOff = deShieldSnowball;
-    	playerColor = COLOR_GRAY;
-    }
-
-   	SWITCH_IN_PREV_BANK(old);
-	
-    wrapPlayerFlameSmall();
-
-	playerOffset = 8;
-	shotOffset = -8;
-	playerXspeed = 12;
-	playerYspeed = 8;
-}
-
-void initLadybug() {
-	unsigned int old = nBank;
-
-    if (f18a) {
-	    SWITCH_IN_BANK14;
-        initLadybugf18();
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-        f18_loadshippal(F18LADYBUGPAL);
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
-        shieldsOn = shieldLadybug;
-	    shieldsOff = deShieldLadybug;
-	    playerColor = COLOR_MEDRED;
-    }
-
-	SWITCH_IN_PREV_BANK(old);
-
-    wrapPlayerFlameSmall();
-
-	playerOffset = 16;
-	shotOffset = 16;
-
-	playerXspeed = 12;
-	playerYspeed = 8;
-}
-
-void initGnat() {
-	unsigned int old = nBank;
-
-    if (f18a) {
-	    SWITCH_IN_BANK14;
-        initGnatf18();
-	    shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-        f18_loadshippal(F18GNATPAL);
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
-	    shieldsOn = shieldGnat;
-	    shieldsOff = deShieldGnat;
-	    playerColor = COLOR_MEDGREEN;
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
-    }
-
-    SWITCH_IN_PREV_BANK(old);
-
-    playerOffset = 22;
-	shotOffset = 23;
-
-	playerXspeed = 12;
-	playerYspeed = 8;
-}
-
-void initSelena() {
-	unsigned int old = nBank;
-
-    if (f18a) {
-	    SWITCH_IN_BANK14;
-        initSelenaf18();
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-        f18_loadshippal(F18SELENAPAL);
-    } else {
-	    SWITCH_IN_BANK5;
-	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
-        vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
-        shieldsOn = shieldSelena;
-	    shieldsOff = deShieldSelena;
-	    playerColor = COLOR_LTBLUE;
-    }
-
-	SWITCH_IN_PREV_BANK(old);
-
-	playerOffset = 8;
-	shotOffset = -8;
-
-	playerXspeed = 12;
-	playerYspeed = 8;
-}
-
 void shieldCruiser() {
 	unsigned int old = nBank;
 	SWITCH_IN_BANK5;
@@ -920,7 +753,7 @@ void main() {
             } else {
                 // load the palette we plan to use
                 SWITCH_IN_BANK14;
-                loadpal_f18a(F18PALETTE, 64);
+                loadpal_f18a(F18PALETTE, 0, 64);
             }
         }
 	}
@@ -1007,6 +840,7 @@ titleagain:
 	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
 
 	// load the correct ship
+    SWITCH_IN_BANK2;
 	switch (playership) {
 	case SHIP_CRUISER:
 		initCruiser();
@@ -1305,11 +1139,11 @@ void playmv()
             SWITCH_IN_BANK14;
 
 		    if (shield > 70) {
-                f18_loadshieldpal(F18SHIELDMAX);
+                loadpal_f18a(F18SHIELDMAX, 53, 3);
 		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
-                f18_loadshieldpal(F18SHIELDMED);
+                loadpal_f18a(F18SHIELDMED, 53, 3);
 		    } else if (shield > 0) {
-                f18_loadshieldpal(F18SHIELDLOW);
+                loadpal_f18a(F18SHIELDLOW, 53, 3);
 		    } else {
 			    // done with shield, back to normal
 			    shieldsOff();

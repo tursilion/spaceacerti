@@ -4,6 +4,7 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
+#include <f18a.h>
 
 // game
 #include "game.h"
@@ -13,6 +14,9 @@
 #include "human.h"
 #include "boss.h"
 #include "f18load.h"
+
+#define BIN2INC_HEADER_ONLY
+#include "f18abosses.c"
 
 // enemy array usage:
 // 0-2	engines
@@ -138,6 +142,7 @@ void draw2();
 void draw3();
 void draw4();
 void draw5();
+void drawf18();
 
 // this is only called once, the boss flash is handled by changing the color table
 void bosscol(char col) {
@@ -160,6 +165,7 @@ void boss()
 
 	BNR=BOSTAB[p++];
 	BNC=BOSTAB[p++];
+    // F18A will ignore the bossdraw function
 	switch (level) {
 		default:
 		case 1:	bossdraw = draw1; bossShape=bossShape1; break;
@@ -168,13 +174,19 @@ void boss()
 		case 4:	bossdraw = draw4; bossShape=bossShape4; break;
 		case 5:	bossdraw = draw5; bossShape=bossShape5; break;
 	}
+    if (f18a) {
+        // set up the bml width and height registers
+        VDP_SET_REGISTER(F18A_REG_BMLW, 128);   // always 128 pixels wide
+    }
 
 	// try to mask the graphics prep a little
 	wrapstars();
 
-	// Boss pattern is now from BOSS_START to 255, and we reload the pattern here
-	wrapunpackboss(level);
-	wrapstars();
+    if (!f18a) {
+    	// Boss pattern is now from BOSS_START to 255, and we reload the pattern here
+	    wrapunpackboss(level);
+	    wrapstars();
+    }
 
 	for (i=0; i<3; i++) {
 		enginer[i]=BOSTAB[p++];
@@ -195,23 +207,35 @@ void boss()
 	for (i=3; i<12; i++) {
 		ent[i]=ENEMY_NONE;
 	}
+
 	// clear shot table (Seems okay with this disabled!)
 	//for (i=0; i<=NUM_SHOTS; i++) {
 	//	shr[i]=0;	// note: ONLY shr is legal in this loop because it includes NUM_SHOTS
 	//}
-	// no powerup either (should already be gone though)
-	ptp4=POWERUP_NONE;
-	
-	// build the boss tables
-	for (x_idx=0; x_idx<3; x_idx++) {
-		for (x_r=0; x_r<BNR; x_r++) {
-			wrapplayer();
-			wrapstars();	// calls waitforstep()
 
-			PrepareBoss(x_idx, x_r);
-			wrapstars();	// calls waitforstep()
-		}
-	}
+    // no powerup either (should already be gone though)
+	ptp4=POWERUP_NONE;
+
+	// build the boss tables
+    if (f18a) {
+        x_r=0;
+        do {
+            wrapLoadBossF18A(level, x_r++); // okay to call this extra times
+            wrapstars();        // need to do it twice to keep speed steady
+            wrapplayer();
+            wrapstars();        // calls waitforstep()
+        } while (wrapLoadBossF18A(level, x_r++));   // should be quick enough
+    } else {
+	    for (x_idx=0; x_idx<3; x_idx++) {
+		    for (x_r=0; x_r<BNR; x_r++) {
+			    wrapplayer();
+			    wrapstars();	// calls waitforstep()
+
+			    PrepareBoss(x_idx, x_r);
+			    wrapstars();	// calls waitforstep()
+		    }
+	    }
+    }
 
 	// set up the scaled movement speed
 	scaledLevel = level;
@@ -238,7 +262,7 @@ void boss()
 	br=-BNR;
 	if (scoremode == 3) {
 		// invisible enemies
-		bosscol(bgColor);
+		bosscol(bgColor);   // TODO: F18A boss needs help with this
 	} else {
 		bosscol(BOSTAB[p]);
 	}
@@ -329,6 +353,8 @@ void boss()
         if (joynum) {
 	    	byboss();
         } else {
+            // make sure it's turned off and palette restored in case it's F18A
+            erboss();
             // didn't really, but this will end the demo
             flag = PLAYER_DIED_DURING_BOSS;
         }
@@ -342,15 +368,34 @@ void drboss() {
 	unsigned char tc,to;
 	unsigned char roff,coff;
 
-	tc=bc>>2;
+    tc=bc>>2;
 	to=bc&0x03;
 	
-	// update pattern table for scroll pos (0-3 subpixels)
-	//VDP_SET_ADDRESS(0x8402+to);
-    VDP_SET_REGISTER(VDP_REG_PDT, 3+to);
-
-	// handle the inline draw function
-	bossdraw();
+    if (f18a) {
+        // position the bitmap overlay
+        // br is a character row for the boss (negative boss height to 1, I think)
+        // bc is a fat pixel column (0-127), I believe. it might be 2 pixels as we divide by 4 above
+        if (br < 0) {
+            // partially offscreen - adjust the pattern - every vertical step is 2 pixel rows, and br is negative
+            VDP_SET_REGISTER(F18A_REG_BMLADR, 160-(br*4));  // remember BR is negative
+            VDP_SET_REGISTER(F18A_REG_BMLH, BNR*8+(br*8));  // remember BR is negative
+            VDP_SET_REGISTER(F18A_REG_BMLX, bc*2);    // directly?
+            VDP_SET_REGISTER(F18A_REG_BMLY, 0);     // locked to the top row
+        } else {
+            // fully onscreen - just position it
+            VDP_SET_REGISTER(F18A_REG_BMLADR, 160);  // make sure base address is right
+            VDP_SET_REGISTER(F18A_REG_BMLH, BNR*8);  // remember BR is negative
+            VDP_SET_REGISTER(F18A_REG_BMLX, bc*2);   // directly?
+            VDP_SET_REGISTER(F18A_REG_BMLY, br*8);   // I think we move down one
+        }
+        // and set the control register
+        VDP_SET_REGISTER(F18A_REG_BMLCFG, 0xf4);    // enable, over tiles, transparent, fat pixels, palette 4
+    } else {
+    	// update pattern table for scroll pos (0-3 subpixels)
+        VDP_SET_REGISTER(VDP_REG_PDT, 3+to);
+	    // handle the inline draw function
+	    bossdraw();
+    }
 
 	// engines (lowest offset is -8, highest is 20)
 	roff=br<<3;
@@ -392,17 +437,24 @@ void drboss() {
 	}
 }
  
-void erboss() { 
+void erboss() {
 	/*erase boss*/
 	unsigned char i;
 	unsigned int p;
 
-	p=gIMAGE+(bc>>2)+(br<<5);
+    if (f18a) {
+        // just turn it off
+        VDP_SET_REGISTER(F18A_REG_BMLCFG, 0);
+        // and restore the palette for that section of sprites
+        wrapLoadF18MainPalette();
+    } else {
+	    p=gIMAGE+(bc>>2)+(br<<5);
 
-	for (i=0; i<BNR; i++) {
-		vdpmemset(p, 32, BNC);
-		p+=32;
-	}
+	    for (i=0; i<BNR; i++) {
+		    vdpmemset(p, 32, BNC);
+		    p+=32;
+	    }
+    }
 }
 
 void mboss() { 
@@ -415,16 +467,18 @@ void mboss() {
 	if (br < 1) {
 		br++;
 		if (br == 1) {
-			// clear the top row and the left most edge, some of the
-			// bosses leave a little trail. hopefully the one-frame hiccup
-			// is forgivable :)
-			hchar(0, 0, 32, 32);
-			hchar(1, 0, 32, 12);
-			hchar(2, 0, 32, 12);
-			hchar(3, 0, 32, 12);
+            if (!f18a) {
+			    // clear the top row and the left most edge, some of the
+			    // bosses leave a little trail. hopefully the one-frame hiccup
+			    // is forgivable :)
+			    hchar(0, 0, 32, 32);
+			    hchar(1, 0, 32, 12);
+			    hchar(2, 0, 32, 12);
+			    hchar(3, 0, 32, 12);
 
-			// now put the score back too ;)
-			addscore(0);
+			    // now put the score back too ;)
+			    addscore(0);
+            }
 
 			// activate the cockpit sprite
 			ent[6] = ENEMY_SHOT;
@@ -662,30 +716,36 @@ uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr) {
 	rd=sr>>3;
 	if (rd <= br+BNR) {
 		cd=(sc+4)>>3;
-		b=gchar(rd,cd);
-		if (b>=BOSS_START) {
-			// potential - check the character pattern
-			p=(b<<3)+gPATTERN;
-			tmpbuf[0] = vdpreadchar(p+4);
-			if (tmpbuf[0]) {
-				// this block is solid, nuke it
-				// need to read the whole block
-				AddDamage(p);
-				addscore(1);
-				if (pwr==PWRPULSE+2) {
-					// maximum pulse shot does double damage
-					cd++;
-					b=gchar(rd,cd);		// read new char, make sure it's really there
-					if (b>=BOSS_START) {
-						// repeat for the next char
-						p=(b<<3)+gPATTERN;
-						AddDamage(p);
-						addscore(1);
-					}
-				}
-				return 1;	// only one shot per frame hits the boss body (for performance's sake)
-			}
-		}
+        if (f18a) {
+            // TODO: need GPU support as the damage field is now 32 bytes and
+            // needs to take colors into account (mind you it was 32 bytes before too)
+
+        } else {
+		    b=gchar(rd,cd);
+		    if (b>=BOSS_START) {
+			    // potential - check the character pattern
+			    p=(b<<3)+gPATTERN;
+			    tmpbuf[0] = vdpreadchar(p+4);
+			    if (tmpbuf[0]) {
+				    // this block is solid, nuke it
+				    // need to read the whole block
+				    AddDamage(p);
+				    addscore(1);
+				    if (pwr==PWRPULSE+2) {
+					    // maximum pulse shot does double damage
+					    cd++;
+					    b=gchar(rd,cd);		// read new char, make sure it's really there
+					    if (b>=BOSS_START) {
+						    // repeat for the next char
+						    p=(b<<3)+gPATTERN;
+						    AddDamage(p);
+						    addscore(1);
+					    }
+				    }
+				    return 1;	// only one shot per frame hits the boss body (for performance's sake)
+			    }
+		    }
+        }
 	}
 	return 0;
 }
@@ -715,8 +775,11 @@ void whoded() {
             if (rd <= 20) {
                 cd = abs(c-shc[a]);
                 if (cd <= 15) {
-					//VDP_SET_ADDRESS(0x830f);		// CT at >03C0 (makes boss flash white, everything else already is)
-                    VDP_SET_REGISTER(VDP_REG_CT, 0x0f);
+                    if (f18a) {
+                        // TODO: F18A set boss color palette to white
+                    } else {
+                        VDP_SET_REGISTER(VDP_REG_CT, 0x0f); // CT at >03C0 (makes boss flash white, everything else already is)
+                    }
 					bosscnt=3;						// how many cycles to stay white (should be 3 frames per cycle)
 					ep[b]-=damage[pwrlvl&0x07];
 					if (ep[b]<=0) { 
@@ -798,19 +861,26 @@ void byboss() {
 		SOUND=0xd0+x;
 		SOUND=0xf0+x;
 
-		// draw random explosion cell (or erase old one!)
-		r=(rndnum()>>2)%BNR; c=(rndnum()>>2)%BNC;
-		x=gchar(br+r,tc+c);
-		if (x>127) {
-			if (++a > 1) {
-				xchar(br+r,tc+c,EXPLOSION_CHAR);		// draw explosion shape if boss
-				a=0;
-			}
-		} else if (x==EXPLOSION_CHAR) {
-			x=r*BNC+c+BOSS_START;					// draw blank if already explosion shape
-			AddDestroyed((x<<3)+gPATTERN);
-			xchar(br+r, tc+c, x);
-		}
+        if (f18a) {
+            // TODO: F18A needs help here - characters can't be over the BML. Sprites can though?
+            // We could do the explosion chars as sprites
+            // TODO2: there's a graphic glitch overtop of the boss when it explodes - copying in the explosion character to all tables maybe?
+
+        } else {
+		    // draw random explosion cell (or erase old one!)
+		    r=(rndnum()>>2)%BNR; c=(rndnum()>>2)%BNC;
+		    x=gchar(br+r,tc+c);
+		    if (x>127) {
+			    if (++a > 1) {
+				    xchar(br+r,tc+c,EXPLOSION_CHAR);		// draw explosion shape if boss
+				    a=0;
+			    }
+		    } else if (x==EXPLOSION_CHAR) {
+			    x=r*BNC+c+BOSS_START;					    // draw blank if already explosion shape - this gets correct char in the boss pattern
+			    AddDestroyed((x<<3)+gPATTERN);              // this wipes the char in all tables
+			    xchar(br+r, tc+c, x);                       // and this replaces the explosion char with the original (now blank)
+		    }
+        }
 
 		// animate stars
 		wrapstars();
@@ -818,9 +888,12 @@ void byboss() {
 		if ((qw&3)==1) {
 			// animate explosions
 			patcpy(EXPLOSION_FIRST+((qw>>2)&3), EXPLOSION_CHAR);
-			// shake boss back and forth (first and last table only - max shake)
-			//VDP_SET_ADDRESS(0x8402 + ((qw>>1)&0x2));
-            VDP_SET_REGISTER(VDP_REG_PDT, 3+((qw>>1)&0x2));
+			// shake boss back and forth (first and last table only - max shake of 6 pixels)
+			if (f18a) {
+                VDP_SET_REGISTER(F18A_REG_BMLX, ((qw>>1)&0x02) ? bc*2 : bc*2+6);
+            } else {
+                VDP_SET_REGISTER(VDP_REG_PDT, 3+((qw>>1)&0x2));
+            }
 		}
 	}
 	// erase boss and delay
@@ -828,7 +901,6 @@ void byboss() {
 	shutup();
 
 	// set pattern table back to default >1800
-	//VDP_SET_ADDRESS(0x8402);
     VDP_SET_REGISTER(VDP_REG_PDT, 3);
 
 	// boss destroyed announcement
@@ -906,6 +978,7 @@ void byboss() {
 void AddDamage(unsigned int ptr) {
     if (f18a) {
         // we have a GPU program to do this
+        // TODO: this needs to be reworked though F18A damage
         VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
         VDPWD = (ptr>>8);   // no need for delays either!
         VDPWD = (ptr&0xff);
@@ -954,7 +1027,7 @@ void AddDamage(unsigned int ptr) {
     }
 }
 
-// handle smooth horizontal scrolling for the boss
+// erase a character on all tables for the boss (not used by F18A?) TODO: maybe?
 void AddDestroyed(unsigned int ptr) {
  	// clear out 8 bytes at ptr (like AddDamage, but no noise or random)
  	// also need to shift it through the other 3 tables
@@ -982,6 +1055,7 @@ void AddDestroyed(unsigned int ptr) {
 // copies the boss patterns scrolled into the next cell
 // idx indicates the target scroll table (0-3)
 // r indicates the boss row (0-(BNR-1))
+// Not used by F18A
 void PrepareBoss(unsigned char idx, unsigned char r) {
 	unsigned char idx2;
 	char c;
@@ -1037,6 +1111,7 @@ void PrepareBoss(unsigned char idx, unsigned char r) {
 // nop is 4. out is 11. We need 29. So we have 18 cycles in instruction,
 // and need 3 nops to get to 30. Safe delay is 5, so let's do our own
 // and get the boss draw just a bit faster.
+// None of these are used by the F18A
 
 inline void BOSS_SAFE_DELAY(void) {	
 __asm

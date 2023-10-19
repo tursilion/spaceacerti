@@ -797,16 +797,16 @@ const unsigned int F18PALETTE[] = {
 };
 
 // these ship palettes load into palette 12 (just 3 colors, as 0 is transparent)
-const unsigned char F18CRUISERPAL[] = { 0x0, 0x00, 0xe, 0x00, 0xc, 0x00 };
-const unsigned char F18SNOWBALLPAL[] = { 0x0, 0x00, 0xf, 0xff, 0xc, 0x00 };
-const unsigned char F18LADYBUGPAL[] = { 0x0, 0x00, 0xa, 0x00, 0xd, 0x00 };
-const unsigned char F18GNATPAL[] = { 0x0, 0x00, 0x2, 0xf0, 0x0, 0xc0 };
-const unsigned char F18SELENAPAL[] = { 0x0, 0x00, 0x0, 0x0c, 0x0, 0x08 };
+const unsigned int F18CRUISERPAL[] = { 0x000, 0x0e00, 0x0c00 };
+const unsigned int F18SNOWBALLPAL[] = { 0x0000, 0x0fff, 0x0c00 };
+const unsigned int F18LADYBUGPAL[] = { 0x0000, 0x0a00, 0x0d00 };
+const unsigned int F18GNATPAL[] = { 0x0000, 0x02f0, 0x00c0 };
+const unsigned int F18SELENAPAL[] = { 0x0000, 0x00c, 0x0008 };
 
 // shields load into palette 13 (just 3 again)
-const unsigned char F18SHIELDMAX[] = { 0xf, 0xff, 0xe, 0xee, 0xc, 0xcc };
-const unsigned char F18SHIELDMED[] = { 0xf, 0xf0, 0xe, 0xe0, 0xc, 0xc0 };
-const unsigned char F18SHIELDLOW[] = { 0xf, 0x00, 0xe, 0x00, 0xc, 0x00 };
+const unsigned int F18SHIELDMAX[] = { 0x0fff, 0x0eee, 0x0ccc };
+const unsigned int F18SHIELDMED[] = { 0x0ff0, 0x0ee0, 0x0cc0 };
+const unsigned int F18SHIELDLOW[] = { 0x0f00, 0x0e00, 0x0c00 };
 
 #else
 
@@ -836,14 +836,14 @@ extern const unsigned char F18SELENA[] ;
 extern const unsigned char F18SELENA2[] ;
 extern const unsigned char F18ALTSELENA[] ;
 extern const unsigned char F18ALTSELENA2[] ;
-extern const unsigned char F18PALETTE[] ;
-extern const unsigned char F18CRUISERPAL[];
-extern const unsigned char F18SNOWBALLPAL[];
-extern const unsigned char F18LADYBUGPAL[];
-extern const unsigned char F18GNATPAL[];
-extern const unsigned char F18SELENAPAL[];
-extern const unsigned char F18SHIELDMAX[];
-extern const unsigned char F18SHIELDMED[];
-extern const unsigned char F18SHIELDLOW[];
+extern const unsigned int  F18PALETTE[] ;
+extern const unsigned int  F18CRUISERPAL[];
+extern const unsigned int  F18SNOWBALLPAL[];
+extern const unsigned int  F18LADYBUGPAL[];
+extern const unsigned int  F18GNATPAL[];
+extern const unsigned int  F18SELENAPAL[];
+extern const unsigned int  F18SHIELDMAX[];
+extern const unsigned int  F18SHIELDMED[];
+extern const unsigned int  F18SHIELDLOW[];
 
 #endif

@@ -45,5 +45,12 @@ void wrapFinalSnowballSmall();
 void wrapldpic();
 void wrapldcruiserend();
 void wrapLoadSnowballBase();
+unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline);
+void wrapLoadF18MainPalette();
+void wrapInitCruiser();
+void wrapInitSnowball();
+void wrapInitLadybug();
+void wrapInitGnat();
+void wrapInitSelena();
 
 #endif

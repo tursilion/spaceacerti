@@ -155,7 +155,6 @@
     <ClInclude Include="attract.h" />
     <ClInclude Include="boss.h" />
     <ClInclude Include="enemy.h" />
-    <ClInclude Include="f18abosses.h" />
     <ClInclude Include="f18load.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="human.h" />

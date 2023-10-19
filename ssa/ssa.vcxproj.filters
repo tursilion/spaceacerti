@@ -237,9 +237,6 @@
     <ClInclude Include="..\..\..\libti99coleco\f18a.h">
       <Filter>libti99</Filter>
     </ClInclude>
-    <ClInclude Include="f18abosses.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="boss1.bmp">
