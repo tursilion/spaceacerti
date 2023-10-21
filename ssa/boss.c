@@ -127,6 +127,12 @@ const unsigned char bossShape5[9*2] = {
     6*8,7*8-8
 };
 
+// all white boss palette for hit flash
+const unsigned int f18WhitePalette[] = {
+    0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,
+    0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff,0x0fff
+};
+
 char br,bd;			// these ones need to be signed
 unsigned char bc;	// but this one doesn't
 unsigned char BNR,BNC;
@@ -143,6 +149,8 @@ void draw3();
 void draw4();
 void draw5();
 void drawf18();
+
+extern const unsigned int f18BlackPal[4];
 
 // this is only called once, the boss flash is handled by changing the color table
 void bosscol(char col) {
@@ -220,6 +228,8 @@ void boss()
     if (f18a) {
         x_r=0;
         do {
+            // I think we need three wrapstars() here to keep framerate constant
+            wrapstars();
             wrapLoadBossF18A(level, x_r++); // okay to call this extra times
             wrapstars();        // need to do it twice to keep speed steady
             wrapplayer();
@@ -262,7 +272,11 @@ void boss()
 	br=-BNR;
 	if (scoremode == 3) {
 		// invisible enemies
-		bosscol(bgColor);   // TODO: F18A boss needs help with this
+        // overwrite the boss palette - it uses 4 4-color palettes
+        loadpal_f18a(f18BlackPal, 16, 4);
+        loadpal_f18a(f18BlackPal, 20, 4);
+        loadpal_f18a(f18BlackPal, 24, 4);
+        loadpal_f18a(f18BlackPal, 28, 4);
 	} else {
 		bosscol(BOSTAB[p]);
 	}
@@ -331,34 +345,42 @@ void boss()
 		if (bosscnt) {
 			if (--bosscnt == 0) {
 				// reset boss color set
-				//VDP_SET_ADDRESS(0x830e);		
-                VDP_SET_REGISTER(VDP_REG_CT, 0x0e); // CT at >0380
+                if (f18a) {
+                    wrapLoadBossF18A(level, 99);    // force palette reload
+                } else {
+                    VDP_SET_REGISTER(VDP_REG_CT, 0x0e); // CT at >0380
+                }
 			}
 		}
 	}
 
 	// reset boss color set in case it flashed (just always)
-    VDP_SET_REGISTER(VDP_REG_CT, 0x0e); // CT at >0380
+    if (f18a) {
+        wrapLoadBossF18A(level, 99);    // force palette reload
+    } else {
+        VDP_SET_REGISTER(VDP_REG_CT, 0x0e); // CT at >0380
+    }
 	
-	// restore the beam graphics
+	// check if player won the battle
+	if (flag == MAIN_LOOP_ACTIVE) {
+        if (joynum) {
+	    	byboss();
+        } else {
+            // didn't really, but this will end the demo
+            flag = PLAYER_DIED_DURING_BOSS;
+        }
+	}
+
+    // make sure it's turned off and palette restored in case it's F18A
+    erboss();
+
+    // restore the beam graphics
     if (f18a) {
     	vdpmemcpy(104*8+0x0800, f18beamleftgfx, 4*8);	// load sprite patterns
     	vdpmemcpy(104*8+0x1000, f18beamleftgfx2, 4*8);	// load sprite patterns
     } else {
     	vdpmemcpy(104*8+0x0800, beamleftgfx, 4*8);	// load sprite patterns
     }
-
-	// check if player won the battle
-	if (flag == MAIN_LOOP_ACTIVE) {
-        if (joynum) {
-	    	byboss();
-        } else {
-            // make sure it's turned off and palette restored in case it's F18A
-            erboss();
-            // didn't really, but this will end the demo
-            flag = PLAYER_DIED_DURING_BOSS;
-        }
-	}
 }
 
 // sadly we are out of vblank before this function is done
@@ -446,7 +468,10 @@ void erboss() {
         // just turn it off
         VDP_SET_REGISTER(F18A_REG_BMLCFG, 0);
         // and restore the palette for that section of sprites
-        wrapLoadF18MainPalette();
+        // don't reload the palette if we are playing cloaked ships though
+        if (scoremode!=3) {
+            wrapLoadF18MainPalette();
+        }
     } else {
 	    p=gIMAGE+(bc>>2)+(br<<5);
 
@@ -546,7 +571,11 @@ void mboss() {
 				eec[x]=8; esc[x]=8; ech[x]=8;
 				if (scoremode == 3) {
 					// invisible enemies
-					sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);     // todo: bgColor is a problem for F18A
+                    if (f18a) {
+    					sprite(x+ENEMY_SPRITE,8,4,enr[x],enc[x]);     // palette 4 is remapped to black
+                    } else {
+    					sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);
+                    }
 				} else {
 					sprite(x+ENEMY_SPRITE,8,f18a?1:COLOR_CYAN,enr[x],enc[x]);
 				}
@@ -669,7 +698,11 @@ void mboss() {
 						eec[x]=8; esc[x]=8; ech[x]=8;
 						if (scoremode == 3) {
 							// invisible enemies
-							sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);
+                            if (f18a) {
+    							sprite(x+ENEMY_SPRITE,8,4,enr[x],enc[x]);   // palette 4 is remapped to black
+                            } else {
+    							sprite(x+ENEMY_SPRITE,8,bgColor,enr[x],enc[x]);
+                            }
 						} else {
 							sprite(x+ENEMY_SPRITE,8,f18a?1:COLOR_CYAN,enr[x],enc[x]);
 						}
@@ -679,7 +712,6 @@ void mboss() {
 
 				case 0x80:
 					// homing laser shot - we assume the bullets are all free!
-					// TODO: laser sound effect
 					ers[7]=0;	// start static
 					ecs[7]=0;
 					ent[7]=ENEMY_SHOT; 
@@ -717,18 +749,55 @@ uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr) {
 	if (rd <= br+BNR) {
 		cd=(sc+4)>>3;
         if (f18a) {
-            // TODO: need GPU support as the damage field is now 32 bytes and
-            // needs to take colors into account (mind you it was 32 bytes before too)
+            // okay, so determine the address of the overlay byte under the sprite position
+            if (br > 0) {
+                // only worry about it once the boss is fully onscreen - this may be a slight difference?
+                // the damage tracking is gonna be different anyway cause of the pixel size
+                sr=rd<<3;   // lock the row to a multiple of 8
+                sc=cd<<3;   // column too (if we don't, the check at p+4 rows won't be reliable)
+                sr-=br*8;   // boss row is in character rows
+                sc-=bc*2;   // boss column is in fat pixels
+
+                // they are unsigned chars, so there's no negative, just check for off the edge of the bitmap
+                // we can use the existing data for boss width and height
+                if ((sr < BNR*8)&&(sc < BNC*8)) {
+                    // okay, we are within the rectangle, get an address
+                    // every row is 32 bytes (always), and every byte contains 4 pixels
+                    p = sr*(128/4) + sc/4 + BOSS_PATTERN;
+                    
+                    // check if it's got anything - we'll use the same sort of check as the other one does
+                    // we just don't need to look up the character separately. Plus 4 there, though, is plus 
+                    // 128 here, cause it's 32 bytes per row.
+                    b = vdpreadchar(p+128);
+                    if (b) {
+				        // this block is solid, nuke it
+				        // this code is similar but not identical to the non-F18A version
+				        AddDamageF18a(p);
+				        addscore(1);
+				        if (pwr==PWRPULSE+2) {
+					        // maximum pulse shot does double damage
+					        sc += 8;
+                            if (sc < BNC*8) {
+						        // repeat for the next char
+                                p += 2;     // every byte is 4 pixels
+						        AddDamageF18a(p);
+						        addscore(1);
+					        }
+				        }
+				        return 1;	// only one shot per frame hits the boss body (for performance's sake)
+                    }
+			    }
+            }
 
         } else {
+
 		    b=gchar(rd,cd);
 		    if (b>=BOSS_START) {
 			    // potential - check the character pattern
 			    p=(b<<3)+gPATTERN;
-			    tmpbuf[0] = vdpreadchar(p+4);
-			    if (tmpbuf[0]) {
+			    b = vdpreadchar(p+4);
+			    if (b) {
 				    // this block is solid, nuke it
-				    // need to read the whole block
 				    AddDamage(p);
 				    addscore(1);
 				    if (pwr==PWRPULSE+2) {
@@ -776,7 +845,7 @@ void whoded() {
                 cd = abs(c-shc[a]);
                 if (cd <= 15) {
                     if (f18a) {
-                        // TODO: F18A set boss color palette to white
+                        loadpal_f18a(f18WhitePalette, 16, 16);  // set boss palette to white
                     } else {
                         VDP_SET_REGISTER(VDP_REG_CT, 0x0f); // CT at >03C0 (makes boss flash white, everything else already is)
                     }
@@ -845,6 +914,17 @@ void byboss() {
 	wrapplayerstraight();
 	playmv();			// redraw the shield, DelSprButPlayer will have erased it
 
+    // for F18a, we need to copy over the explosion character into the sprite table (just the first for now)
+    if (f18a) {
+        // use the beam left/boss homing sprite - we need to convert from character to sprite though
+        patsprcpy(EXPLOSION_FIRST,104);
+        // because we're F18A, erase the rest
+        vdpmemset(104*8+0x0808, 0, 24);     // rest of first table
+        vdpmemset(104*8+0x1000, 0, 32);     // all of second table
+        // we're going to use tmpbuf[64] to remember where the sprites are
+        memset(tmpbuf, 0, sizeof(tmpbuf));
+    }
+
 	// draw explosions over boss
 	a=0;
 	for (qw=0; qw<290; qw++) { 
@@ -862,13 +942,58 @@ void byboss() {
 		SOUND=0xf0+x;
 
         if (f18a) {
-            // TODO: F18A needs help here - characters can't be over the BML. Sprites can though?
-            // We could do the explosion chars as sprites
-            // TODO2: there's a graphic glitch overtop of the boss when it explodes - copying in the explosion character to all tables maybe?
+            unsigned char sr, sc, sp;
+            unsigned int p;
+            // We could do the explosion chars as sprites (we can use 4-16 and 22-31 for a total of 23 which isn't bad)
+		    r=(rndnum()>>2)%BNR; 
+            c=(rndnum()>>2)%BNC;
+            // to determine if it's legal we'll use similar to the hit detection, but at offset 0
+            sr=r<<3;   // lock the row to a multiple of 8
+            sc=c<<3;   // column too (if we don't, the check at p+4 rows won't be reliable)
 
+            // first check if we already did this position, and return a valid sprite index
+            sp=32;  // out of range
+            for (unsigned char i=4; i<32; ++i) {
+                if (i == 17) i=22;
+                if ((tmpbuf[i*2] == sr)&&(tmpbuf[i*2+1] == sc)) {
+                    sp=i;
+                    break;
+                }
+                if (SpriteTab[i].y == 0xd1) {
+                    sp = i; // remember free sprite
+                }
+            }
+
+            // if we didn't find a valid sprite, just ignore this cycle
+            if (sp < 32) {
+                // we have a sprite to work with
+                if (SpriteTab[sp].y == 0xd1) {
+                    // using the bossShape table, see if we can contain the explosion sprites
+                    // we can assume row is acceptable.
+                    {
+                        unsigned char bossr = r<<1;
+                        if (((c<<3) >= bossShape[bossr])&&((c<<3) <= bossShape[bossr+1]+1)) {
+                            // palette 8 is flames/explosions
+                            sprite(sp, 104, 8, (r<<3)+br*8, (c<<3)+bc*2);
+                            tmpbuf[sp*2]=r<<3;
+                            tmpbuf[sp*2+1]=c<<3;
+                        }
+                    }
+                } else {
+                    // this was already a valid sprite, so remove it
+                    spdel(sp);
+                    tmpbuf[sp*2]=0xd1;
+
+                    // okay, we are within the rectangle, get an address
+                    // every row is 32 bytes (always), and every byte contains 4 pixels
+                    p = sr*(128/4) + sc/4 + BOSS_PATTERN;
+                    AddDestroyedF18a(p);
+		        }
+            }
         } else {
 		    // draw random explosion cell (or erase old one!)
-		    r=(rndnum()>>2)%BNR; c=(rndnum()>>2)%BNC;
+		    r=(rndnum()>>2)%BNR; 
+            c=(rndnum()>>2)%BNC;
 		    x=gchar(br+r,tc+c);
 		    if (x>127) {
 			    if (++a > 1) {
@@ -886,17 +1011,20 @@ void byboss() {
 		wrapstars();
 		
 		if ((qw&3)==1) {
-			// animate explosions
-			patcpy(EXPLOSION_FIRST+((qw>>2)&3), EXPLOSION_CHAR);
 			// shake boss back and forth (first and last table only - max shake of 6 pixels)
 			if (f18a) {
                 VDP_SET_REGISTER(F18A_REG_BMLX, ((qw>>1)&0x02) ? bc*2 : bc*2+6);
+                // animate sprite version of explosions
+                patsprcpy(EXPLOSION_FIRST+((qw>>2)&3),104);
             } else {
                 VDP_SET_REGISTER(VDP_REG_PDT, 3+((qw>>1)&0x2));
+			    // animate explosions
+			    patcpy(EXPLOSION_FIRST+((qw>>2)&3), EXPLOSION_CHAR);
             }
 		}
 	}
 	// erase boss and delay
+	DelSprButPlayer(PLAYER_FLAME);
 	erboss();
 	shutup();
 
@@ -976,58 +1104,56 @@ void byboss() {
  
 // damage pattern for smooth horizontal scrolling for the boss
 void AddDamage(unsigned int ptr) {
-    if (f18a) {
-        // we have a GPU program to do this
-        // TODO: this needs to be reworked though F18A damage
-        VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
-        VDPWD = (ptr>>8);   // no need for delays either!
-        VDPWD = (ptr&0xff);
-        VDPWD = 0;          // no data
-        VDPWD = 0;
-        VDPWD = 0;
-        VDPWD = 1;          // command to go
-    } else {
- 	    // add 8 bytes of random noise at ptr, but we
- 	    // also need to shift it through the other 3 tables
- 	    unsigned short *mask;	// needs 16 bytes
- 	    unsigned char idx,idx2;
+ 	// add 8 bytes of random noise at ptr, but we
+ 	// also need to shift it through the other 3 tables
+ 	unsigned short *mask;	// needs 16 bytes
+ 	unsigned char idx,idx2;
 
-	    // Tried unrolling and making this explicit - but it was exactly
-	    // the same speed, even over 15,000 iterations. So left the loops.
+	// Tried unrolling and making this explicit - but it was exactly
+	// the same speed, even over 15,000 iterations. So left the loops.
 
-	    // alias mask to the second half of tmpbuf, which is 32 bytes
-	    mask=(unsigned short*)&tmpbuf[16];
+	// alias mask into tmpbuf, which is 64 bytes
+	mask=(unsigned short*)&tmpbuf[16];
 
-	    // do initial pattern
-	    vdpmemread(ptr, tmpbuf, 8);
-	    tmpbuf[4]=0;
+	// do initial pattern
+	vdpmemread(ptr, tmpbuf, 8);
+	tmpbuf[4]=0;
 
-	    for (idx=0; idx<8; idx++) {
- 		    mask[idx]=rndnum()&0xff;
- 		    tmpbuf[idx]&=mask[idx];
-		    mask[idx]<<=8;
-		    mask[idx]|=0xff;
- 	    }
- 	    mask[4]=0x00ff;				// test line, wipe it
+	for (idx=0; idx<8; idx++) {
+ 		mask[idx]=rndnum()&0xff;
+ 		tmpbuf[idx]&=mask[idx];
+		mask[idx]<<=8;
+		mask[idx]|=0xff;
+ 	}
+ 	mask[4]=0x00ff;				// test line, wipe it
 
- 	    vdpmemcpy(ptr, tmpbuf, 8);
+ 	vdpmemcpy(ptr, tmpbuf, 8);
 
-	    // do the rest of the patterns
-	    for (idx=0; idx<3; idx++) {
- 		    ptr+=SCROLL_OFFSET;				// offset is to the next table
- 		    vdpmemread(ptr, tmpbuf, 16);
- 		    for (idx2=0; idx2<8; idx2++) {
- 			    mask[idx2]>>=2;		// shift 2 pixels right
- 			    mask[idx2]|=0xc000;	// preserve shifted in pixels
- 			    tmpbuf[idx2]&=(mask[idx2]>>8)&0xff;
- 			    tmpbuf[idx2+8]&=mask[idx2]&0xff;
- 		    }
- 		    vdpmemcpy(ptr,tmpbuf,16);
- 	    }
-    }
+	// do the rest of the patterns
+	for (idx=0; idx<3; idx++) {
+ 		ptr+=SCROLL_OFFSET;				// offset is to the next table
+ 		vdpmemread(ptr, tmpbuf, 16);
+ 		for (idx2=0; idx2<8; idx2++) {
+ 			mask[idx2]>>=2;		// shift 2 pixels right
+ 			mask[idx2]|=0xc000;	// preserve shifted in pixels
+ 			tmpbuf[idx2]&=(mask[idx2]>>8)&0xff;
+ 			tmpbuf[idx2+8]&=mask[idx2]&0xff;
+ 		}
+ 		vdpmemcpy(ptr,tmpbuf,16);
+ 	}
+}
+void AddDamageF18a(unsigned int ptr) {
+    // we have a GPU program to do this
+    VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
+    VDPWD = (ptr>>8);   // no need for delays either!
+    VDPWD = (ptr&0xff);
+    VDPWD = 0;          // no data
+    VDPWD = 0;
+    VDPWD = 0;
+    VDPWD = 1;          // command to go
 }
 
-// erase a character on all tables for the boss (not used by F18A?) TODO: maybe?
+// erase a character on all tables for the boss
 void AddDestroyed(unsigned int ptr) {
  	// clear out 8 bytes at ptr (like AddDamage, but no noise or random)
  	// also need to shift it through the other 3 tables
@@ -1050,6 +1176,17 @@ void AddDestroyed(unsigned int ptr) {
  		}
  		vdpmemcpy(ptr,tmpbuf,16);
  	}
+}
+
+void AddDestroyedF18a(unsigned int ptr) {
+    // we have a GPU program to do this
+    VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
+    VDPWD = (ptr>>8);   // no need for delays either!
+    VDPWD = (ptr&0xff);
+    VDPWD = 0;          // no data
+    VDPWD = 0;
+    VDPWD = 0;
+    VDPWD = 3;          // command to go
 }
 
 // copies the boss patterns scrolled into the next cell
@@ -1099,622 +1236,4 @@ void PrepareBoss(unsigned char idx, unsigned char r) {
 		// decrement the pointer
 		p-=8;
 	}
-}
-
-// hard-coded boss draw functions are nearly twice as
-// fast as the looping version, and we optimize a bit
-// by skipping empty space.
-// Note that the draw functions all have one more character
-// than the count, because the shifting makes all chars 2 wide
-// the compiler is optimizing these as "ld a,#<constant> ; out (_VDPWD),a"
-// To that end, maybe we can save a few nops? ld a,# is 7 cycles, each
-// nop is 4. out is 11. We need 29. So we have 18 cycles in instruction,
-// and need 3 nops to get to 30. Safe delay is 5, so let's do our own
-// and get the boss draw just a bit faster.
-// None of these are used by the F18A
-
-inline void BOSS_SAFE_DELAY(void) {	
-__asm
-	nop
-	nop
-	nop
-__endasm;
-}
-
-#define EDGEBLANKA			\
-	if (bd>0) {				\
-		VDPWD=32;			\
-		BOSS_SAFE_DELAY();	\
-		VDPWD=32;			\
-		BOSS_SAFE_DELAY();	\
-	}
-
-#define EDGEBLANKB			\
-	if (bd<0) {				\
-		VDPWD=32;			\
-		BOSS_SAFE_DELAY();	\
-		VDPWD=32;			\
-	}
-
-#define LINECHAR		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR2		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR3		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR4		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR5		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR6		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR7		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR8		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR9		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR10		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR12		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-#define LINECHAR14		\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();	\
-	VDPWD=ch++;			\
-	BOSS_SAFE_DELAY();
-
-inline void BOSS_SET_ADDRESS_WRITE(unsigned int x)	{	VDPWA=((x)&0xff); VDPWA=((((x)>>8)&0x3f)|0x40); }
-
-void draw1() {
-	unsigned char ch=BOSS_START+1;	// skipping the first 1
-	unsigned int p;
-
-	// gIMAGE /must/ stay at >0000 for this code to work
-	p=(bc>>2)+(br<<5)+gIMAGE;	// note: this wraps negative badly and requires the special addres write macro
-								// that performs masking to ensure it stays in the right memory range
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR8;
-	EDGEBLANKB;
-	ch+=2+0-1;      // add characters spare at end of this line, plus leading characters spare next line, -1
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	ch+=1+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+4-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+4);
-	EDGEBLANKA;
-	LINECHAR3;
-	EDGEBLANKB;
-}
-
-void draw2() {
-	unsigned char ch=BOSS_START;
-	unsigned int p;
-
-	p=(((unsigned)(bc))>>2)+(((unsigned)(br))<<5)+gIMAGE;
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch++;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	ch+=1+1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR8;
-	EDGEBLANKB;
-	ch+=2+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+4-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+4);
-	EDGEBLANKA;
-	LINECHAR3;
-	EDGEBLANKB;
-	ch+=4+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+4-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+4);
-	EDGEBLANKA;
-	LINECHAR3;
-	EDGEBLANKB;
-}
-
-void draw3() {
-	unsigned char ch=BOSS_START;	// no skip at all
-	unsigned int p;
-
-	p=(((unsigned)(bc))>>2)+(((unsigned)(br))<<5)+gIMAGE;
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	ch+=1+1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR9;
-	EDGEBLANKB;
-	ch+=1+1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR8;
-	EDGEBLANKB;
-}
-
-void draw4() {
-	unsigned char ch=BOSS_START;
-	unsigned int p;
-
-	p=(((unsigned)(bc))>>2)+(((unsigned)(br))<<5)+gIMAGE;
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	ch+=1+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR5;
-	EDGEBLANKB;
-	ch+=4+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR5;
-	EDGEBLANKB;
-}
-
-void draw5() {
-	unsigned char ch=BOSS_START;
-	unsigned int p;
-
-	p=(((unsigned)(bc))>>2)+(((unsigned)(br))<<5)+gIMAGE;
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR14;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR14;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR14;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR14;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR14;
-	EDGEBLANKB;
-	ch+=1+1-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR12;
-	EDGEBLANKB;
-	ch+=2+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR8;
-	EDGEBLANKB;
-	ch+=4+4-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+4);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=5+5-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+5);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
 }

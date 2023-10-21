@@ -92,6 +92,7 @@
     <ClCompile Include="boss3.c" />
     <ClCompile Include="boss4.c" />
     <ClCompile Include="boss5.c" />
+    <ClCompile Include="bossDraw.c" />
     <ClCompile Include="cruiserend_c.c" />
     <ClCompile Include="cruiserend_p.c" />
     <ClCompile Include="difficulty.c" />
@@ -139,6 +140,7 @@
     <None Include="..\setup.bat" />
     <None Include="crt0.map" />
     <None Include="crt0.s" />
+    <None Include="f18a_asm.a99" />
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>

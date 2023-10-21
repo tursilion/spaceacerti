@@ -8,13 +8,13 @@ AFLAGS = -plosgff
 .PHONY: all clean
 
 # crt0 must be first!
-objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel enemy.rel music.rel human.rel wineasy.rel winhard.rel winmed.rel \
-		title_c.rel title_p.rel boss1.rel boss2.rel boss3.rel boss4.rel boss5.rel outfile0.rel outfile1.rel outfile2.rel outfile3.rel \
-		font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel ship2_c.rel ship2_p.rel \
-		ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel ladybugc.rel ladybugp.rel \
-		ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel gnat3rlec.rel gnat3rlep.rel \
-		gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel cruiserendc.rel cruiserendp.rel \
-        f18sprites.rel f18load.rel f18abosses.rel
+objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel bossdraw.rel enemy.rel music.rel human.rel wineasy.rel \
+        winhard.rel winmed.rel title_c.rel title_p.rel boss1.rel boss2.rel boss3.rel boss4.rel boss5.rel outfile0.rel outfile1.rel \
+        outfile2.rel outfile3.rel font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel \
+        ship2_c.rel ship2_p.rel ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel \
+        ladybugc.rel ladybugp.rel ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel \
+        gnat3rlec.rel gnat3rlep.rel gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel \
+        cruiserendc.rel cruiserendp.rel f18sprites.rel f18load.rel f18abosses.rel
 
 all: buildcol
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
@@ -41,6 +41,9 @@ bg.rel: bg.c game.h
 
 boss.rel: boss.c game.h boss.h
 	$(CC) $(CFLAGS) -o boss.rel boss.c --codeseg boss --constseg boss
+
+bossdraw.rel: bossdraw.c boss.h
+	$(CC) $(CFLAGS) -o bossdraw.rel bossdraw.c --codeseg boss --constseg boss
 
 enemy.rel: enemy.c game.h
 	$(CC) $(CFLAGS) -o enemy.rel enemy.c --codeseg enemy --constseg enemy

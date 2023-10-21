@@ -76,11 +76,14 @@ extern const unsigned char CHARS[];
 extern const unsigned char ELECTRICWALL[];
 extern unsigned char screenFlashCnt;
 
-// used for patcpy and scroll
-unsigned char tmpbuf[32];
+// used for patcpy and scroll and F18a boss explosion
+unsigned char tmpbuf[64];
 
 // used for bank switch returns
 unsigned int nBank = 0xffff;
+
+// used for the cloaked enemy mode!
+const unsigned int f18BlackPal[4] = { 0,0,0,0 };
 
 void sprStart0() __naked {
 	// copy sprites 0-31 in order (simplest case)
@@ -750,10 +753,6 @@ void main() {
                 VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
                 lock_f18a();
                 f18a=0;
-            } else {
-                // load the palette we plan to use
-                SWITCH_IN_BANK14;
-                loadpal_f18a(F18PALETTE, 0, 64);
             }
         }
 	}
@@ -768,6 +767,12 @@ void main() {
 
 titleagain:
 	screen(COLOR_BLACK);
+
+    if (f18a) {
+        // load the palette we plan to use
+        SWITCH_IN_BANK14;
+        loadpal_f18a(F18PALETTE, 0, 64);
+    }
 
 	SWITCH_IN_BANK9;
 	handleTitlePage();
@@ -858,6 +863,13 @@ titleagain:
 		initSelena();
 		break;
 	}
+
+    if ((f18a)&&(scoremode==3)) {
+        // enemies are going to be bgcolor -- which is always black so we can assume
+        // going to fix this by setting the palettes appropriately
+        // palette 4 will be dedicated to being black
+        loadpal_f18a(f18BlackPal, 16, 4);
+    }
 
 	while (1) {		/*forever*/
 		score=0;

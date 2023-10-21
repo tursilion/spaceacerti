@@ -1,6 +1,3 @@
-// TODO: saucers can start too close to the right edge?
-// TODO: Helicopters that just appear near the bottom?
-
 // libti99
 #include <vdp.h>
 #include <f18a.h>
@@ -193,7 +190,14 @@ void enout() {
 						if (enc[k] > 144) enc[k]-=128;
 						break;
 				} 
-				if (scoremode == 3) c=bgColor;	// invisible enemies
+				if (scoremode == 3) {
+                    // invisible enemies
+                    if (f18a) {
+                        c=4;    // palette 4 is mapped to black
+                    } else {
+                        c=bgColor;	
+                    }
+                }
 				ech[k]=esc[k];
 				sprite(k+ENEMY_SPRITE,ech[k],c,enr[k],enc[k]);  // c is F18A adjust above
             }
@@ -662,7 +666,14 @@ void enemybeamgen(uint8 x) {
 	}
 	if (ent[x] != ENEMY_NONE) {
         unsigned char c = f18a?4:COLOR_GRAY;
-        if (scoremode == 3) c=bgColor;	// invisible enemies
+        if (scoremode == 3) {
+            // invisible enemies
+            if (f18a) {
+                c=4;    // palette 4 is mapped to black
+            } else {
+                c=bgColor;	
+            }
+        }
 
 		if (ent[x+6] != ENEMY_BEAM) {
 			// we don't have both sprites available, just draw the one we have
@@ -733,7 +744,7 @@ void enemy()
 				p4Time = POWERUP_TIME;
 				ptp4++;
 				if (ptp4 > POWERUP_SHIELD+2) ptp4=POWERUP_SHIELD;
-				patsprcpy(ptp4,248);
+				patsprcpy(ptp4,248);    // okay even on F18A cause we have the VDP data already zeroed
 			}
 		}
 	}

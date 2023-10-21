@@ -47,9 +47,9 @@ VRAM map (except for ending routines)
  >03E0	(Unused)
  >0800	Sprite Pattern Table
  >1000  9918A - unused, F18A - second half of sprite pattern table (4 color sprite mode)
- >1800	Pattern table (scroll 0) 
+ >1800	Pattern table (scroll 0)
  >2000	Pattern table (scroll 2) 
- >2800	Pattern table (scroll 4) - F18A: boss bitmap layer (3k max with padding)
+ >2800	Pattern table (scroll 4) - F18A: boss bitmap layer (16-color, 3k max with padding)
  >3000	Pattern table (scroll 6) - F18A: >3400 free
  >3800	(unused)
  >3C80  Reserved for register writes to F18A GPU
@@ -117,6 +117,17 @@ Snowball Palette:   000, fff, c00
 Ladybug palette:    000, a00, d00
 Gnat palette:       000, 2f0, 0c0
 Selena palette:     000, 00c, 008
+
+Possible sprite palettes - 8 color mode
+---------------------------------------
+0   standard TI palette
+1   standard TI palette
+2
+3
+4
+5
+6   player ship
+7   player shields
 
 CHARACTER PATTERNS
 ------------------

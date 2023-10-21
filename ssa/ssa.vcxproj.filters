@@ -193,6 +193,9 @@
     <ClCompile Include="f18abosses.c">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="bossDraw.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -260,6 +263,9 @@
     <None Include="crt0.map" />
     <None Include="crt0.s" />
     <None Include="Makefile" />
+    <None Include="f18a_asm.a99">
+      <Filter>Src</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />

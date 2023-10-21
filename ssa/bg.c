@@ -13,7 +13,7 @@
 #define NUM_SMALL_STARS		6
 
 uint8 stdata[NUM_SMALL_STARS*3];    // strided array so we can use faster(?) pointer math: row, col, offset
-extern unsigned char tmpbuf[32];
+extern unsigned char tmpbuf[64];
 unsigned char screenFlashCnt;
 
 // do the background effect

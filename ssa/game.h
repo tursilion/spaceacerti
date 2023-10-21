@@ -270,7 +270,7 @@ extern uint8 pcr4,ptp4,pr4,pc4,p4Time;
 extern uint8 flag;
 extern unsigned char nDifficulty;
 extern unsigned char bgColor;
-extern unsigned char tmpbuf[32];
+extern unsigned char tmpbuf[64];
 extern const unsigned char damage[8];
 extern int distns;
 extern unsigned int shield;

@@ -74,13 +74,15 @@ checksfx:
             unsigned char regs = *(pSfx++);
             if (0 == regs) {
                 pSfx = NULL;
-                blockSfx = 0;
+                // we'll undo the block next frame
             } else {
                 while (regs--) {
                     AY_REGISTER = *(pSfx++);
                     AY_DATA_WRITE = *(pSfx++);
                 }
             }
+        } else {
+            blockSfx = 0;   // make sure we didn't forget to clear something
         }
     } else {
         if (NULL != pShoot) {
@@ -193,6 +195,8 @@ void shutup()
 
     pSfx = NULL;
     pShoot = NULL;
+
+    // note: turns out this is also important to work around a Phoenix powerup bug
     AY_REGISTER = AY_VOLA;
     AY_DATA_WRITE = 0x0;
     AY_REGISTER = AY_VOLB;

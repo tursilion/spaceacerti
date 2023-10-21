@@ -18,7 +18,9 @@ void warpout();
 void whoded();
 void byboss();
 void AddDamage(unsigned int vptr);
+void AddDamageF18a(unsigned int vptr);
 void AddDestroyed(unsigned int vptr);
+void AddDestroyedF18a(unsigned int vptr);
 void PrepareBoss(unsigned char idx, unsigned char r);
 
 #endif
