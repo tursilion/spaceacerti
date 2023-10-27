@@ -15,6 +15,7 @@
 #include "enemy.h"
 #include "human.h"
 #include "music.h"
+#include "f18load.h"
 
 // bg.c
 extern unsigned char screenFlashCnt;
@@ -311,8 +312,8 @@ void shoot()
 			r+=shotOffset;
 			if (a2 == a) {
 				// only two slightly angled shots
-				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT1,f18a?11:COLOR_DKGREEN,r,c);
-				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT1,f18a?11:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT1,f18a?PAL_SPREAD:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT1,f18a?PAL_SPREAD:COLOR_DKGREEN,r,c);
 				shd[a]=-2;
 				shd[a3]=2;
 				shr[a]=r;
@@ -326,9 +327,9 @@ void shoot()
 				shd[a3]=4;
 				shr[a]=shr[a2]=shr[a3]=r;
 				shc[a]=shc[a2]=shc[a3]=c;
-				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT2,f18a?11:COLOR_DKGREEN,r,c);
-				sprite(PLAYER_SHOT+a2,PLAYER_SHOT_3WAY_STRAIGHT,f18a?11:COLOR_DKGREEN,r,c);
-				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT2,f18a?11:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a,PLAYER_SHOT_3WAY_LEFT2,f18a?PAL_SPREAD:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a2,PLAYER_SHOT_3WAY_STRAIGHT,f18a?PAL_SPREAD:COLOR_DKGREEN,r,c);
+				sprite(PLAYER_SHOT+a3,PLAYER_SHOT_3WAY_RIGHT2,f18a?PAL_SPREAD:COLOR_DKGREEN,r,c);
 			}
 		}
 	} else {
@@ -343,7 +344,7 @@ void shoot()
 			shc[a]=c;
             shrd[a]=-4;
 			shd[a]=0;
-			sprite(PLAYER_SHOT+a,PLAYER_SHOT_PULSE_BASE+(truepwr<<2),f18a?10:COLOR_MAGENTA,r,c);
+			sprite(PLAYER_SHOT+a,PLAYER_SHOT_PULSE_BASE+(truepwr<<2),f18a?PAL_PULSE:COLOR_MAGENTA,r,c);
 		}
 	}
 }
@@ -842,7 +843,7 @@ void playerinit() {
         spdel(PLAYER_SHIELD+1);
         spdel(PLAYER_SHIELD+2);
         spdel(PLAYER_SHIELD+3);
-    	sprite(PLAYER_FLAME,FLAME_BIG,8,224,120);
+    	sprite(PLAYER_FLAME,FLAME_BIG,PAL_SHIPFLAME,224,120);
     } else {
 	    sprite(PLAYER_SHIELD,124,COLOR_BLACK,192,112);
 	    sprite(PLAYER_SHIELD+1,128,COLOR_BLACK,192,128);
@@ -898,7 +899,7 @@ void dyen(unsigned char x) {
 			eec[x+6]=72;
 			esc[x+6]=52;
 			en_func[x+6] = enemyexplosion;
-			sprite(x+6+ENEMY_SPRITE,ech[x+6], f18a?8:COLOR_LTRED, enr[x+6], enc[x+6]);
+			sprite(x+6+ENEMY_SPRITE,ech[x+6], f18a?PAL_EXPLODE:COLOR_LTRED, enr[x+6], enc[x+6]);
 
 			if (ech[x] == 76) {
 				// left destroyed
@@ -937,7 +938,7 @@ void dyen(unsigned char x) {
 				ech[k]=84;
 				eec[k]=84;
 				esc[k]=84;
-				sprite(k+ENEMY_SPRITE,84,f18a?2:COLOR_LTYELLOW,r,c);
+				sprite(k+ENEMY_SPRITE,84,f18a?PAL_MINETIP:COLOR_LTYELLOW,r,c);  // this is the explosion particle - a shot with a recycled palette
 				if (k<3) {
 					ers[k]=-9;
 				}
@@ -962,7 +963,7 @@ void dyen(unsigned char x) {
 			ech[4]=52;
 			eec[4]=72;
 			esc[4]=52;
-			sprite(ENEMY_SPRITE+4,52,f18a?8:COLOR_LTRED,r,c);
+			sprite(ENEMY_SPRITE+4,52,f18a?PAL_EXPLODE:COLOR_LTRED,r,c);
 
 			SOUND=0xff;
 		}

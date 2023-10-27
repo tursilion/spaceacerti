@@ -694,10 +694,10 @@ void deShieldSelena() {
 
 // for the F18 we can just turn the sprites on and off
 void shieldf18() {
-	sprite(PLAYER_SHIELD,124,13,192,112);
-	sprite(PLAYER_SHIELD+1,128,13,192,128);
-	sprite(PLAYER_SHIELD+2,132,13,208,112);
-	sprite(PLAYER_SHIELD+3,136,13,208,128);
+	sprite(PLAYER_SHIELD,124,PAL_PLAYSHIELD,192,112);
+	sprite(PLAYER_SHIELD+1,128,PAL_PLAYSHIELD,192,128);
+	sprite(PLAYER_SHIELD+2,132,PAL_PLAYSHIELD,208,112);
+	sprite(PLAYER_SHIELD+3,136,PAL_PLAYSHIELD,208,128);
 }
 void deshieldf18() {
     spdel(PLAYER_SHIELD);
@@ -864,11 +864,10 @@ titleagain:
 		break;
 	}
 
-    if ((f18a)&&(scoremode==3)) {
+    if ((f18a)&&(scoremode == 3)) {
         // enemies are going to be bgcolor -- which is always black so we can assume
         // going to fix this by setting the palettes appropriately
-        // palette 4 will be dedicated to being black
-        loadpal_f18a(f18BlackPal, 16, 4);
+        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
     }
 
 	while (1) {		/*forever*/
@@ -1058,7 +1057,11 @@ void ispace() {
 	}
 
 	// background color for cloaked enemies
-	bgColor = COLOR_BLACK;
+    if (f18a) {
+    	bgColor = PAL_INVISIBLE;
+    } else {
+    	bgColor = COLOR_BLACK;
+    }
 
 	// set up main music and any stage-specific stuff
 	switch(level) {

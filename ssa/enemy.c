@@ -8,6 +8,7 @@
 #include "game.h"
 #include "enemy.h"
 #include "trampoline.h"
+#include "f18load.h"
 
 extern unsigned char screenFlashCnt;
 
@@ -179,24 +180,20 @@ void enout() {
                 switch (gentype[idx]) {
 				    // minimum player damage is 2 for spread, 3 for pulse
                     default:    //for (;;) { } // not sure why we need a default, but we seem to. So make it a saucer.
-					case ENEMY_SAUCER:		eec[k]=0; esc[k]=0; ep[k]=2; if (!f18a) c=COLOR_MEDGREEN; else c=4; en_func[k]=enemysaucer; if (enc[k]<32) enc[k]+=32; if (enc[k]>216) enc[k]-=48; break;
-					case ENEMY_JET:			eec[k]=4; esc[k]=4; ep[k]=3; ecs[k]=0; if (!f18a) c=COLOR_LTBLUE; else c=5; en_func[k]=enemyjet; break;
-					case ENEMY_MINE:		eec[k]=8; esc[k]=8; ep[k]=10; if (!f18a) c=COLOR_CYAN; else c=1; en_func[k]=enemymine; break;
-					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (!f18a) c=COLOR_MAGENTA; else c=6; ers[k]=(rndnum()&0x7f)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
-					case ENEMY_SWIRLY:		eec[k]=40; esc[k]=28; ep[k]=8; if (!f18a) c=COLOR_MEDRED; else c=7; en_func[k]=enemyswirly; break;
-					case ENEMY_BOMB:		eec[k]=44; esc[k]=44; ep[k]=20; if (!f18a) c=COLOR_DKYELLOW; else c=7; en_func[k]=enemybomb; break;
+					case ENEMY_SAUCER:		eec[k]=0; esc[k]=0; ep[k]=2; if (!f18a) c=COLOR_MEDGREEN; else c=PAL_SAUCER; en_func[k]=enemysaucer; if (enc[k]<32) enc[k]+=32; if (enc[k]>216) enc[k]-=48; break;
+					case ENEMY_JET:			eec[k]=4; esc[k]=4; ep[k]=3; ecs[k]=0; if (!f18a) c=COLOR_LTBLUE; else c=PAL_JET; en_func[k]=enemyjet; break;
+					case ENEMY_MINE:		eec[k]=8; esc[k]=8; ep[k]=10; if (!f18a) c=COLOR_CYAN; else c=PAL_MINE; en_func[k]=enemymine; break;
+					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (!f18a) c=COLOR_MAGENTA; else c=PAL_COPTER; ers[k]=(rndnum()&0x7f)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
+					case ENEMY_SWIRLY:		eec[k]=40; esc[k]=28; ep[k]=8; if (!f18a) c=COLOR_MEDRED; else c=PAL_SWIRL; en_func[k]=enemyswirly; break;
+					case ENEMY_BOMB:		eec[k]=44; esc[k]=44; ep[k]=20; if (!f18a) c=COLOR_DKYELLOW; else c=PAL_BOMB; en_func[k]=enemybomb; break;
 					case ENEMY_BEAMGEN:		
-						eec[k]=80; esc[k]=76; ep[k]=14; if (!f18a) c=COLOR_GRAY; else c=4; en_func[k]=enemybeamgen; 
+						eec[k]=80; esc[k]=76; ep[k]=14; if (!f18a) c=COLOR_GRAY; else c=PAL_BEAMGEN; en_func[k]=enemybeamgen; 
 						if (enc[k] > 144) enc[k]-=128;
 						break;
 				} 
 				if (scoremode == 3) {
                     // invisible enemies
-                    if (f18a) {
-                        c=4;    // palette 4 is mapped to black
-                    } else {
-                        c=bgColor;	
-                    }
+                    c=bgColor;	
                 }
 				ech[k]=esc[k];
 				sprite(k+ENEMY_SPRITE,ech[k],c,enr[k],enc[k]);  // c is F18A adjust above
@@ -665,14 +662,10 @@ void enemybeamgen(uint8 x) {
 		noen(x+6);
 	}
 	if (ent[x] != ENEMY_NONE) {
-        unsigned char c = f18a?4:COLOR_GRAY;
+        unsigned char c = f18a?PAL_BEAMGEN:COLOR_GRAY;
         if (scoremode == 3) {
             // invisible enemies
-            if (f18a) {
-                c=4;    // palette 4 is mapped to black
-            } else {
-                c=bgColor;	
-            }
+            c=bgColor;	
         }
 
 		if (ent[x+6] != ENEMY_BEAM) {
@@ -686,7 +679,7 @@ void enemybeamgen(uint8 x) {
 			switch (enr[x]&3) {
 				case 0:	// left and beam
 					sprite(x+ENEMY_SPRITE, 76, c, enr[x], bmin);
-					sprite(x+6+ENEMY_SPRITE, ech[x+6], f18a?2:COLOR_LTYELLOW, enr[x], enc[x+6]);
+					sprite(x+6+ENEMY_SPRITE, ech[x+6], f18a?PAL_BEAM:COLOR_LTYELLOW, enr[x], enc[x+6]);
 					break;
 				case 3:
 				case 1:	// left and right
@@ -695,7 +688,7 @@ void enemybeamgen(uint8 x) {
 					break;
 				case 2:	// right and beam
 					sprite(x+ENEMY_SPRITE, 80, c, enr[x], bmax);
-					sprite(x+6+ENEMY_SPRITE, ech[x+6], f18a?2:COLOR_LTYELLOW, enr[x], enc[x+6]);
+					sprite(x+6+ENEMY_SPRITE, ech[x+6], f18a?PAL_BEAM:COLOR_LTYELLOW, enr[x], enc[x+6]);
 					break;
 			}
 		}
@@ -755,7 +748,7 @@ void enemy()
 		MineTipPos=0;
 	}
 	if (ent[MineTipPos] == ENEMY_MINE) {
-		sprite(31, 204, f18a?2:COLOR_LTYELLOW, enr[MineTipPos], enc[MineTipPos]);
+		sprite(31, 204, f18a?PAL_MINETIP:COLOR_LTYELLOW, enr[MineTipPos], enc[MineTipPos]);
 	} else {
 		spdel(31);
 	}
@@ -804,7 +797,7 @@ void shootplayer(unsigned char en, unsigned char shot) {
 			ech[shot]=84;
 			enr[shot]=enr[en];
 			enc[shot]=enc[en];
-			sprite(shot+ENEMY_SPRITE,84,f18a?9:COLOR_DKGREEN,enr[en],enc[en]);
+			sprite(shot+ENEMY_SPRITE,84,f18a?PAL_SHOT:COLOR_DKGREEN,enr[en],enc[en]);
 		}
 	}
 }
@@ -844,7 +837,7 @@ void pwr(uint8 x)
 			ptp4=(rndnum()&3)+POWERUP_SHIELD;		// gives one of 3
 			if (ptp4 == POWERUP_SHIELD+3) ptp4=POWERUP_SHIELD;
 			patsprcpy(ptp4,248);		
-			sprite(POWERUP_SPRITE,248,2,enr[x],enc[x]);
+			sprite(POWERUP_SPRITE,248,2,enr[x],enc[x]); // in either mode, the color palette cycles - so just need to make sure it works with the selected palettes
 			pcr4=POWERUP_FIRST_COLOR; pr4=enr[x]; pc4=enc[x];
 			p4Time=POWERUP_TIME;
 		}

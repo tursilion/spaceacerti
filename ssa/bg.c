@@ -69,7 +69,7 @@ void stars() {
 	if (screenFlashCnt) {
 		--screenFlashCnt;
 		if (screenFlashCnt == 0) {
-			screen(bgColor);
+			screen(COLOR_BLACK);
 		}
 	}
 }
