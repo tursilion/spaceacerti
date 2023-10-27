@@ -1,0 +1,95 @@
+-- Image information --
+
+Provided is a project for "asesprite" though that's pay software. You can also work on the project elsewhere but it MUST be able to work in a pixel art form and must NOT re-order the palette. I think even MS Paint is 24 bit these days. Photoshop can work in reduced color but re-orders the palette when saved.
+
+The image ShipVsBoss.png shows the style clash in game. ;)
+
+The palette is currently set up as 144 colors, divided into 13 palettes of 8 colors each. This is more than the hardware supports, but that's because I can load just one boss at a time. ;)
+
+The sprites are arranged 16 across and 5 rows - each sprite is 16x16 pixels. They are currently colored for a 4-color palette... every pixel will need to be touched up, even if you want to keep the existing color, cause the colors will now be in the wrong place in the palette. You can't jump palettes - even if you need standards like black and white, you have to include them in each palette. (note for some reason, if you are loading a grid, the grid is offset 7 pixels in. My tools adjust for that.)
+
+The first 16 colors (or 2 palettes) are fixed and must not be changed. You can use them, but you are stuck with the colors that are there. The first color in every palette is hot pink (#FF00FF), and this represents transparent. This color is unavailable.
+
+Palettes 3,4,5,6 are free to use and define to any colors you like - however, don't get too subtle. The hardware will drop the last four bits of the color (so for instance, a red of FF becomes just F on the hardware, and a green of 78 and 7F are the same color: 7). To keep it simple, recommend the second digit of hex colors is left at zero, but at least check your colors are separate enough.
+
+Palettes 7 and 8 are dynamic so you can not define the colors in them. 7 will be used for the player's ship and so I've masked it out black here - just don't use it. Palette 8 is for the shields. If you want to improve them, you can redefine the colors in palette 8.
+
+Be careful not to add new pixels to the shields, and if you add pixels to the ships don't overlap the shields. The sprite engine causes sprites to flicker with each other and they will appear to shimmer with each other anywhere they overlap. It's not as nice as an effect as it sounds.
+
+All small sprites need to share the first 6 palettes. The small sprites are, across from the top:
+
+Row 1:
+    Saucer
+    Jet straight down
+    Mine
+    Helicopter frame 1
+    Helicopter frame 2
+    Helicopter frame 3
+    Helicopter frame 4
+    Swirly frame 1
+    Swirly frame 2
+    Swirly frame 3
+    Swirly frame 4
+    Bomb
+    Jet turning left
+    Explosion frame 1
+    Explosion frame 2
+    Explosion frame 3
+    
+Row 2:
+    Explosion frame 4
+    Explosion frame 5
+    Explosion frame 6
+    Boss flame frame 1
+    Boss flame frame 2
+    Enemy shot
+    Player pulse shot level 1
+    Player pulse shot level 2
+    Player pulse shot level 3
+    Player flame frame 1
+    Beam moving left
+    (rest is blank to leave room for player ship)
+    
+Row 3:
+    (all blank to leave room for player ship)
+    
+Row 4:
+    (3 blank to leave room for player ship)
+    Lighted tips for mine
+    Player spread shot straight
+    Player spread shot left 1
+    Player spread shot left 2
+    Player spread shot right 1
+    Player spread shot right 2
+    Beam moving right
+    Helicopter leaving frame 1
+    Helicopter leaving frame 2
+    Helicopter leaving frame 3
+    Helicopter leaving frame 4
+    (blank)
+    Jet turning right
+    
+Row 5:
+    Player flame frame 2
+    Homing shot (this will have multiple palettes but I haven't worked out how, don't make too complex)
+    Beam generator left
+    Beam generator right
+    (rest blank)
+    
+The player ships are 32x32, though most don't fill that space. They will get dedicated 8 color palettes in this sheet. All shields are 32x32 as well and need to not overlap the player ship - if you don't add or remove pixels that's not something to worry about. I've touched up the bosses to make that more clear.
+
+All shields will share palette 8. They are the only thing currently in the right palette, though they are in the top half of it. But that's okay if you don't want to touch them.
+
+The first is the red cruiser and it goes in palette 9.
+Then the white Snowball in palette 10.
+Then the red ladybug in palette 11.
+Then the gnat in palette 12.
+And finally Selena in palette 13.
+
+All player ships use the sequence of straight, then left turn, then right turn.
+    
+=== What I need
+
+- All sprites updated to use 8 (really 7) color palettes. Every pixel (except maybe the shields) needs to be touched up.
+- a list for the small sprites telling me which palette to use for each one!
+- the PNG or ASE save file
