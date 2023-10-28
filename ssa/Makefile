@@ -14,7 +14,7 @@ objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel b
         ship2_c.rel ship2_p.rel ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel \
         ladybugc.rel ladybugp.rel ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel \
         gnat3rlec.rel gnat3rlep.rel gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel \
-        cruiserendc.rel cruiserendp.rel f18sprites.rel f18load.rel f18abosses.rel
+        cruiserendc.rel cruiserendp.rel f18sprites.rel f18load.rel f18load2.rel f18abosses.rel
 
 all: buildcol
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
@@ -149,10 +149,12 @@ attract.rel: attract.c attract.h
 sfxs.rel: sfxs.c
 	$(CC) $(CFLAGS) -o sfxs.rel sfxs.c --codeseg sfxs --constseg sfxs
 
-f18sprites.rel: f18sprites.c
-	$(CC) $(CFLAGS) -o f18sprites.rel f18sprites.c --codeseg f18sprites --constseg f18sprites
+f18sprites.rel: f18sprites8.c
+	$(CC) $(CFLAGS) -o f18sprites.rel f18sprites8.c --codeseg f18sprites --constseg f18sprites
 f18load.rel: f18load.c
 	$(CC) $(CFLAGS) -o f18load.rel f18load.c --codeseg f18load --constseg f18load
+f18load2.rel: f18load2.c
+	$(CC) $(CFLAGS) -o f18load2.rel f18load2.c --codeseg f18load2 --constseg f18load2
 f18abosses.rel: f18abosses.c
 	$(CC) $(CFLAGS) -o f18abosses.rel f18abosses.c --codeseg f18bosses --constseg f18bosses
 

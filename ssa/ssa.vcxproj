@@ -99,7 +99,9 @@
     <ClCompile Include="enemy.c" />
     <ClCompile Include="f18abosses.c" />
     <ClCompile Include="f18load.c" />
+    <ClCompile Include="f18load2.c" />
     <ClCompile Include="f18sprites.c" />
+    <ClCompile Include="f18sprites8.c" />
     <ClCompile Include="font.c" />
     <ClCompile Include="gnat1rlec.c" />
     <ClCompile Include="gnat1rlep.c" />

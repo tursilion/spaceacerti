@@ -33,7 +33,7 @@
 #include "cruiserend_p.c"
 #include "snowballbase_c.c"
 #include "snowballbase_p.c"
-#include "f18sprites.c"
+#include "f18sprites8.c"
 #include "f18abosses.c"
 
 // I don't THINK these need to be recursive, but just in case
@@ -89,6 +89,7 @@ void wrapplayerstraight() {
 }
 
 // boss chars run through to 255
+// not used for F18A
 void wrapunpackboss(unsigned char level) {
 	unsigned int old = nBank;
 	SWITCH_IN_BANK5;
@@ -239,6 +240,7 @@ void wrapLoadEngineSprites() {
     	SWITCH_IN_BANK14;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, F18SPRITES+76*8, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18SPRITES2+76*8, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x1000, F18SPRITES3+76*8, 2*4*8);
     } else {
     	SWITCH_IN_BANK5;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, SPRITES+76*8, 2*4*8);
@@ -258,6 +260,7 @@ void wrapPlayerFlameBig() {
     	    SWITCH_IN_BANK14;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18SPRITES+100*8, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18SPRITES2+100*8, 4*8);
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x1000, F18SPRITES3+100*8, 4*8);
         } else {
     	    SWITCH_IN_BANK5;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, SPRITES+100*8, 4*8);
@@ -277,6 +280,7 @@ void wrapPlayerFlameSmall() {
             SWITCH_IN_BANK14;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18PLAYERFLAMESMALL, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18PLAYERFLAMESMALL2, 4*8);
+	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x1000, F18PLAYERFLAMESMALL3, 4*8);
         } else {
     	    SWITCH_IN_BANK5;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, PLAYERFLAMESMALL, 4*8);
@@ -483,7 +487,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat1[scanline*(F18BOSS1W/4)], F18BOSS1W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS1W/4), 0, 32-(F18BOSS1W/4));
             } else {
-                loadpal_f18a(f18bosspal1, 16, 16);
+                loadpal_f18a(f18bosspal1, PAL_BOSS*4, 16);
                 ret = 0;
             }
             break;
@@ -493,7 +497,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat2[scanline*(F18BOSS2W/4)], F18BOSS2W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS2W/4), 0, 32-(F18BOSS2W/4));
             } else {
-                loadpal_f18a(f18bosspal2, 16, 16);
+                loadpal_f18a(f18bosspal2, PAL_BOSS*4, 16);
                 ret = 0;
             }
             break;
@@ -503,7 +507,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat3[scanline*(F18BOSS3W/4)], F18BOSS3W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS3W/4), 0, 32-(F18BOSS3W/4));
             } else {
-                loadpal_f18a(f18bosspal3, 16, 16);
+                loadpal_f18a(f18bosspal3, PAL_BOSS*4, 16);
                 ret = 0;
             }
             break;
@@ -513,7 +517,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat4[scanline*(F18BOSS4W/4)], F18BOSS4W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS4W/4), 0, 32-(F18BOSS4W/4));
             } else {
-                loadpal_f18a(f18bosspal4, 16, 16);
+                loadpal_f18a(f18bosspal4, PAL_BOSS*4, 16);
                 ret = 0;
             }
             break;
@@ -523,7 +527,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat5[scanline*(F18BOSS5W/4)], F18BOSS5W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS5W/4), 0, 32-(F18BOSS5W/4));
             } else {
-                loadpal_f18a(f18bosspal5, 16, 16);
+                loadpal_f18a(f18bosspal5, PAL_BOSS*4, 16);
                 ret = 0;
             }
             break;
@@ -536,9 +540,8 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
 void wrapLoadF18MainPalette() {
     unsigned int old = nBank;
 
-    // just the palette overwritten by the boss
     SWITCH_IN_BANK14;
-    loadpal_f18a(&F18PALETTE[16], 16, 16);
+    loadpal_f18a(F18PALETTE, 0, 64);
     SWITCH_IN_PREV_BANK(old);
 }
 
@@ -548,7 +551,7 @@ void wrapInitCruiser() {
     if (f18a) {
         SWITCH_IN_BANK14;
         initCruiserf18();
-        loadpal_f18a(F18CRUISERPAL, 49, 3);
+        loadpal_f18a(F18CRUISERPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
@@ -563,7 +566,7 @@ void wrapInitSnowball() {
     if (f18a) {
         SWITCH_IN_BANK14;
         initSnowballf18();
-        loadpal_f18a(F18SNOWBALLPAL, 49, 3);
+        loadpal_f18a(F18SNOWBALLPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
     	SWITCH_IN_BANK5;
     	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
@@ -578,7 +581,7 @@ void wrapInitLadybug() {
     if (f18a) {
 	    SWITCH_IN_BANK14;
         initLadybugf18();
-        loadpal_f18a(F18LADYBUGPAL, 49, 3);
+        loadpal_f18a(F18LADYBUGPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
@@ -591,9 +594,9 @@ void wrapInitGnat() {
 	unsigned int old = nBank;
 
     if (f18a) {
-	    SWITCH_IN_BANK14;
+	    SWITCH_IN_BANK15;
         initGnatf18();
-        loadpal_f18a(F18GNATPAL, 49, 3);
+        loadpal_f18a(F18GNATPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
@@ -606,9 +609,9 @@ void wrapInitSelena() {
 	unsigned int old = nBank;
 
     if (f18a) {
-	    SWITCH_IN_BANK14;
+	    SWITCH_IN_BANK15;
         initSelenaf18();
-        loadpal_f18a(F18SELENAPAL, 49, 3);
+        loadpal_f18a(F18SELENAPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5;
 	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites

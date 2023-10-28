@@ -82,12 +82,19 @@ void gamewineasy() {
 	unsigned char idx;
 	unsigned int x;
 
-	vdpmemcpy(gPATTERN+96*8, smallcapsfont, 28*8);
+    if (f18a) {
+        vdpmemcpy(gPATTERN+0x800+96*8, smallcapsfont, 28*8);
+	    vdpmemcpy(gPATTERN+0x800+121*8, easypats, 8*3);
+	    // and zero out whatever used to be the space character
+	    vdpmemset(gPATTERN+0x800+32*8, 0, 8);
+    } else {
+        vdpmemcpy(gPATTERN+96*8, smallcapsfont, 28*8);
+	    vdpmemcpy(gPATTERN+121*8, easypats, 8*3);
+	    // and zero out whatever used to be the space character
+	    vdpmemset(gPATTERN+32*8, 0, 8);
+    }
 	patcpy('y', '[');
 	patcpy('z', '\\');
-	vdpmemcpy(gPATTERN+121*8, easypats, 8*3);
-	// and zero out whatever used to be the space character
-	vdpmemset(gPATTERN+32*8, 0, 8);
 
 	for (idx = 0; idx < 32; idx++) {
 		vchar(1,idx,123,22);

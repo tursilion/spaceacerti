@@ -196,6 +196,12 @@
     <ClCompile Include="bossDraw.c">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="f18sprites8.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="f18load2.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

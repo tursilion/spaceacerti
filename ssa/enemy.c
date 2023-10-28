@@ -452,6 +452,7 @@ void enemybomb(uint8 x) {
 	}
 }
 
+// TODO: F18A 8-color bullets - need a change?
 const unsigned int bulletColor1[4] = { 0x00d0, 0x0e22 };   // green on red
 const unsigned int bulletColor2[4] = { 0x0e22, 0x00d0 };   // red on green
 
@@ -464,10 +465,10 @@ void enemyshot(uint8 x) {
 	// flash the enemy bullets
     if (f18a) {
         if (cnt == 4) {
-            loadpal_f18a(bulletColor1, 37, 2);
+            loadpal_f18a(bulletColor1, PAL_SHOT*4+1, 2);
         } else if (cnt == 8) {
             cnt = 0;
-            loadpal_f18a(bulletColor2, 37, 2);
+            loadpal_f18a(bulletColor2, PAL_SHOT*4+1, 2);
         }
     } else {
         // change the color

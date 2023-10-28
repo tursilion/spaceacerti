@@ -19,7 +19,7 @@
 #include "f18load.h"
 
 #define BIN2INC_HEADER_ONLY
-#include "f18sprites.c"
+#include "f18sprites8.c"
 
 // full software reboot vector (warning: hard coded but defined by the crt0)
 static void (* const hwreboot)()=0x802c;
@@ -337,10 +337,13 @@ void loadcharset() {
 	unsigned int old = nBank;
 
 	SET_COLECO_FONT_BANK;
-	vdpmemcpy(gPATTERN+(32*8), colecofont, 768);
-	vdpmemcpy(gPATTERN+(32*8)+SCROLL_OFFSET, colecofont, 768);
-	vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*2), colecofont, 768);
-	vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*3), colecofont, 768);
+
+    vdpmemcpy(gPATTERN+(32*8)+SCROLL_OFFSET, colecofont, 768);
+    if (!f18a) {
+	    vdpmemcpy(gPATTERN+(32*8), colecofont, 768);
+	    vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*2), colecofont, 768);
+	    vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*3), colecofont, 768);
+    }
 
 #if 0
 	// makes the font, then we saved it off
@@ -366,15 +369,17 @@ void patcpy(uint8 from, uint8 to) {
 	if (from) {
 		vdpmemread(((int)from<<3)+gPATTERN, tmpbuf, 8);
 	}
-	vdpmemcpy(((int)to<<3)+gPATTERN, tmpbuf, 8);
 	vdpmemcpy(((int)to<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);
-	vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*2), tmpbuf, 8);
-	vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*3), tmpbuf, 8);
+    if (!f18a) {
+	    vdpmemcpy(((int)to<<3)+gPATTERN, tmpbuf, 8);
+	    vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*2), tmpbuf, 8);
+	    vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*3), tmpbuf, 8);
+    }
 }
 
 // copies a VDP character pattern to sprite table
 void patsprcpy(uint8 from, uint8 to) {
-	vdpmemread((from<<3)+gPATTERN, tmpbuf, 8);
+	vdpmemread((from<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);    // this is the only one guaranteed in F18A mode
 	vdpmemcpy((to<<3)+gSPRITE_PATTERNS, tmpbuf, 8);
 }
 
@@ -574,11 +579,14 @@ unsigned char grf1() {
 
 	x = set_graphics_raw(VDP_SPR_16x16);
 	// we separate sprites and patterns
-	VDP_SET_REGISTER(VDP_REG_PDT, 0x03);    gPattern = 0x1800;  // set it, but we usually use the macro version
-
     if (f18a) {
-        VDP_SET_REGISTER(F18A_REG_ECM, 2);  // sprites have 2 bitplanes
+        // we'll really use 0x2000 for patterns, but all the code assumes four sets starting at 0x1800 so lying below
+    	VDP_SET_REGISTER(VDP_REG_PDT, 0x04);
+        VDP_SET_REGISTER(F18A_REG_ECM, 3);  // sprites have 3 bitplanes
+    } else {
+        VDP_SET_REGISTER(VDP_REG_PDT, 0x03);    
     }
+    gPattern = 0x1800;  // set it, but we usually use the macro version
 
 	// clear the screen
 	cls();
@@ -770,8 +778,7 @@ titleagain:
 
     if (f18a) {
         // load the palette we plan to use
-        SWITCH_IN_BANK14;
-        loadpal_f18a(F18PALETTE, 0, 64);
+        wrapLoadF18MainPalette();
     }
 
 	SWITCH_IN_BANK9;
@@ -798,10 +805,12 @@ titleagain:
 	loadcharset();
 	
 	SWITCH_IN_BANK5;
-	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
 	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
-	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*2), CHARS, SIZE_OF_CHARS);
-	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*3), CHARS, SIZE_OF_CHARS);
+    if (!f18a) {
+    	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
+    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*2), CHARS, SIZE_OF_CHARS);
+    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*3), CHARS, SIZE_OF_CHARS);
+    }
 
 	spdall();	// clears sprite table
 	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
@@ -832,6 +841,7 @@ titleagain:
         SWITCH_IN_BANK14;
 	    vdpmemcpy(gSPRITE_PATTERNS, F18SPRITES, SIZE_OF_SPRITES);
 	    vdpmemcpy(gSPRITE_PATTERNS+0x800, F18SPRITES2, SIZE_OF_SPRITES);
+	    vdpmemcpy(gSPRITE_PATTERNS+0x1000, F18SPRITES3, SIZE_OF_SPRITES);
 	    // also, manually clear out sprite patterns 248-251 (powerup,etc)
 	    vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
 	    vdpmemset(gSPRITE_PATTERNS+(248*8)+0x800, 0, 32);
@@ -868,6 +878,7 @@ titleagain:
         // enemies are going to be bgcolor -- which is always black so we can assume
         // going to fix this by setting the palettes appropriately
         loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
+        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+4, 4);
     }
 
 	while (1) {		/*forever*/
@@ -1028,8 +1039,10 @@ void ispace() {
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &F18SPRITES[84*8], 4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18ELECTRICWALL2, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8+0x800, &F18SPRITES2[84*8], 4*8);
-        // turn on the extended sprite mode - 2 bitplanes
-        VDP_SET_REGISTER(F18A_REG_ECM, 2);
+	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x1000, F18ELECTRICWALL3, 2*4*8);
+	    vdpmemcpy(gSPRITE_PATTERNS+84*8+0x1000, &F18SPRITES3[84*8], 4*8);
+        // turn on the extended sprite mode - 3 bitplanes
+        VDP_SET_REGISTER(F18A_REG_ECM, 3);
     } else {
     	SWITCH_IN_BANK5;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, ELECTRICWALL, 2*4*8);
@@ -1154,11 +1167,11 @@ void playmv()
             SWITCH_IN_BANK14;
 
 		    if (shield > 70) {
-                loadpal_f18a(F18SHIELDMAX, 53, 3);
+                loadpal_f18a(F18SHIELDMAX, PAL_PLAYSHIELD*4+1, 7);
 		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
-                loadpal_f18a(F18SHIELDMED, 53, 3);
+                loadpal_f18a(F18SHIELDMED, PAL_PLAYSHIELD*4+1, 7);
 		    } else if (shield > 0) {
-                loadpal_f18a(F18SHIELDLOW, 53, 3);
+                loadpal_f18a(F18SHIELDLOW, PAL_PLAYSHIELD*4+1, 7);
 		    } else {
 			    // done with shield, back to normal
 			    shieldsOff();

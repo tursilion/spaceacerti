@@ -9,7 +9,7 @@ void initSelenaf18();
 #define GPU_DAMAGEIN 0x3c80
 #define GPU_DAMAGEGO 0x3c82
 
-#if 1
+#if 0
 // palette indexes (4 color sprite mode)
 #define PAL_SAUCER      4
 #define PAL_JET         5
@@ -33,29 +33,33 @@ void initSelenaf18();
 #define PAL_BOSSHOMEDK  15
 #define PAL_INVISIBLE   4
 #define PAL_SHOT        9
+#define PAL_BOSS        4       // boss uses 4 palettes
 #else
 // palette indexes (8 color sprite mode)
+// Still need to define the palettes as if they were 4 color, but the least significant bit is ignored
 #define PAL_SAUCER      4
-#define PAL_JET         5
-#define PAL_MINE        1
+#define PAL_JET         4
+#define PAL_MINE        0
 #define PAL_COPTER      6
-#define PAL_SWIRL       7
-#define PAL_BOMB        7
+#define PAL_SWIRL       6
+#define PAL_BOMB        6
 #define PAL_EXPLODE     8
 #define PAL_BOSSFLAME   8
 #define PAL_PULSE       10
 #define PAL_SHIPFLAME   8
 #define PAL_BEAM        2
 #define PAL_MINETIP     2
-#define PAL_SPREAD      11
+#define PAL_SPREAD      10
 #define PAL_PLAYHOME    10
 #define PAL_BEAMGEN     4
-#define PAL_PLAYSHIELD  13
-#define PAL_PLAYSHIP    12
-#define PAL_BOSSHOMETIP 3
+#define PAL_BOSSHOMETIP 2
 #define PAL_BOSSHOMELT  14
-#define PAL_BOSSHOMEDK  15
+#define PAL_BOSSHOMEDK  14
 #define PAL_INVISIBLE   4
-#define PAL_SHOT        9
+#define PAL_SHOT        8
+#define PAL_BOSS        4       // boss uses 2 8-color palettes, 4 4-color
+
+#define PAL_PLAYSHIELD  14
+#define PAL_PLAYSHIP    12
 #endif
 

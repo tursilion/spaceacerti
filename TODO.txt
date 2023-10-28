@@ -35,8 +35,8 @@ VRAM map (except for ending routines)
  >03E0	(Unused)
  >0800	Sprite Pattern Table
  >1000  9918A - unused, F18A - second half of sprite pattern table (4 color sprite mode)
- >1800	Pattern table (scroll 0)
- >2000	Pattern table (scroll 2) 
+ >1800	Pattern table (scroll 0) - F18A - third half of sprite pattern table (8 color mode)
+ >2000	Pattern table (scroll 2) - F18A - actual used pattern table and in-game pattern table
  >2800	Pattern table (scroll 4) - F18A: boss bitmap layer (16-color, 3k max with padding)
  >3000	Pattern table (scroll 6) - F18A: >3400 free
  >3800	(unused)
@@ -105,29 +105,6 @@ Snowball Palette:   000, fff, c00
 Ladybug palette:    000, a00, d00
 Gnat palette:       000, 2f0, 0c0
 Selena palette:     000, 00c, 008
-
-#define PAL_SAUCER      4
-#define PAL_JET         5
-#define PAL_MINE        1
-#define PAL_COPTER      6
-#define PAL_SWIRL       7
-#define PAL_BOMB        7
-#define PAL_EXPLODE     8
-#define PAL_BOSSFLAME   8
-#define PAL_PULSE       10
-#define PAL_SHIPFLAME   8
-#define PAL_BEAM        2
-#define PAL_MINETIP     2
-#define PAL_SPREAD      11
-#define PAL_PLAYHOME    10
-#define PAL_BEAMGEN     4
-#define PAL_PLAYSHIELD  13
-#define PAL_PLAYSHIP    12
-#define PAL_BOSSHOMETIP 14
-#define PAL_BOSSHOMELT  3
-#define PAL_BOSSHOMEDK  15
-#define PAL_INVISIBLE   4
-#define PAL_SHOT        9
 
 Possible sprite palettes - 8 color mode
 ---------------------------------------
