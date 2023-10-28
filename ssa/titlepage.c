@@ -19,6 +19,14 @@
 #include "..\title2\ship4_c.c"
 #include "..\title2\ship4_p.c"
 
+// bitmap for F18A text
+const unsigned char F18Text[] = {
+    0x7E,0xC0,0xC0,0xDC,0xC0,0xC0,0xC0,0x00,
+    0x18,0x38,0x18,0x18,0x18,0x18,0x18,0x00,
+    0x7C,0xC6,0xC6,0x5C,0xC6,0xC6,0x7C,0x00,
+    0x7C,0xC6,0xC6,0xDE,0xC6,0xC6,0xC6,0x00
+};
+
 // only ship1 is on the same page as we are, 2-4 are on another page
 
 // this is for bitmap mode - it does NOT use the globals,
@@ -74,6 +82,12 @@ void handleTitlePage() {
 	if ((playership != 255)&&(score != 0)) {
 		wrapspritescore(0x3800, 0x1b00, 0xff, 103, 0);
 	}
+
+    // display F18A in bottom left if active
+    if (f18a) {
+        vdpmemcpy(0x1000+7*32*8, F18Text, 4*8);
+        vdpmemset(0x3000+7*32*8, COLOR_LTBLUE<<4|COLOR_BLACK, 32);
+    }
 
 	cntdown = 600;
 	joynum=1;
