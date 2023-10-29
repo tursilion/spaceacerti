@@ -24,13 +24,7 @@ extern unsigned char BNR,BNC;
 // and get the boss draw just a bit faster.
 // None of these are used by the F18A
 
-inline void BOSS_SAFE_DELAY(void) {	
-__asm
-	nop
-	nop
-	nop
-__endasm;
-}
+inline void BOSS_SAFE_DELAY(void) {	} 
 
 #define EDGEBLANKA			\
 	if (bd>0) {				\

@@ -961,6 +961,8 @@ const unsigned char CHARS[] = {
 };
 
 // this seems fast enough that we don't have to pre-process the characters
+// TODO: Not sure these two text blocks will line up, but GCC has a 1k limit
+// on text strings, else it crashes with "stack smashing detected"
 const char TXTDAT[] =
  " ============================== "
  "        Congratulations!        "
@@ -993,7 +995,8 @@ const char TXTDAT[] =
  "             =====              "
  "     Tadd Nuznov (RushJet1)     "
  " ============================== "
- "          EXTRA THANKS          "
+ "          EXTRA THANKS          ";
+const char TXTDAT2[] = 
  "          ============          "
  "         Gord (again!!)         "
  "          Steve Brent           "
@@ -1048,3 +1051,4 @@ const char WINTIPS[] =
 	 " Hold UP to activate cheat mode "
 	 "Isn't it fun to read through the binary?"
 ;
+

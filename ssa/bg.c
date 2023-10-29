@@ -2,7 +2,6 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
-#include <player.h>
 
 // game
 #include "game.h"

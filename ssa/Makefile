@@ -1,209 +1,237 @@
-#CC = D:/work/coleco/sdcc-4.2.0/bin/sdcc.exe
-CC = D:/work/coleco/sdcc20230715/bin/sdcc.exe
-CFLAGS = -mz80 --vc -c "-Id:/work/coleco/libti99coleco" "-ID:/work/TI/vgmcomp2/Players/libcolecovgm2" -DENABLEFX --std-sdcc11 --opt-code-speed --less-pedantic --fsigned-char
-#AS = D:/work/coleco/sdcc-4.2.0/bin/sdasz80
-AS = D:/work/coleco/sdcc20230715/bin/sdasz80
-AFLAGS = -plosgff
+#note: no cart in this one
+# todo: I need to make my own linker to go from the ELF to the cartridge,
+# similar to the Coleco MakeMegacart
+
+# Paths to TMS9900 compilation tools
+GAS=/home/tursilion/gcc9900/bin/tms9900-as
+LD=/home/tursilion/gcc9900/bin/tms9900-ld
+CC=/home/tursilion/gcc9900/bin/tms9900-gcc
+CP=/usr/bin/cp
+NAME=gromcfg
+
+# Path to elf2cart conversion utility
+ELF2CART=/home/tursilion/elf2cart
+ELF2EA5=/home/tursilion/elf2ea5
+EA5PLIT=/home/tursilion/ea5split/ea5split
+
+# Flags used during linking
+#
+# Locate the code (.text section) and the data (.data section)
+# TODO: a linker script is necessary to define the output sections (that will replace the list in the Coleco CRT0)
+# That will also let us set the start addresses. The ELF should in theory contain section names which will let
+# out custom cartridge builder figure out where things go.
+# https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_node/ld_19.html
+LDFLAGS_EA5=-M -T linker.ld
+
+INCPATH=-I/mnt/d/work/libti99ALL -I/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
+LIBPATH=-L/mnt/d/work/libti99ALL -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
+LIBS=-lti99 -ltivgm2
+
+CFLAGS=\
+  -O2 -std=c99 -c -s --save-temp -DTI99
 
 .PHONY: all clean
 
 # crt0 must be first!
-objs = crt0.rel ssd_inc.rel superspaceacer.rel trampolines.rel bg.rel boss.rel bossdraw.rel enemy.rel music.rel human.rel wineasy.rel \
-        winhard.rel winmed.rel title_c.rel title_p.rel boss1.rel boss2.rel boss3.rel boss4.rel boss5.rel outfile0.rel outfile1.rel \
-        outfile2.rel outfile3.rel font.rel difficulty.rel selena_end_c.rel selena_end_p.rel titlepage.rel ship1_c.rel ship1_p.rel \
-        ship2_c.rel ship2_p.rel ship3_c.rel ship3_p.rel ship4_c.rel ship4_p.rel qwertianc.rel qwertianp.rel attract.rel sfxs.rel \
-        ladybugc.rel ladybugp.rel ladybugscreenc.rel ladybugscreenp.rel gnat1rlec.rel gnat1rlep.rel gnat2rlec.rel gnat2rlep.rel \
-        gnat3rlec.rel gnat3rlep.rel gnat4rlec.rel gnat4rlep.rel gnat5rlec.rel gnat5rlep.rel snowballbasec.rel snowballbasep.rel \
-        cruiserendc.rel cruiserendp.rel f18sprites.rel f18load.rel f18load2.rel f18abosses.rel
+OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o bg.o boss.o bossdraw.o enemy.o music.o wineasy.o \
+        winhard.o title_c.o title_p.o boss1.o boss2.o boss3.o boss4.o boss5.o outfile0.o outfile1.o \
+        outfile2.o outfile3.o font.o difficulty.o selena_end_c.o selena_end_p.o titlepage.o ship1_c.o ship1_p.o \
+        ship2_c.o ship2_p.o ship3_c.o ship3_p.o ship4_c.o ship4_p.o qwertianc.o qwertianp.o attract.o sfxs.o \
+        ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
+        gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
+        human.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18abosses.o
 
-all: buildcol
+# List of all files needed in executable
+PREREQUISITES=\
+  $(OBJECT_LIST_EA5) $(OBJECT_LIST)
+
+all: buildti
 	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
 
 # crt0.s contains a reference to each segment in order, so they can be linked up - put files into segments there
 # if makemegacart complains about data in RAM, see if a segment is missing there
 
-buildcol: $(objs)
-	$(CC) -mz80 --vc --no-std-crt0 $(BANKS) --code-loc 0x8100 --data-loc 0x7000 -l"d:/work/coleco/libti99coleco/libti99.a" -l"D:\work\TI\vgmcomp2\Players\libcolecovgm2\libcolecovgm2.a" $(objs)
-	"../parseMap.exe" crt0.map
+buildti: $(PREREQUISITES)
+	$(LD) $(OBJECT_LIST) $(LIBS) $(LIBPATH) $(LDFLAGS_EA5) -o $(NAME).ea5.elf > ea5.map
+	$(ELF2EA5) $(NAME).ea5.elf $(NAME).ea5.bin
+	$(EA5PLIT) $(NAME).ea5.bin
+	$(CP) GROMCF* /cygdrive/c/classic99/dsk1/
 
-# banks - all defined the same way, we just need to declare them
+# banks - all defined the same way, we just need to declare them -- can we use this with GCC?
 BANKS = "-Wl -b_bank1=0xc000" "-Wl -b_bank2=0xc000" "-Wl -b_bank3=0xc000" "-Wl -b_bank4=0xc000" "-Wl -b_bank5=0xc000" "-Wl -b_bank6=0xc000" "-Wl -b_bank7=0xc000" \
 		"-Wl -b_bank8=0xc000" "-Wl -b_bank9=0xc000" "-Wl -b_bank10=0xc000" "-Wl -b_bank11=0xc000" "-Wl -b_bank12=0xc000" "-Wl -b_bank13=0xc000" "-Wl -b_bank14=0xc000" "-Wl -b_bank15=0xc000"
 
 clean:
-	cmd //c del *.rel *.map *.lst *.sym *.asm *.ihx *.rom boss1.c boss2.c boss3.c boss4.c boss5.c
+	-rm *.o *.map *.lst *.sym *.asm *.ihx *.rom
 
-ssd_inc.rel: ssd_inc.c
-	$(CC) $(CFLAGS) -o ssd_inc.rel ssd_inc.c --codeseg ssd --constseg ssd
+# Since we don't need custom segment tags anymore, we could in theory just use a generic recipe...
 
-bg.rel: bg.c game.h
-	$(CC) $(CFLAGS) -o bg.rel bg.c --codeseg bg --constseg bg
+ssd_inc.o: ssd_inc.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ssd_inc.o ssd_inc.c
 
-boss.rel: boss.c game.h boss.h
-	$(CC) $(CFLAGS) -o boss.rel boss.c --codeseg boss --constseg boss
+bg.o: bg.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o bg.o bg.c
 
-bossdraw.rel: bossdraw.c boss.h
-	$(CC) $(CFLAGS) -o bossdraw.rel bossdraw.c --codeseg boss --constseg boss
+boss.o: boss.c game.h boss.h
+	$(CC) $(CFLAGS) $(INCPATH) -o boss.o boss.c
 
-enemy.rel: enemy.c game.h
-	$(CC) $(CFLAGS) -o enemy.rel enemy.c --codeseg enemy --constseg enemy
+bossdraw.o: bossdraw.c boss.h
+	$(CC) $(CFLAGS) $(INCPATH) -o bossdraw.o bossdraw.c
 
-music.rel: music.c game.h
-	$(CC) $(CFLAGS) -o music.rel music.c --codeseg music --constseg music
+enemy.o: enemy.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o enemy.o enemy.c
 
-human.rel: human.c game.h
-	$(CC) $(CFLAGS) -o human.rel human.c --codeseg human --constseg human
+music.o: music.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o music.o music.c
 
-superspaceacer.rel: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h
-	$(CC) $(CFLAGS) -o superspaceacer.rel superspaceacer.c --codeseg ssa --constseg ssa
+human.o: human.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o human.o human.c
 
-titlepage.rel: titlepage.c game.h
-	$(CC) $(CFLAGS) -o titlepage.rel titlepage.c --codeseg titlepage --constseg titlepage
+superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h
+	$(CC) $(CFLAGS) $(INCPATH) -o superspaceacer.o superspaceacer.c
 
-trampolines.rel: trampolines.c game.h trampoline.h
-	$(CC) $(CFLAGS) -o trampolines.rel trampolines.c --codeseg tramp --constseg tramp
+titlepage.o: titlepage.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o titlepage.o titlepage.c
 
-wineasy.rel: wineasy.c game.h
-	$(CC) $(CFLAGS) -o wineasy.rel wineasy.c --codeseg wineasy --constseg wineasy
+trampolines.o: trampolines.c game.h trampoline.h
+	$(CC) $(CFLAGS) $(INCPATH) -o trampolines.o trampolines.c
 
-winmed.rel: winmed.c game.h
-	$(CC) $(CFLAGS) -o winmed.rel winmed.c --codeseg winmed --constseg winmed
+wineasy.o: wineasy.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o wineasy.o wineasy.c
 
-winhard.rel: winhard.c game.h boss.h trampoline.h music.h human.h
-	$(CC) $(CFLAGS) -o winhard.rel winhard.c --codeseg winhard --constseg winhard
+winmed.o: winmed.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o winmed.o winmed.c
 
-title_c.rel: title_c.c
-	$(CC) $(CFLAGS) -o title_c.rel title_c.c --codeseg titlec --constseg titlec
+winhard.o: winhard.c game.h boss.h trampoline.h music.h human.h
+	$(CC) $(CFLAGS) $(INCPATH) -o winhard.o winhard.c
 
-title_p.rel: title_p.c
-	$(CC) $(CFLAGS) -o title_p.rel title_p.c --codeseg titlep --constseg titlep
+title_c.o: title_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o title_c.o title_c.c
 
-boss1.rel: boss1.bmp
-	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss1.bmp boss1.c BOSS1
-	$(CC) $(CFLAGS) -oboss1.rel boss1.c --codeseg boss1 --constseg boss1
+title_p.o: title_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o title_p.o title_p.c
 
-boss2.rel: boss2.bmp
-	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss2.bmp boss2.c BOSS2
-	$(CC) $(CFLAGS) -oboss2.rel boss2.c --codeseg boss2 --constseg boss2
+boss1.o: boss1.bmp
+	$(CC) $(CFLAGS) $(INCPATH) -oboss1.o boss1.c
 
-boss3.rel: boss3.bmp
-	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss3.bmp boss3.c BOSS3
-	$(CC) $(CFLAGS) -oboss3.rel boss3.c --codeseg boss3 --constseg boss3
+boss2.o: boss2.bmp
+	$(CC) $(CFLAGS) $(INCPATH) -oboss2.o boss2.c
 
-boss4.rel: boss4.bmp
-	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss4.bmp boss4.c BOSS4
-	$(CC) $(CFLAGS) -oboss4.rel boss4.c --codeseg boss4 --constseg boss4
+boss3.o: boss3.bmp
+	$(CC) $(CFLAGS) $(INCPATH) -oboss3.o boss3.c
 
-boss5.rel: boss5.bmp
-	D:/work/coleco/tursi/superspaceacer/packboss/Debug/packboss.exe boss5.bmp boss5.c BOSS5
-	$(CC) $(CFLAGS) -oboss5.rel boss5.c --codeseg boss5 --constseg boss5
+boss4.o: boss4.bmp
+	$(CC) $(CFLAGS) $(INCPATH) -oboss4.o boss4.c
 
-outfile0.rel: outfile0.c
-	$(CC) $(CFLAGS) -o outfile0.rel outfile0.c --codeseg outfile0 --constseg outfile0
-outfile1.rel: outfile1.c
-	$(CC) $(CFLAGS) -o outfile1.rel outfile1.c --codeseg outfile1 --constseg outfile1
-outfile2.rel: outfile2.c
-	$(CC) $(CFLAGS) -o outfile2.rel outfile2.c --codeseg outfile2 --constseg outfile2
-outfile3.rel: outfile3.c
-	$(CC) $(CFLAGS) -o outfile3.rel outfile3.c --codeseg outfile3 --constseg outfile3
+boss5.o: boss5.bmp
+	$(CC) $(CFLAGS) $(INCPATH) -oboss5.o boss5.c
 
-ship1_c.rel: ../title2/ship1_c.c
-	$(CC) $(CFLAGS) -o ship1_c.rel ../title2/ship1_c.c --codeseg ship1c --constseg ship1c
-ship1_p.rel: ../title2/ship1_p.c
-	$(CC) $(CFLAGS) -o ship1_p.rel ../title2/ship1_p.c --codeseg ship1p --constseg ship1p
+outfile0.o: outfile0.c
+	$(CC) $(CFLAGS) $(INCPATH) -o outfile0.o outfile0.c
+outfile1.o: outfile1.c
+	$(CC) $(CFLAGS) $(INCPATH) -o outfile1.o outfile1.c
+outfile2.o: outfile2.c
+	$(CC) $(CFLAGS) $(INCPATH) -o outfile2.o outfile2.c
+outfile3.o: outfile3.c
+	$(CC) $(CFLAGS) $(INCPATH) -o outfile3.o outfile3.c
 
-ship2_c.rel: ../title2/ship2_c.c
-	$(CC) $(CFLAGS) -o ship2_c.rel ../title2/ship2_c.c --codeseg ship2c --constseg ship2c
-ship2_p.rel: ../title2/ship2_p.c
-	$(CC) $(CFLAGS) -o ship2_p.rel ../title2/ship2_p.c --codeseg ship2p --constseg ship2p
+ship1_c.o: ../title2/ship1_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship1_c.o ../title2/ship1_c.c
+ship1_p.o: ../title2/ship1_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship1_p.o ../title2/ship1_p.c
 
-ship3_c.rel: ../title2/ship3_c.c
-	$(CC) $(CFLAGS) -o ship3_c.rel ../title2/ship3_c.c --codeseg ship3c --constseg ship3c
-ship3_p.rel: ../title2/ship3_p.c
-	$(CC) $(CFLAGS) -o ship3_p.rel ../title2/ship3_p.c --codeseg ship3p --constseg ship3p
+ship2_c.o: ../title2/ship2_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship2_c.o ../title2/ship2_c.c
+ship2_p.o: ../title2/ship2_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship2_p.o ../title2/ship2_p.c
 
-ship4_c.rel: ../title2/ship4_c.c
-	$(CC) $(CFLAGS) -o ship4_c.rel ../title2/ship4_c.c --codeseg ship4c --constseg ship4c
-ship4_p.rel: ../title2/ship4_p.c
-	$(CC) $(CFLAGS) -o ship4_p.rel ../title2/ship4_p.c --codeseg ship4p --constseg ship4p
+ship3_c.o: ../title2/ship3_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship3_c.o ../title2/ship3_c.c
+ship3_p.o: ../title2/ship3_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship3_p.o ../title2/ship3_p.c
 
-font.rel: font.c
-	$(CC) $(CFLAGS) -o font.rel font.c --codeseg font --constseg font
+ship4_c.o: ../title2/ship4_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship4_c.o ../title2/ship4_c.c
+ship4_p.o: ../title2/ship4_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ship4_p.o ../title2/ship4_p.c
 
-difficulty.rel: difficulty.c
-	$(CC) $(CFLAGS) -o difficulty.rel difficulty.c --codeseg difficulty --constseg difficulty
+font.o: font.c
+	$(CC) $(CFLAGS) $(INCPATH) -o font.o font.c
 
-selena_end_c.rel: selena_end_c.c
-	$(CC) $(CFLAGS) -o selena_end_c.rel selena_end_c.c --codeseg selenac --constseg selenac
-selena_end_p.rel: selena_end_p.c
-	$(CC) $(CFLAGS) -o selena_end_p.rel selena_end_p.c --codeseg selenap --constseg selenap
+difficulty.o: difficulty.c
+	$(CC) $(CFLAGS) $(INCPATH) -o difficulty.o difficulty.c
 
-qwertianp.rel: qwertianp.c
-	$(CC) $(CFLAGS) -o qwertianp.rel qwertianp.c --codeseg qwertianp --constseg qwertianp
-qwertianc.rel: qwertianc.c
-	$(CC) $(CFLAGS) -o qwertianc.rel qwertianc.c --codeseg qwertianc --constseg qwertianc
+selena_end_c.o: selena_end_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o selena_end_c.o selena_end_c.c
+selena_end_p.o: selena_end_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o selena_end_p.o selena_end_p.c
 
-attract.rel: attract.c attract.h
-	$(CC) $(CFLAGS) -o attract.rel attract.c --codeseg attract --constseg attract
+qwertianp.o: qwertianp.c
+	$(CC) $(CFLAGS) $(INCPATH) -o qwertianp.o qwertianp.c
+qwertianc.o: qwertianc.c
+	$(CC) $(CFLAGS) $(INCPATH) -o qwertianc.o qwertianc.c
 
-sfxs.rel: sfxs.c
-	$(CC) $(CFLAGS) -o sfxs.rel sfxs.c --codeseg sfxs --constseg sfxs
+attract.o: attract.c attract.h
+	$(CC) $(CFLAGS) $(INCPATH) -o attract.o attract.c
 
-f18sprites.rel: f18sprites8.c
-	$(CC) $(CFLAGS) -o f18sprites.rel f18sprites8.c --codeseg f18sprites --constseg f18sprites
-f18load.rel: f18load.c
-	$(CC) $(CFLAGS) -o f18load.rel f18load.c --codeseg f18load --constseg f18load
-f18load2.rel: f18load2.c
-	$(CC) $(CFLAGS) -o f18load2.rel f18load2.c --codeseg f18load2 --constseg f18load2
-f18abosses.rel: f18abosses.c
-	$(CC) $(CFLAGS) -o f18abosses.rel f18abosses.c --codeseg f18bosses --constseg f18bosses
+sfxs.o: sfxs.c
+	$(CC) $(CFLAGS) $(INCPATH) -o sfxs.o sfxs.c
 
-ladybugc.rel : ladybugc.c
-	$(CC) $(CFLAGS) -o ladybugc.rel ladybugC.c --codeseg ladybugc --constseg ladybugc
-ladybugp.rel : ladybugp.c
-	$(CC) $(CFLAGS) -o ladybugp.rel ladybugP.c --codeseg ladybugp --constseg ladybugp
+f18sprites.o: f18sprites8.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18sprites.o f18sprites8.c
+f18load.o: f18load.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18load.o f18load.c
+f18load2.o: f18load2.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18load2.o f18load2.c
+f18abosses.o: f18abosses.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18abosses.o f18abosses.c
 
-ladybugscreenc.rel : ladybugscreenc.c
-	$(CC) $(CFLAGS) -o ladybugscreenc.rel ladybugscreenc.c --codeseg ladybugscreenc --constseg ladybugscreenc
-ladybugscreenp.rel : ladybugscreenp.c
-	$(CC) $(CFLAGS) -o ladybugscreenp.rel ladybugscreenp.c --codeseg ladybugscreenp --constseg ladybugscreenp
+ladybugc.o : ladybugc.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ladybugc.o ladybugC.c
+ladybugp.o : ladybugp.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ladybugp.o ladybugP.c
 
-gnat1rlec.rel : gnat1rlec.c
-	$(CC) $(CFLAGS) -o gnat1rlec.rel gnat1rlec.c --codeseg gnat1rlec --constseg gnat1rlec
-gnat1rlep.rel : gnat1rlep.c
-	$(CC) $(CFLAGS) -o gnat1rlep.rel gnat1rlep.c --codeseg gnat1rlep --constseg gnat1rlep
-gnat2rlec.rel : gnat2rlec.c
-	$(CC) $(CFLAGS) -o gnat2rlec.rel gnat2rlec.c --codeseg gnat2rlec --constseg gnat2rlec
-gnat2rlep.rel : gnat2rlep.c
-	$(CC) $(CFLAGS) -o gnat2rlep.rel gnat2rlep.c --codeseg gnat2rlep --constseg gnat2rlep
-gnat3rlec.rel : gnat3rlec.c
-	$(CC) $(CFLAGS) -o gnat3rlec.rel gnat3rlec.c --codeseg gnat3rlec --constseg gnat3rlec
-gnat3rlep.rel : gnat3rlep.c
-	$(CC) $(CFLAGS) -o gnat3rlep.rel gnat3rlep.c --codeseg gnat3rlep --constseg gnat3rlep
-gnat4rlec.rel : gnat4rlec.c
-	$(CC) $(CFLAGS) -o gnat4rlec.rel gnat4rlec.c --codeseg gnat4rlec --constseg gnat4rlec
-gnat4rlep.rel : gnat4rlep.c
-	$(CC) $(CFLAGS) -o gnat4rlep.rel gnat4rlep.c --codeseg gnat4rlep --constseg gnat4rlep
-gnat5rlec.rel : gnat5rlec.c
-	$(CC) $(CFLAGS) -o gnat5rlec.rel gnat5rlec.c --codeseg gnat5rlec --constseg gnat5rlec
-gnat5rlep.rel : gnat5rlep.c
-	$(CC) $(CFLAGS) -o gnat5rlep.rel gnat5rlep.c --codeseg gnat5rlep --constseg gnat5rlep
+ladybugscreenc.o : ladybugscreenc.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ladybugscreenc.o ladybugscreenc.c
+ladybugscreenp.o : ladybugscreenp.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ladybugscreenp.o ladybugscreenp.c
 
-snowballbasec.rel : snowballbase_c.c
-	$(CC) $(CFLAGS) -o snowballbasec.rel snowballbase_c.c --codeseg snowballbasec --constseg snowballbasec
-snowballbasep.rel : snowballbase_p.c
-	$(CC) $(CFLAGS) -o snowballbasep.rel snowballbase_p.c --codeseg snowballbasep --constseg snowballbasep
+gnat1rlec.o : gnat1rlec.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat1rlec.o gnat1rlec.c
+gnat1rlep.o : gnat1rlep.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat1rlep.o gnat1rlep.c
+gnat2rlec.o : gnat2rlec.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat2rlec.o gnat2rlec.c
+gnat2rlep.o : gnat2rlep.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat2rlep.o gnat2rlep.c
+gnat3rlec.o : gnat3rlec.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat3rlec.o gnat3rlec.c
+gnat3rlep.o : gnat3rlep.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat3rlep.o gnat3rlep.c
+gnat4rlec.o : gnat4rlec.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat4rlec.o gnat4rlec.c
+gnat4rlep.o : gnat4rlep.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat4rlep.o gnat4rlep.c
+gnat5rlec.o : gnat5rlec.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat5rlec.o gnat5rlec.c
+gnat5rlep.o : gnat5rlep.c
+	$(CC) $(CFLAGS) $(INCPATH) -o gnat5rlep.o gnat5rlep.c
 
-cruiserendc.rel : cruiserend_c.c
-	$(CC) $(CFLAGS) -o cruiserendc.rel cruiserend_c.c --codeseg cruiserendc --constseg cruiserendc
-cruiserendp.rel : cruiserend_p.c
-	$(CC) $(CFLAGS) -o cruiserendp.rel cruiserend_p.c --codeseg cruiserendp --constseg cruiserendp
+snowballbasec.o : snowballbase_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o snowballbasec.o snowballbase_c.c
+snowballbasep.o : snowballbase_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o snowballbasep.o snowballbase_p.c
 
-cruiserfinalc.rel : cruiserfinal_c.c
-	$(CC) $(CFLAGS) -o cruiserfinalc.rel cruiserfinal_c.c --codeseg cruiserfinalc --constseg cruiserfinalc
-cruiserfinalp.rel : cruiserfinal_p.c
-	$(CC) $(CFLAGS) -o cruiserfinalp.rel cruiserfinal_p.c --codeseg cruiserfinalp --constseg cruiserfinalp
+cruiserendc.o : cruiserend_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o cruiserendc.o cruiserend_c.c
+cruiserendp.o : cruiserend_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o cruiserendp.o cruiserend_p.c
+
+cruiserfinalc.o : cruiserfinal_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o cruiserfinalc.o cruiserfinal_c.c
+cruiserfinalp.o : cruiserfinal_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o cruiserfinalp.o cruiserfinal_p.c
 
 # libti99 crt0 copied into folder
-crt0.rel: crt0.s
-	$(AS) $(AFLAGS) crt0.rel crt0.s
+crt0.o: crt0_ea5.asm
+	$(GAS) $(AFLAGS) crt0_ea5.asm -o crt0.o

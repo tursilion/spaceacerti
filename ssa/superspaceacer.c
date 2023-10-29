@@ -6,7 +6,8 @@
 #include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
-#include <ColecoSNPlay.h>
+
+#include <TISNPlay.h>
 
 // game
 #include "game.h"
@@ -85,188 +86,198 @@ unsigned int nBank = 0xffff;
 // used for the cloaked enemy mode!
 const unsigned int f18BlackPal[4] = { 0,0,0,0 };
 
-void sprStart0() __naked {
+void sprStart0() {
 	// copy sprites 0-31 in order (simplest case)
-	__asm
-		ld hl,#_SpriteTab+0
-		ld c,#_VDPWD
-		.rept 128
-		OUTI
-		.endm
-
-        ret
-	__endasm;
+	__asm__ (
+        "li r0,SpriteTab+0\n\t"
+        "li r1,0x8C00\n\t"
+        ".rept 128\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        : : : "r0","r1"
+    );
 }
 
-void sprStart4() __naked {
+void sprStart4() {
 	// copy sprites 4-31, then 0-3
 	// decrement mode
-	__asm
-		ld hl,#_SpriteTab+124
-		ld de,#-8
-		ld c,#_VDPWD
-		.rept 28
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-		ld hl,#_SpriteTab+12
-		.rept 4
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-        ret
-	__endasm;
+	__asm__ (
+        "li r0,SpriteTab+124\n\t"
+        "li r1,0x8C00\n\t"
+        "li r2,-8\n\t"
+        ".rept 28\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+12\n\t"
+        ".rept 4\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1","r2"
+    );
 }
 
-void sprStart8() __naked {
+void sprStart8() {
 	// copy sprites 8-31, then 0-7
-	__asm
-		ld hl,#_SpriteTab+32
-		ld c,#_VDPWD
-		.rept 96
-		OUTI
-		.endm
-
-		ld hl,#_SpriteTab+0
-		.rept 32
-		OUTI
-		.endm
-
-        ret
-	__endasm;
+	__asm__ (
+        "li r0,SpriteTab+32\n\t"
+        "li r1,0x8C00\n\t"
+        ".rept 96\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+0\n\t"
+        ".rept 32\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1"
+    );
 }
 
-void sprStart12() __naked {
+void sprStart12() {
 	// copy sprites 12-31, then 0-11
 	// decrement mode
-	__asm
-		ld hl,#_SpriteTab+124
-		ld de,#-8
-		ld c,#_VDPWD
-		.rept 20
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-		ld hl,#_SpriteTab+44
-		.rept 12
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-        ret        
-    __endasm;
+	__asm__ (
+        "li r0,SpriteTab+124\n\t"
+        "li r1,0x8C00\n\t"
+        "li r2,-8\n\t"
+        ".rept 20\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+44\n\t"
+        ".rept 12\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1","r2"
+    );
 }
 
-void sprStart16() __naked {
+void sprStart16() {
 	// copy sprites 16-31, then 0-15
-	__asm
-		ld hl,#_SpriteTab+64
-		ld c,#_VDPWD
-		.rept 64
-		OUTI
-		.endm
-
-		ld hl,#_SpriteTab+0
-		.rept 64
-		OUTI
-		.endm
-
-        ret
-	__endasm;
+	__asm__ (
+        "li r0,SpriteTab+64\n\t"
+        "li r1,0x8C00\n\t"
+        ".rept 64\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+0\n\t"
+        ".rept 64\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1"
+    );
 }
 
-void sprStart20() __naked {
+void sprStart20() {
 	// copy sprites 20-31, then 0-19
 	// decrement mode
-	__asm
-		ld hl,#_SpriteTab+124
-		ld de,#-8
-		ld c,#_VDPWD
-		.rept 12
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-		ld hl,#_SpriteTab+76
-		.rept 20
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-        ret
-	__endasm;
+	__asm__ (
+        "li r0,SpriteTab+124\n\t"
+        "li r1,0x8C00\n\t"
+        "li r2,-8\n\t"
+        ".rept 12\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+76\n\t"
+        ".rept 20\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1","r2"
+    );
 }
 
-void sprStart24() __naked {
+void sprStart24() {
 	// copy sprites 24-31, then 0-23
-	__asm
-		ld hl,#_SpriteTab+96
-		ld c,#_VDPWD
-		.rept 32
-		OUTI
-		.endm
-
-		ld hl,#_SpriteTab+0
-		.rept 96
-		OUTI
-		.endm
-
-        ret        
-    __endasm;
+	__asm__ (
+        "li r0,SpriteTab+96\n\t"
+        "li r1,0x8C00\n\t"
+        ".rept 32\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+0\n\t"
+        ".rept 96\n\t"
+        "movb *r0+,*r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1"
+    );
 }
 
-void sprStart28() __naked {
+void sprStart28() {
 	// copy sprites 28-31, then 0-27
 	// decrement mode
-	__asm
-		ld hl,#_SpriteTab+112
-		ld de,#-8
-		ld c,#_VDPWD
-		.rept 4
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
+	__asm__ (
+        "li r0,SpriteTab+112\n\t"
+        "li r1,0x8C00\n\t"
+        "li r2,-8\n\t"
+        ".rept 4\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        "li r0,SpriteTab+108\n\t"
+        ".rept 28\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "movb *r0+,*r1\n\t"
+        "a r2,r1\n\t"
+        ".endr\n\t"
+        
+        : : : "r0","r1","r2"
+    );
+}
 
-		ld hl,#_SpriteTab+108
-		.rept 28
-		OUTI
-		OUTI
-		OUTI
-		OUTI
-		add hl,de
-		.endm
-
-        ret
-	__endasm;
+int checkLimi() {
+    int ret;
+    
+    __asm__ (
+        "clr r12\n\tseto %0\n\ttb 2\n\tjne 2\n\tclr %0\n\tnop" 
+        : "=rm"(ret) : : "r12" 
+    );
+  
+    return ret;
 }
 
 void musicsync() {
 	// safely check if it's time to play music
-	if (vdpLimi&0x80) {
+	if (checkLimi()) {
 		VDP_INT_POLL;
 		doMusic();
 	}
@@ -452,7 +463,7 @@ unsigned char intpic() {
 	unsigned char i;
 
 	// set the mode (returns disabled and uninitialized)
-	i = set_bitmap(VDP_SPR_16x16);
+	i = set_bitmap_raw(VDP_SPR_16x16);
 	// one difference
 	VDP_SET_REGISTER(VDP_REG_SDT, 0x07);	gSpritePat = 0x3800;
 
@@ -473,7 +484,7 @@ unsigned char intpic() {
 	return i;
 }
 
-void RLEUnpack(unsigned int p, unsigned char *buf, unsigned int nMax) {
+void RLEUnpack(unsigned int p, const unsigned char *buf, unsigned int nMax) {
 	unsigned char z;
 	int cnt;	// looks like the boss pack code has some bugs and packs too many bytes, we need this
 
@@ -501,7 +512,7 @@ void RLEUnpack(unsigned int p, unsigned char *buf, unsigned int nMax) {
 // this won't be perfect, but it'll be close
 // Unlike the main unpack function, this one allows you to request fewer bytes
 // than the original file was packed for... this slows it a bit.
-void RLEUnpackInt(unsigned char *bufp, unsigned char *bufc, unsigned int nMax) {
+void RLEUnpackInt(const unsigned char *bufp, const unsigned char *bufc, unsigned int nMax) {
 	unsigned char z;
 	unsigned int pAdr = 0;
 	unsigned int cAdr = 0x2000;
@@ -1310,4 +1321,40 @@ void reboot() {
     *SAVEDF18A = f18a;
 
 	hwreboot();	// never returns
+}
+
+// replacement for memmove
+void *memmove(void *dest, const void *src, unsigned int n) {
+    int *from = (int*)src;
+    int *to = (int*)dest;
+    
+    if ((from==to)||(n==0)) return dest;
+    
+    if ((to > from)&&(to-from < n)) {
+        // overlap, so copy backwards - just doing bytes
+        unsigned char *f=(unsigned char*)src;
+        unsigned char *t=(unsigned char*)dest;
+        for (int i=n-1; i>=0; --i) {
+            to[i]=from[i];
+        }
+        return dest;
+    } else {
+        // overlap or not, copy forwards which is slightly faster
+        // if we're not odd aligned, then copy words. We could
+        // probably work out a misaligned word copy, but nah
+        if (((int)from&1)||((int)to&1)||(n&1)) {
+            unsigned char *f=(unsigned char*)src;
+            unsigned char *t=(unsigned char*)dest;
+            for (int i=0; i<n; ++i) {
+                to[i]=from[i];
+            }
+        } else {
+            // fully aligned word copy - fastest case
+            n>>=1;
+            while (n--) {
+                *(to++)=*(from++);
+            }
+        }
+        return dest;
+    }
 }

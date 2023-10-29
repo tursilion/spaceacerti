@@ -1,7 +1,6 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
-#include <player.h>
 
 #include "game.h"
 #include "trampoline.h"
@@ -10,14 +9,14 @@
 #define BIN2INC_HEADER_ONLY
 #include "title_c.c"
 #include "title_p.c"
-#include "..\title2\ship1_c.c"
-#include "..\title2\ship1_p.c"
-#include "..\title2\ship2_c.c"
-#include "..\title2\ship2_p.c"
-#include "..\title2\ship3_c.c"
-#include "..\title2\ship3_p.c"
-#include "..\title2\ship4_c.c"
-#include "..\title2\ship4_p.c"
+#include "../title2/ship1_c.c"
+#include "../title2/ship1_p.c"
+#include "../title2/ship2_c.c"
+#include "../title2/ship2_p.c"
+#include "../title2/ship3_c.c"
+#include "../title2/ship3_p.c"
+#include "../title2/ship4_c.c"
+#include "../title2/ship4_p.c"
 
 // bitmap for F18A text
 const unsigned char F18Text[] = {

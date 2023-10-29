@@ -2,7 +2,7 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
-#include <ColecoSNPlay.h>
+#include <TISNPlay.h>
 
 // game
 #include "game.h"
@@ -37,6 +37,8 @@ static unsigned char a1,a2,b1,b2;
 
 // we can change this out for the sound effect only version
 void (*doMusic)(void);
+
+// TODO: all the AY hits need to be replaced with SID hits
 
 // one interrupt of music (not called on interrupt)
 void doAllMusic() {
@@ -77,8 +79,8 @@ checksfx:
                 // we'll undo the block next frame
             } else {
                 while (regs--) {
-                    AY_REGISTER = *(pSfx++);
-                    AY_DATA_WRITE = *(pSfx++);
+//                    AY_REGISTER = *(pSfx++);
+//                    AY_DATA_WRITE = *(pSfx++);
                 }
             }
         } else {
@@ -94,8 +96,8 @@ checksfx:
                 pShoot = NULL;
             } else {
                 while (regs--) {
-                    AY_REGISTER = *(pShoot++);
-                    AY_DATA_WRITE = *(pShoot++);
+//                    AY_REGISTER = *(pShoot++);
+//                    AY_DATA_WRITE = *(pShoot++);
                 }
             }
         }
@@ -196,6 +198,7 @@ void shutup()
     pSfx = NULL;
     pShoot = NULL;
 
+#if 0
     // note: turns out this is also important to work around a Phoenix powerup bug
     AY_REGISTER = AY_VOLA;
     AY_DATA_WRITE = 0x0;
@@ -203,6 +206,7 @@ void shutup()
     AY_DATA_WRITE = 0x0;
     AY_REGISTER = AY_VOLC;
     AY_DATA_WRITE = 0x0;
+#endif
 }
 
 // do any necessary sound chip initialization
@@ -214,8 +218,8 @@ void initSound() {
     b1=0;
     b2=0;
     // set up the AY so A and B are tone channels, and C is noise
-    AY_REGISTER = AY_MIXER;
-    AY_DATA_WRITE = 0x1C;
+//    AY_REGISTER = AY_MIXER;
+//    AY_DATA_WRITE = 0x1C;
 }
 
 // hit an armored enemy

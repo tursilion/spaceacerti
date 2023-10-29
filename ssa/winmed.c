@@ -3,7 +3,7 @@
 #include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
-#include <ColecoSNPlay.h>
+#include <TISNPlay.h>
 
 // game
 #include "game.h"
@@ -53,7 +53,7 @@ void musicvdpsync(unsigned int reg1, unsigned int reg2) {
 	// safely check if it's time to play music
 	// writes the address passed (should normally be a register command)
 	// followed by a poll which will destroy a real address set
-	while (!(vdpLimi&0x80)) { }
+	VDP_WAIT_VBLANK_CRU;
 	VDP_SET_ADDRESS(reg1);
 	VDP_SET_ADDRESS(reg2);
 	VDP_INT_POLL;
@@ -80,7 +80,7 @@ void reparse(unsigned char *str, unsigned char offset) {
 			p=&fontstr[51];
 			while (*p) {
 				if (*p == str[idx]) {
-					c = (p-fontstr);
+					c = (p-(const unsigned char*)fontstr);
 					break;
 				}
 				++p;
@@ -111,7 +111,7 @@ void movesprites() {
 }
 
 void gamewinmedium() { 
-	unsigned char idx,i2,c;
+	unsigned char idx,i2,c,st;
 	unsigned int srcCpy, dstCpy;
 	unsigned char finalcountdown = 0;
 	const char *txt;
@@ -121,13 +121,6 @@ void gamewinmedium() {
 	scorecountdown = 0;
 
 	// set up the VDP registers, it's all different
-	//VDP_SET_ADDRESS(0x81a2);	// 16k,ints,Mag2,graphics mode (disabled screen)
-	//VDP_SET_ADDRESS(0x8201);	// SIT at >0400
-	//VDP_SET_ADDRESS(0x831c);	// CT at >0700
-	//VDP_SET_ADDRESS(0x8400);	// PT at >0000
-	//VDP_SET_ADDRESS(0x850f);	// SAL at >0780
-	//VDP_SET_ADDRESS(0x8602);	// SDT at >1000
-	
 	VDP_SET_REGISTER(VDP_REG_MODE1, 0xa2);	// 16k,ints,Mag2,graphics mode (disabled screen)
 	VDP_SET_REGISTER(VDP_REG_SIT, 0x01);	// SIT at >0400
 	VDP_SET_REGISTER(VDP_REG_CT, 0x1c);	// CT at >0700
@@ -205,11 +198,12 @@ void gamewinmedium() {
 		musicvdpsync(0x8201,0x8400);
 
 		// for each frame, we copy one row of text to the other screen
-		for (idx = 0; idx<23; idx++) {
-			if ((idx%3) == 0) {
+		for (idx = 0, st = 0; idx<23; idx++) {
+			if (st == 0) {
 				// move sprites
 				movesprites();
 			}
+			++st; if (st == 3) st = 0;
 			musicvdpsync(0x8201,0x8400+(idx/3));	// sets the pattern
 			// copy one line to the other buffer
 			vdpmemread(srcCpy, tmpbuf, 32);
@@ -241,11 +235,12 @@ void gamewinmedium() {
 		// ** second loop **
 
 		// for each frame, we copy one row of text to the other screen
-		for (idx = 0; idx<23; idx++) {
-			if ((idx%3) == 0) {
+		for (idx = 0, st = 0; idx<23; idx++) {
+			if (st == 0) {
 				// move sprites
 				movesprites();
 			}
+			++st; if (st == 3) st = 0;
 			musicvdpsync(0x8203,0x8400+(idx/3));	// sets the pattern
 			// copy one line to the other buffer
 			vdpmemread(srcCpy, tmpbuf, 32);
@@ -269,7 +264,6 @@ void gamewinmedium() {
 			++scorecountdown;
 			if (scorecountdown == 0) scorecountdown = 1;	// time to move
 		}
-
 		// restore the txt pointer -- except for the hint line, this should do nothing
 		txt = oldtxt;
 

@@ -97,7 +97,7 @@ void player()
 		joystfast(joynum);
 
 		if (KSCAN_KEY == '#') {
-			unsigned const unsigned char *oldLoop = pLoopMus;
+			const unsigned char *oldLoop = pLoopMus;
 			if (doMusic == doAllMusic) {
 				doMusic = doSfxInstead;
 				centr(11, "MUSIC OFF");
@@ -115,7 +115,7 @@ void player()
 			centr(11, "         ");
 			pLoopMus = oldLoop;
 		} else if (KSCAN_KEY == '*') {
-			unsigned const unsigned char *oldLoop = pLoopMus;
+			const unsigned char *oldLoop = pLoopMus;
 
 			shutup();
 			centr(11, "PAUSE");
@@ -927,7 +927,6 @@ void dyen(unsigned char x) {
 			spposn(x+ENEMY_SPRITE,r,c);
 			screen(COLOR_WHITE);
 			screenFlashCnt = 4;
-
 			for (k=0; k<12; k++) {
 				wrapnoen(k);
 			}
@@ -949,7 +948,7 @@ void dyen(unsigned char x) {
 					ers[k]=9;
 				}
 				if (k%3==0) {
-					ecs[k]=-9;
+					//ecs[k]=-9;        // TODO: COMPILER CRASHES ON THIS LINE - invalid expression as operand
 				}
 				if ((k-1)%3==0) {
 					ecs[k]=0;
@@ -964,12 +963,12 @@ void dyen(unsigned char x) {
 			eec[4]=72;
 			esc[4]=52;
 			sprite(ENEMY_SPRITE+4,52,f18a?PAL_EXPLODE:COLOR_LTRED,r,c);
-
 			SOUND=0xff;
 		}
 	} else {
         playsfx_armor();
     }
+
 }
  
 void initCruiser() {

@@ -3,7 +3,7 @@
 #include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
-#include <ColecoSNPlay.h>
+#include <TISNPlay.h>
 
 // game
 #include "game.h"
