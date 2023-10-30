@@ -31,33 +31,44 @@ int strlen(const char *s);
 void strcpy(char *p, const char *s);
 
 // bank switching - nOldBank is used to let a function restore the original bank
+// the banks are based on the Coleco 16k banking, thus a/b for the TI 8k banks
+// our fixed bank is copied out of bank 0 a/b into 32k memory expansion
 extern unsigned int nBank;
-#define SWITCH_IN_PREV_BANK(nOldBank) (*(volatile unsigned char*)0)=(*(volatile unsigned char*)nOldBank); nBank=nOldBank;
-#define SWITCH_IN_BANK1	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xfffe); nBank=(unsigned int)0xfffe; 
-#define SWITCH_IN_BANK2	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFFD); nBank=(unsigned int)0xfffd;
-#define SWITCH_IN_BANK3	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFFC); nBank=(unsigned int)0xfffc;
-#define SWITCH_IN_BANK4	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFFB); nBank=(unsigned int)0xfffb;							
-#define SWITCH_IN_BANK5	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFFA); nBank=(unsigned int)0xfffa;
-#define SWITCH_IN_BANK6	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF9); nBank=(unsigned int)0xfff9;
-#define SWITCH_IN_BANK7	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF8); nBank=(unsigned int)0xfff8;
-#define SWITCH_IN_BANK8	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF7); nBank=(unsigned int)0xfff7;
-#define SWITCH_IN_BANK9	(*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF6); nBank=(unsigned int)0xfff6;
-#define SWITCH_IN_BANK10 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF5); nBank=(unsigned int)0xfff5;
-#define SWITCH_IN_BANK11 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF4); nBank=(unsigned int)0xfff4;
-#define SWITCH_IN_BANK12 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF3); nBank=(unsigned int)0xfff3;
-#define SWITCH_IN_BANK13 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF2); nBank=(unsigned int)0xfff2;
-#define SWITCH_IN_BANK14 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF1); nBank=(unsigned int)0xfff1;
-#define SWITCH_IN_BANK15 (*(volatile unsigned char*)0)=(*(volatile unsigned char*)0xFFF0); nBank=(unsigned int)0xfff0;
+#define SWITCH_IN_PREV_BANK(nOldBank) (*(volatile unsigned char*)nOldBank)=0; nBank=nOldBank;
+#define SWITCH_IN_BANK0a  (*(volatile unsigned char*)0x6000)=0; nBank=(unsigned int)0x6000; 
+#define SWITCH_IN_BANK1a  (*(volatile unsigned char*)0x6004)=0; nBank=(unsigned int)0x6004; 
+#define SWITCH_IN_BANK2a  (*(volatile unsigned char*)0x6008)=0; nBank=(unsigned int)0x6008;
+#define SWITCH_IN_BANK3a  (*(volatile unsigned char*)0x600C)=0; nBank=(unsigned int)0x600C;
+#define SWITCH_IN_BANK4a  (*(volatile unsigned char*)0x6010)=0; nBank=(unsigned int)0x6010;	
+#define SWITCH_IN_BANK5a  (*(volatile unsigned char*)0x6014)=0; nBank=(unsigned int)0x6014;
+#define SWITCH_IN_BANK6a  (*(volatile unsigned char*)0x6018)=0; nBank=(unsigned int)0x6018;
+#define SWITCH_IN_BANK7a  (*(volatile unsigned char*)0x601C)=0; nBank=(unsigned int)0x601C;
+#define SWITCH_IN_BANK8a  (*(volatile unsigned char*)0x6020)=0; nBank=(unsigned int)0x6020;
+#define SWITCH_IN_BANK9a  (*(volatile unsigned char*)0x6024)=0; nBank=(unsigned int)0x6024;
+#define SWITCH_IN_BANK10a (*(volatile unsigned char*)0x6028)=0; nBank=(unsigned int)0x6028;
+#define SWITCH_IN_BANK11a (*(volatile unsigned char*)0x602C)=0; nBank=(unsigned int)0x602C;
+#define SWITCH_IN_BANK12a (*(volatile unsigned char*)0x6030)=0; nBank=(unsigned int)0x6030;
+#define SWITCH_IN_BANK13a (*(volatile unsigned char*)0x6034)=0; nBank=(unsigned int)0x6034;
+#define SWITCH_IN_BANK14a (*(volatile unsigned char*)0x6038)=0; nBank=(unsigned int)0x6038;
+#define SWITCH_IN_BANK15a (*(volatile unsigned char*)0x603C)=0; nBank=(unsigned int)0x603C;
+#define SWITCH_IN_BANK0b  (*(volatile unsigned char*)0x6002)=0; nBank=(unsigned int)0x6002; 
+#define SWITCH_IN_BANK1b  (*(volatile unsigned char*)0x6006)=0; nBank=(unsigned int)0x6006; 
+#define SWITCH_IN_BANK2b  (*(volatile unsigned char*)0x600A)=0; nBank=(unsigned int)0x600A;
+#define SWITCH_IN_BANK3b  (*(volatile unsigned char*)0x600E)=0; nBank=(unsigned int)0x600E;
+#define SWITCH_IN_BANK4b  (*(volatile unsigned char*)0x6012)=0; nBank=(unsigned int)0x6012;	
+#define SWITCH_IN_BANK5b  (*(volatile unsigned char*)0x6016)=0; nBank=(unsigned int)0x6016;
+#define SWITCH_IN_BANK6b  (*(volatile unsigned char*)0x601A)=0; nBank=(unsigned int)0x601A;
+#define SWITCH_IN_BANK7b  (*(volatile unsigned char*)0x601E)=0; nBank=(unsigned int)0x601E;
+#define SWITCH_IN_BANK8b  (*(volatile unsigned char*)0x6022)=0; nBank=(unsigned int)0x6022;
+#define SWITCH_IN_BANK9b  (*(volatile unsigned char*)0x6026)=0; nBank=(unsigned int)0x6026;
+#define SWITCH_IN_BANK10b (*(volatile unsigned char*)0x602A)=0; nBank=(unsigned int)0x602A;
+#define SWITCH_IN_BANK11b (*(volatile unsigned char*)0x602E)=0; nBank=(unsigned int)0x602E;
+#define SWITCH_IN_BANK12b (*(volatile unsigned char*)0x6032)=0; nBank=(unsigned int)0x6032;
+#define SWITCH_IN_BANK13b (*(volatile unsigned char*)0x6036)=0; nBank=(unsigned int)0x6036;
+#define SWITCH_IN_BANK14b (*(volatile unsigned char*)0x603A)=0; nBank=(unsigned int)0x603A;
+#define SWITCH_IN_BANK15b (*(volatile unsigned char*)0x603E)=0; nBank=(unsigned int)0x603E;
 
-#define SET_COLECO_FONT_BANK SWITCH_IN_BANK7 
-
-// NOTE: we have to do an assignment for the bank switch. SDCC does not recognize the potential
-// of side effects on a read and so ignores the volatile flag, and optimizes the read away IF
-// it decides there is no potential of other action. (For example, I had a function that set
-// bank 5, read a byte from memory, then changed back to the old bank. The setting of bank 5
-// was optimized away until a write occurred. This didn't happen in most cases because if
-// a function call occurred, SDCC decided it couldn't be sure about side effects and did not
-// optimize the read away.
+#define SET_COLECO_FONT_BANK SWITCH_IN_BANK6b 
 
 // the lib also defines gXXX variables, but these will be faster here due to constant expression elimination
 #define gIMAGE 0x0000
@@ -167,9 +178,8 @@ extern struct _sprite SpriteTab[32];
 void musicsync();
 void spdall() ;
 void loadcharset();
-void chrdef(unsigned char n, char *sz) ;
-void patcpy(uint8 from, uint8 to) ;
-void patsprcpy(uint8 from, uint8 to) ;
+void patcpy(int from, int to) ;
+void patsprcpy(int from, int to) ;
 unsigned char rndnum();
 unsigned char intpic() ;
 void RLEUnpack(unsigned int p, const unsigned char *buf, unsigned int nMax);
@@ -183,8 +193,8 @@ void ispace();
 void sgrint();
 void playmv();
 void stars();
-char target(unsigned char dest, unsigned char src);
-void pwr(uint8 x);
+int target(unsigned int dest, unsigned int src);
+void pwr(int x);
 void gamovr();
 void gamwin();
 void scrolltext();
@@ -194,16 +204,16 @@ void gamewinhard();
 void DoWinMusic() ;
 void mainwin();
 void read();
-void centr(unsigned char row, const char *out);
+void centr(unsigned int row, const char *out);
 void scroll();
 void pause();
 void nmi(void);
-void addscore(unsigned char val);
+void addscore(unsigned int val);
 void getDifficulty();
 void initstars();
 void waitforstep();
-void delaystars(unsigned char q);
-void DelSprButPlayer(unsigned char x);
+void delaystars(unsigned int q);
+void DelSprButPlayer(unsigned int x);
 void background() ;
 void shieldCruiser();
 void shieldSnowball();
@@ -219,7 +229,7 @@ void shieldf18();
 void deshieldf18();
 void handleTitlePage();
 void reboot();
-void noen(uint8 x);
+void noen(int x);
 
 // macros to look like the old c99
 #define screen(x) VDP_SET_REGISTER(VDP_REG_COL, x)
@@ -251,40 +261,40 @@ void noen(uint8 x);
 // shared variables
 extern unsigned int score;
 extern unsigned int oldscore;
-extern unsigned char scoremode;
-extern unsigned char joynum;
-extern char lives;
-extern unsigned char level;
-extern unsigned char ent[12];
-extern void (*en_func[12])(uint8);
+extern unsigned int scoremode;
+extern unsigned int joynum;
+extern int lives;
+extern unsigned int level;
+extern unsigned int ent[12];
+extern void (*en_func[12])(int);
 extern const unsigned char *pLoopMus;
 extern unsigned int  loopBank;
 extern unsigned int  loopIdx;
-extern uint8 ch;
-extern uint8 enr[12], enc[12];
-extern uint8 ech[12], eec[12], esc[12];
-extern char ers[12], ecs[12];
-extern char ep[6];		// was engine power, now general hitpoints, yes, want signed char
-extern uint8 shr[NUM_SHOTS+1], shc[NUM_SHOTS];
-extern uint8 pcr4,ptp4,pr4,pc4,p4Time;
-extern uint8 flag;
-extern unsigned char nDifficulty;
-extern unsigned char bgColor;
+extern int ch;
+extern int enr[12], enc[12];
+extern int ech[12], eec[12], esc[12];
+extern int ers[12], ecs[12];
+extern int ep[6];		// was engine power, now general hitpoints, yes, want signed char
+extern int shr[NUM_SHOTS+1], shc[NUM_SHOTS];
+extern int pcr4,ptp4,pr4,pc4,p4Time;
+extern int flag;
+extern unsigned int nDifficulty;
+extern unsigned int bgColor;
 extern unsigned char tmpbuf[64];
-extern const unsigned char damage[8];
+extern const unsigned int damage[8];
 extern int distns;
 extern unsigned int shield;
-extern unsigned char BNR,BNC;
+extern unsigned int BNR,BNC;
 extern unsigned int  musBank;
-extern unsigned char playerColor;
-extern unsigned char playerOffset;
-extern char shotOffset;
-extern uint8 playership;
-extern unsigned char playerXspeed, playerYspeed;
-extern uint8 oldshield;
-extern unsigned char seed;
-extern unsigned char force;
-extern uint8 f18a;
+extern unsigned int playerColor;
+extern unsigned int playerOffset;
+extern int shotOffset;
+extern int playership;
+extern unsigned int playerXspeed, playerYspeed;
+extern int oldshield;
+extern unsigned int seed;
+extern unsigned int force;
+extern int f18a;
 
 
 #endif

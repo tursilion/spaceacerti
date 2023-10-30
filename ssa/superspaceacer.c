@@ -36,29 +36,29 @@ static void (* const hwreboot)()=0x802c;
 struct _sprite SpriteTab[32];
 
 // player data for weapons, but used in multiple places
-const unsigned char damage[8] = { 3,4,5,1, 2,2,3,1 };
+const unsigned int damage[8] = { 3,4,5,1, 2,2,3,1 };
 
 // distns table per stage (level-1)
 const int stage_distns[5] = { 1100, 1150, 1200, 1400, 1650 };
 
 // multi-purpose
 int a,b,x,y;
-uint8 flag;
+int flag;
 
 // cheat flag
-uint8 ch;
+int ch;
 
 // which ship did the player choose?
-uint8 playership = 255;
+int playership = 255;
 // how many pixels down does the sprite start? (for smaller ones)
-uint8 playerOffset;
+unsigned int playerOffset;
 // old shield color - used to detect changes so we don't upload the graphics every frame
-uint8 oldshield = 0;
+int oldshield = 0;
 // force bonus - if you never shoot except during the boss, and never miss, you get it
-uint8 force = 0;
+unsigned int force = 0;
 
 // holds whether the F18A was detected
-uint8 f18a = 0;
+int f18a = 0;
 
 // function pointers for shield graphics swap functions
 // these functions MUST exist in the fixed bank
@@ -66,12 +66,12 @@ void (*shieldsOn)() = shieldCruiser;
 void (*shieldsOff)() = deShieldCruiser;
 
 // stage and game related
-unsigned char level;
+unsigned int level;
 int distns;
-unsigned char nDifficulty;
-unsigned char seed=1;
+unsigned int nDifficulty;
+unsigned int seed=1;
 unsigned char attractShip = 0;
-unsigned char bgColor = COLOR_BLACK;
+unsigned int bgColor = COLOR_BLACK;
 
 extern const unsigned char CHARS[];
 extern const unsigned char ELECTRICWALL[];
@@ -376,7 +376,7 @@ void loadcharset() {
 
 // copies a VDP character pattern to all four tables
 // if from is 0, assumes that tmpbuf is already loaded
-void patcpy(uint8 from, uint8 to) {
+void patcpy(int from, int to) {
 	if (from) {
 		vdpmemread(((int)from<<3)+gPATTERN, tmpbuf, 8);
 	}
@@ -389,7 +389,7 @@ void patcpy(uint8 from, uint8 to) {
 }
 
 // copies a VDP character pattern to sprite table
-void patsprcpy(uint8 from, uint8 to) {
+void patsprcpy(int from, int to) {
 	vdpmemread((from<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);    // this is the only one guaranteed in F18A mode
 	vdpmemcpy((to<<3)+gSPRITE_PATTERNS, tmpbuf, 8);
 }
@@ -570,13 +570,13 @@ void RLEUnpackInt(const unsigned char *bufp, const unsigned char *bufc, unsigned
 	}
 }
 
-void noen(uint8 x) { 
+void noen(int x) { 
 	/* remove enemy x from service */
 	spdel(x+ENEMY_SPRITE);
 	ent[x]=ENEMY_NONE;
 }
 
-char target(unsigned char dest, unsigned char src)
+int target(unsigned int dest, unsigned int src)
 { 
 	// similar to sgn(), but designed to work with unsigned values
 	// without wraparound
@@ -609,10 +609,10 @@ unsigned char grf1() {
 	return x;
 }
 
-void DelSprButPlayer(unsigned char x) {
+void DelSprButPlayer(unsigned int x) {
 	// delete all sprites but main player sprites, and 'x'ception
 	// warning: deletes shield sprites too
-	unsigned char i;
+	unsigned int i;
 
 	for (i=0; i<32; i++) {
 		if (i<PLAYER_SPRITE+4) continue;
@@ -623,7 +623,7 @@ void DelSprButPlayer(unsigned char x) {
 
 void shieldCruiser() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, ALTSHIELDS, 4*4*8);			// straight
 	vdpmemcpy(156*8+0x0800, &ALTSHIELDS[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &ALTSHIELDS[8*4*8], 4*4*8);	// right
@@ -632,7 +632,7 @@ void shieldCruiser() {
 
 void shieldSnowball() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, ALTSNOWBALL, 4*4*8);			// straight
 	vdpmemcpy(156*8+0x0800, &ALTSNOWBALL[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &ALTSNOWBALL[8*4*8], 4*4*8);	// right
@@ -641,7 +641,7 @@ void shieldSnowball() {
 
 void shieldLadybug() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, ALTLADYBUG, 4*4*8);			// straight
 	vdpmemcpy(156*8+0x0800, &ALTLADYBUG[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &ALTLADYBUG[8*4*8], 4*4*8);	// right
@@ -650,7 +650,7 @@ void shieldLadybug() {
 
 void shieldGnat() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, ALTGNAT, 4*4*8);			// straight
 	vdpmemcpy(156*8+0x0800, &ALTGNAT[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &ALTGNAT[8*4*8], 4*4*8);	// right
@@ -659,7 +659,7 @@ void shieldGnat() {
 
 void shieldSelena() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, ALTSELENA, 4*4*8);			// straight
 	vdpmemcpy(156*8+0x0800, &ALTSELENA[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &ALTSELENA[8*4*8], 4*4*8);	// right
@@ -668,7 +668,7 @@ void shieldSelena() {
 
 void deShieldCruiser() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, &SPRITES[124*8], 4*4*8);	// straight
 	vdpmemcpy(156*8+0x0800, &SPRITES[156*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &SPRITES[188*8], 4*4*8);	// right
@@ -677,7 +677,7 @@ void deShieldCruiser() {
 
 void deShieldSnowball() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, &SNOWBALL[16*8], 4*4*8);	// straight
 	vdpmemcpy(156*8+0x0800, &SNOWBALL[48*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &SNOWBALL[80*8], 4*4*8);	// right
@@ -686,7 +686,7 @@ void deShieldSnowball() {
 
 void deShieldLadybug() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, &LADYBUG[16*8], 4*4*8);	// straight
 	vdpmemcpy(156*8+0x0800, &LADYBUG[48*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &LADYBUG[80*8], 4*4*8);	// right
@@ -695,7 +695,7 @@ void deShieldLadybug() {
 
 void deShieldGnat() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, &GNAT[16*8], 4*4*8);	// straight
 	vdpmemcpy(156*8+0x0800, &GNAT[48*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &GNAT[80*8], 4*4*8);	// right
@@ -704,7 +704,7 @@ void deShieldGnat() {
 
 void deShieldSelena() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(124*8+0x0800, &SELENA[16*8], 4*4*8);	// straight
 	vdpmemcpy(156*8+0x0800, &SELENA[48*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x0800, &SELENA[80*8], 4*4*8);	// right
@@ -778,7 +778,9 @@ void main() {
 	if (seed == 0) ++seed;
 
     if (f18a) {
-        SWITCH_IN_BANK14;
+        // TODO: this needs the graphics in 14a - maybe we can copy them to the top of the 32k if we can get fixed down?
+        // Otherwise, it's one time, it's okay if it's a bit slower
+        SWITCH_IN_BANK14b;
         initF18GPU();                           // and load the GPU code and init the graphics
     }
 
@@ -792,7 +794,7 @@ titleagain:
         wrapLoadF18MainPalette();
     }
 
-	SWITCH_IN_BANK9;
+	SWITCH_IN_BANK9a;
 	handleTitlePage();
 
 	if (joynum == 0) {
@@ -801,7 +803,7 @@ titleagain:
 		// gameplay attract or story attract
 		if (!(*SAVEDATTRACT)) {
 			*SAVEDATTRACT = 1;
-			SWITCH_IN_BANK12;
+			SWITCH_IN_BANK12a;
 			doAttract();	// never returns
 		} else {
 			// we'll do the demo play
@@ -815,7 +817,7 @@ titleagain:
 	/*load VDP data */
 	loadcharset();
 	
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
     if (!f18a) {
     	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
@@ -830,7 +832,7 @@ titleagain:
 
 	sgrint();	// sets color table
 
-	SWITCH_IN_BANK4;
+	SWITCH_IN_BANK4a;
 	scoremode = 0;
 	if (joynum != 0) {
         playership = 0;     // always reset to cruiser on entry
@@ -849,7 +851,7 @@ titleagain:
 
 	// load in the sprites (patterns were modified by getDifficulty)
     if (f18a) {
-        SWITCH_IN_BANK14;
+        SWITCH_IN_BANK14a;
 	    vdpmemcpy(gSPRITE_PATTERNS, F18SPRITES, SIZE_OF_SPRITES);
 	    vdpmemcpy(gSPRITE_PATTERNS+0x800, F18SPRITES2, SIZE_OF_SPRITES);
 	    vdpmemcpy(gSPRITE_PATTERNS+0x1000, F18SPRITES3, SIZE_OF_SPRITES);
@@ -857,7 +859,7 @@ titleagain:
 	    vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
 	    vdpmemset(gSPRITE_PATTERNS+(248*8)+0x800, 0, 32);
     } else {
-    	SWITCH_IN_BANK5;
+    	SWITCH_IN_BANK5b;
 	    vdpmemcpy(gSPRITE_PATTERNS, SPRITES, SIZE_OF_SPRITES);
 	    // also, manually clear out sprite patterns 248-251 (powerup,etc)
 	    vdpmemset(gSPRITE_PATTERNS+(248*8), 0, 32);
@@ -866,22 +868,21 @@ titleagain:
 	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
 
 	// load the correct ship
-    SWITCH_IN_BANK2;
 	switch (playership) {
 	case SHIP_CRUISER:
-		initCruiser();
+		wrapInitCruiser();
 		break;
 	case SHIP_SNOWBALL:
-		initSnowball();
+		wrapInitSnowball();
 		break;
 	case SHIP_LADYBUG:
-		initLadybug();
+		wrapInitLadybug();
 		break;
 	case SHIP_GNAT:
-		initGnat();
+		wrapInitGnat();
 		break;
 	case SHIP_SELENA:
-		initSelena();
+		wrapInitSelena();
 		break;
 	}
 
@@ -929,7 +930,7 @@ titleagain:
 			space();
 			if (flag != PLAYER_DIED) {
 				// means game over
-				SWITCH_IN_BANK7;
+				SWITCH_IN_BANK7a;
                 if (force) force = 2;
 				boss();
 			}
@@ -955,7 +956,7 @@ titleagain:
 			}
 		}
 		if ((level==6)&&(joynum)) {
-			SWITCH_IN_BANK8;
+			SWITCH_IN_BANK8a;
 			gamwin();
 		}
 		if (level==9) {
@@ -975,33 +976,33 @@ void space()
 	flag=MAIN_LOOP_ACTIVE;
 	while ((flag == MAIN_LOOP_ACTIVE) || (flag == MAIN_LOOP_DONE)) { 
 		// frame 0
-		SWITCH_IN_BANK2;
-		player();			// handles player and player shots
+		wrapplayer();   	// handles player and player shots
 		colchk(0);			// first half - this means the gnat may still beat mines..
 		
-		SWITCH_IN_BANK6;
+		SWITCH_IN_BANK6a;
 		stars();
 
 		// frame 1
-		SWITCH_IN_BANK1;		// covers enout and enemy
+		SWITCH_IN_BANK1a;		// covers enout and enemy
 		if (flag == MAIN_LOOP_ACTIVE) {
 			enout();
 		}
 		enemy();
 
-		SWITCH_IN_BANK6;
+		SWITCH_IN_BANK6a;
 		stars();
 
 		// frame 2
-		SWITCH_IN_BANK2;
 		if (ch) {
+    		SWITCH_IN_BANK2b;
 			cheat();
 		} else {
+            SWITCH_IN_BANK2a;
 			plycol();		// player collision first, otherwise the mines /never/ hit the gnat if it's shooting
 		}
 		colchk(1);			// second half
 		
-		SWITCH_IN_BANK6;
+		SWITCH_IN_BANK6a;
 		stars();
 		
 		if (flag == MAIN_LOOP_DONE) {
@@ -1045,7 +1046,7 @@ void ispace() {
 
 	// load the electric wall sprites and normal shots
     if (f18a) {
-    	SWITCH_IN_BANK14;
+    	SWITCH_IN_BANK14a;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, F18ELECTRICWALL, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &F18SPRITES[84*8], 4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18ELECTRICWALL2, 2*4*8);
@@ -1055,13 +1056,13 @@ void ispace() {
         // turn on the extended sprite mode - 3 bitplanes
         VDP_SET_REGISTER(F18A_REG_ECM, 3);
     } else {
-    	SWITCH_IN_BANK5;
+    	SWITCH_IN_BANK5b;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, ELECTRICWALL, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+84*8, &SPRITES[84*8], 4*8);
     }
 
 	// small stars first
-	SWITCH_IN_BANK6;
+	SWITCH_IN_BANK6a;
 	initstars();
 
 	// show score
@@ -1097,10 +1098,10 @@ void ispace() {
     case 6: StartMusic(WINANIMMUS, 0); break;
 	}
 
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2b;
 	playerinit();
 	
-	SWITCH_IN_BANK1;
+	SWITCH_IN_BANK1a;
 	enemyinit();
 
 	distns=distns+100*level;
@@ -1126,7 +1127,7 @@ void gamovr()
 			nCnt=240;
 		}
 	
-		SWITCH_IN_BANK6;
+		SWITCH_IN_BANK6a;
 		stars();
 		 
 		nCnt--;
@@ -1175,7 +1176,7 @@ void playmv()
 
         if (f18a) {
             unsigned int old = nBank;
-            SWITCH_IN_BANK14;
+            SWITCH_IN_BANK14a;
 
 		    if (shield > 70) {
                 loadpal_f18a(F18SHIELDMAX, PAL_PLAYSHIELD*4+1, 7);
@@ -1214,9 +1215,9 @@ void playmv()
 }
 
 // adds to score and displays the result
-void addscore(unsigned char val) {
+void addscore(unsigned int val) {
 	unsigned int x;
-	unsigned char c;
+	unsigned int c;
 
 	score+=val;
 	x=score;
@@ -1275,9 +1276,9 @@ void addscore(unsigned char val) {
 }
 
 // displays centered, NUL terminated text
-void centr(unsigned char row, const char *out) {
+void centr(unsigned int row, const char *out) {
 	/* print&center the text in out[]*/
-	unsigned char c;
+	unsigned int c;
 
 	c=15-(strlen(out)>>1);
 	VDP_SET_ADDRESS_WRITE(gIMAGE+(row<<5)+c);

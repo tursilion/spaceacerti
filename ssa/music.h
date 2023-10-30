@@ -18,7 +18,7 @@ extern const unsigned char *pLoopMus;
 extern void (*doMusic)(void);
 void doAllMusic();
 void doSfxInstead();
-void StartMusic(const unsigned char *p, unsigned int musBank, unsigned char idx, unsigned char bLoop);
+void StartMusic(const unsigned char *p, unsigned int musBank, unsigned int idx, unsigned int bLoop);
 void shutup();
 void initSound();
 

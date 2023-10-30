@@ -154,9 +154,6 @@
     <ClCompile Include="cruiserend_p.c">
       <Filter>Gfx</Filter>
     </ClCompile>
-    <ClCompile Include="f18sprites.c">
-      <Filter>Gfx</Filter>
-    </ClCompile>
     <ClCompile Include="f18load.c">
       <Filter>Src</Filter>
     </ClCompile>
@@ -200,6 +197,27 @@
       <Filter>Gfx</Filter>
     </ClCompile>
     <ClCompile Include="f18load2.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="human2.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="ssd_inc2.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="bossdat.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="bossDraw2.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="winhard2.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="f18load3.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="f18load4.c">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>

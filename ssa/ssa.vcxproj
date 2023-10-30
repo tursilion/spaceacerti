@@ -92,7 +92,9 @@
     <ClCompile Include="boss3.c" />
     <ClCompile Include="boss4.c" />
     <ClCompile Include="boss5.c" />
+    <ClCompile Include="bossdat.c" />
     <ClCompile Include="bossDraw.c" />
+    <ClCompile Include="bossDraw2.c" />
     <ClCompile Include="cruiserend_c.c" />
     <ClCompile Include="cruiserend_p.c" />
     <ClCompile Include="difficulty.c" />
@@ -100,7 +102,8 @@
     <ClCompile Include="f18abosses.c" />
     <ClCompile Include="f18load.c" />
     <ClCompile Include="f18load2.c" />
-    <ClCompile Include="f18sprites.c" />
+    <ClCompile Include="f18load3.c" />
+    <ClCompile Include="f18load4.c" />
     <ClCompile Include="f18sprites8.c" />
     <ClCompile Include="font.c" />
     <ClCompile Include="gnat1rlec.c" />
@@ -114,6 +117,7 @@
     <ClCompile Include="gnat5rlec.c" />
     <ClCompile Include="gnat5rlep.c" />
     <ClCompile Include="human.c" />
+    <ClCompile Include="human2.c" />
     <ClCompile Include="ladybugc.c" />
     <ClCompile Include="ladybugp.c" />
     <ClCompile Include="ladybugscreenC.c" />
@@ -128,6 +132,7 @@
     <ClCompile Include="snowballbase_c.c" />
     <ClCompile Include="snowballbase_p.c" />
     <ClCompile Include="ssd_inc.c" />
+    <ClCompile Include="ssd_inc2.c" />
     <ClCompile Include="string.c" />
     <ClCompile Include="superspaceacer.c" />
     <ClCompile Include="titlepage.c" />
@@ -136,6 +141,7 @@
     <ClCompile Include="trampolines.c" />
     <ClCompile Include="wineasy.c" />
     <ClCompile Include="winhard.c" />
+    <ClCompile Include="winhard2.c" />
     <ClCompile Include="winmed.c" />
   </ItemGroup>
   <ItemGroup>

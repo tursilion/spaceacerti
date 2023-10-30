@@ -253,73 +253,7 @@ inline void BOSS_SAFE_DELAY(void) {	}
 
 inline void BOSS_SET_ADDRESS_WRITE(unsigned int x)	{	VDPWA=((x)&0xff); VDPWA=((((x)>>8)&0x3f)|0x40); }
 
-void draw1() {
-	unsigned char ch=BOSS_START+1;	// skipping the first 1
-	unsigned int p;
-
-	// gIMAGE /must/ stay at >0000 for this code to work
-	p=(bc>>2)+(br<<5)+gIMAGE;	// note: this wraps negative badly and requires the special addres write macro
-								// that performs masking to ensure it stays in the right memory range
-	if (bd>0) {
-		p-=2;	// for leading edge
-	}
-
-	BOSS_SET_ADDRESS_WRITE(p+1);
-	EDGEBLANKA;
-	LINECHAR8;
-	EDGEBLANKB;
-	ch+=2+0-1;      // add characters spare at end of this line, plus leading characters spare next line, -1
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	//ch+=1+0-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p);
-	EDGEBLANKA;
-	LINECHAR10;
-	EDGEBLANKB;
-	ch+=1+2-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+2);
-	EDGEBLANKA;
-	LINECHAR6;
-	EDGEBLANKB;
-	ch+=3+3-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+3);
-	EDGEBLANKA;
-	LINECHAR4;
-	EDGEBLANKB;
-	ch+=4+4-1;
-	p+=32;
-
-	BOSS_SET_ADDRESS_WRITE(p+4);
-	EDGEBLANKA;
-	LINECHAR3;
-	EDGEBLANKB;
-}
-
-void draw2() {
+void draw4() {
 	unsigned char ch=BOSS_START;
 	unsigned int p;
 
@@ -332,42 +266,42 @@ void draw2() {
 	EDGEBLANKA;
 	LINECHAR10;
 	EDGEBLANKB;
-	//ch++;
+	//ch+=1-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
 	LINECHAR10;
 	EDGEBLANKB;
-	ch+=1+1-1;
+	//ch+=1-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+1);
+	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR8;
+	LINECHAR10;
 	EDGEBLANKB;
-	ch+=2+3-1;
+	//ch+=1-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+3);
+	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR4;
+	LINECHAR10;
 	EDGEBLANKB;
-	ch+=4+3-1;
+	//ch+=1-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+3);
+	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR4;
+	LINECHAR10;
 	EDGEBLANKB;
-	ch+=4+4-1;
+	//ch+=1-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+4);
+	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR3;
+	LINECHAR10;
 	EDGEBLANKB;
-	ch+=4+3-1;
+	ch+=1+3-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p+3);
@@ -379,33 +313,40 @@ void draw2() {
 
 	BOSS_SET_ADDRESS_WRITE(p+2);
 	EDGEBLANKA;
+	LINECHAR5;
+	EDGEBLANKB;
+	ch+=4+2-1;
+	p+=32;
+
+	BOSS_SET_ADDRESS_WRITE(p+2);
+	EDGEBLANKA;
 	LINECHAR6;
 	EDGEBLANKB;
-	ch+=3+3-1;
+	ch+=3+2-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+3);
+	BOSS_SET_ADDRESS_WRITE(p+2);
 	EDGEBLANKA;
-	LINECHAR4;
+	LINECHAR6;
 	EDGEBLANKB;
-	ch+=4+3-1;
+	ch+=3+2-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+3);
+	BOSS_SET_ADDRESS_WRITE(p+2);
 	EDGEBLANKA;
-	LINECHAR4;
+	LINECHAR6;
 	EDGEBLANKB;
-	ch+=4+4-1;
+	ch+=3+2-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+4);
+	BOSS_SET_ADDRESS_WRITE(p+2);
 	EDGEBLANKA;
-	LINECHAR3;
+	LINECHAR5;
 	EDGEBLANKB;
 }
 
-void draw3() {
-	unsigned char ch=BOSS_START;	// no skip at all
+void draw5() {
+	unsigned char ch=BOSS_START;
 	unsigned int p;
 
 	p=(((unsigned)(bc))>>2)+(((unsigned)(br))<<5)+gIMAGE;
@@ -415,50 +356,62 @@ void draw3() {
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR10;
+	LINECHAR14;
 	EDGEBLANKB;
-	//ch+=1-1;
+	//ch+=1+0-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR10;
+	LINECHAR14;
 	EDGEBLANKB;
-	//ch+=1-1;
+	//ch+=1+0-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR10;
+	LINECHAR14;
 	EDGEBLANKB;
-	//ch+=1-1;
+	//ch+=1+0-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR10;
+	LINECHAR14;
 	EDGEBLANKB;
-	//ch+=1-1;
+	//ch+=1+0-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p);
 	EDGEBLANKA;
-	LINECHAR10;
+	LINECHAR14;
 	EDGEBLANKB;
 	ch+=1+1-1;
 	p+=32;
 
 	BOSS_SET_ADDRESS_WRITE(p+1);
 	EDGEBLANKA;
-	LINECHAR9;
+	LINECHAR12;
 	EDGEBLANKB;
-	ch+=1+1-1;
+	ch+=2+3-1;
 	p+=32;
 
-	BOSS_SET_ADDRESS_WRITE(p+1);
+	BOSS_SET_ADDRESS_WRITE(p+3);
 	EDGEBLANKA;
 	LINECHAR8;
 	EDGEBLANKB;
+	ch+=4+4-1;
+	p+=32;
+
+	BOSS_SET_ADDRESS_WRITE(p+4);
+	EDGEBLANKA;
+	LINECHAR6;
+	EDGEBLANKB;
+	ch+=5+5-1;
+	p+=32;
+
+	BOSS_SET_ADDRESS_WRITE(p+5);
+	EDGEBLANKA;
+	LINECHAR4;
+	EDGEBLANKB;
 }
-
-

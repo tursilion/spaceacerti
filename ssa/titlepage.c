@@ -50,15 +50,15 @@ void animate(unsigned char x) {
 			break;
 
 		case 1:
-			wrapCopyShip(SHIP2P,SHIP2C);
+			wrapCopyShip(SHIP2P,SHIP2C,2);
 			break;
 
 		case 2:
-			wrapCopyShip(SHIP3P,SHIP3C);
+			wrapCopyShip(SHIP3P,SHIP3C,3);
 			break;
 
 		case 3:
-			wrapCopyShip(SHIP4P,SHIP4C);
+			wrapCopyShip(SHIP4P,SHIP4C,4);
 			break;
 	}
 }

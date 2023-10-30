@@ -36,63 +36,81 @@
 #include "f18sprites8.c"
 #include "f18abosses.c"
 
-// I don't THINK these need to be recursive, but just in case
-#pragma nooverlay
+void ladybugwin(void);
 
 void wrapenemy() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK1;
+	SWITCH_IN_BANK1a;
 	enemy();
 	SWITCH_IN_PREV_BANK(old);
 }
 
-void wrapnoen(uint8 x) {
+void wrapnoen(int x) {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK1;
+	SWITCH_IN_BANK1a;
 	noen(x);
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapplayer() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2b;
 	player();
+
+    SWITCH_IN_BANK2a;
+	if (playership != SHIP_SELENA) {
+        mvshot();
+    } else {
+        homingshot();
+    }
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapcheat() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2b;
 	cheat();
 	SWITCH_IN_PREV_BANK(old);
 }
 
-void wrapcolchk(uint8 x) {
+void wrapcolchk(int x) {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2a;
 	colchk(x);
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapplycol() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2a;
 	plycol();
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapplayerstraight() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK2;
+	SWITCH_IN_BANK2b;
 	playerstraight();
+	SWITCH_IN_PREV_BANK(old);
+}
+void wrapplayerleft() {
+	unsigned int old = nBank;
+	SWITCH_IN_BANK2b;
+	playerleft();
+	SWITCH_IN_PREV_BANK(old);
+}
+void wrapplayerright() {
+	unsigned int old = nBank;
+	SWITCH_IN_BANK2b;
+	playerright();
 	SWITCH_IN_PREV_BANK(old);
 }
 
 // boss chars run through to 255
 // not used for F18A
-void wrapunpackboss(unsigned char level) {
+void wrapunpackboss(unsigned int level) {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5a;
 	// level 2 is handled at level start
 	switch (level) {
 		case 1:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS1, (BNR*BNC)<<3); break;
@@ -108,7 +126,7 @@ void winwrapgetscroll(unsigned char *dst, const char *src, unsigned int cnt) {
 	// copies from src (dst is usually going to be tmpbuf)
 	// used to get text out of the ending scrolltext
 	unsigned int old = nBank;
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK8a;
 	memcpy(dst, src, cnt);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -119,7 +137,7 @@ char winwrapgetbyte(const char *adr) {
 	unsigned int old = nBank;
 	char ch;
 
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 	ch = *adr;
 	SWITCH_IN_PREV_BANK(old);
 
@@ -128,15 +146,15 @@ char winwrapgetbyte(const char *adr) {
 
 void wrapstars() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK6;
+	SWITCH_IN_BANK6a;
 	stars();
 	SWITCH_IN_PREV_BANK(old);
 }
 
-void delaystars(unsigned char q)
+void delaystars(unsigned int q)
 {  /* delay for 'q' jiffies with star movement */
 	unsigned int old = nBank;
-	SWITCH_IN_BANK6;
+	SWITCH_IN_BANK6a;
 
 	while (q--)	{ 
 		stars();
@@ -147,7 +165,7 @@ void delaystars(unsigned char q)
 
 void wrapinitstars() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK6;
+	SWITCH_IN_BANK6a;
 	initstars();
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -162,14 +180,14 @@ void wrapispace() {
  
 void wrapbackground() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK6;
+	SWITCH_IN_BANK6a;
 	background();
 	SWITCH_IN_PREV_BANK(old);
 }
 
-void wrapcheckdamage(uint8 sr, uint8 sc, uint8 pwr) {
+void wrapcheckdamage(int sr, int sc, int pwr) {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK7;
+	SWITCH_IN_BANK7a;
 	// warning: checkdamage returns a return value, but we are ignoring it
 	checkdamage(sr, sc, pwr);
 	SWITCH_IN_PREV_BANK(old);
@@ -177,7 +195,7 @@ void wrapcheckdamage(uint8 sr, uint8 sc, uint8 pwr) {
 
 void wrapLoadSelenaPic() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK3;
+	SWITCH_IN_BANK3b;
 	RLEUnpack(0x0000, selenaendP, 6144);
 	RLEUnpack(0x2000, selenaendC, 6144);
 	SWITCH_IN_PREV_BANK(old);
@@ -191,7 +209,7 @@ void wrapgetfontbytes(unsigned char *dest, const unsigned char *src, unsigned in
 	SWITCH_IN_PREV_BANK(old);
 }
 
-void wrapspritescore(unsigned int sprpat, unsigned int sprtab, unsigned char row, unsigned char col, unsigned char ch) {
+void wrapspritescore(unsigned int sprpat, unsigned int sprtab, unsigned int row, unsigned int col, unsigned int ch) {
 	unsigned int x=score;
 	unsigned int old = nBank;
 	unsigned char i;
@@ -237,12 +255,12 @@ void wrapLoadEngineSprites() {
 	unsigned int old = nBank;
 
     if (f18a) {
-    	SWITCH_IN_BANK14;
+    	SWITCH_IN_BANK14a;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, F18SPRITES+76*8, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x800, F18SPRITES2+76*8, 2*4*8);
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8+0x1000, F18SPRITES3+76*8, 2*4*8);
     } else {
-    	SWITCH_IN_BANK5;
+    	SWITCH_IN_BANK5b;
 	    vdpmemcpy(gSPRITE_PATTERNS+76*8, SPRITES+76*8, 2*4*8);
     }
 	SWITCH_IN_PREV_BANK(old);
@@ -257,12 +275,12 @@ void wrapPlayerFlameBig() {
         vdpchar(100*8+0x0800, 0x01);						// 1 pixel on for high flame (we'll try it for F18A too)
     } else if (playership != SHIP_SELENA) {
         if (f18a) {
-    	    SWITCH_IN_BANK14;
+    	    SWITCH_IN_BANK14a;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18SPRITES+100*8, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18SPRITES2+100*8, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x1000, F18SPRITES3+100*8, 4*8);
         } else {
-    	    SWITCH_IN_BANK5;
+    	    SWITCH_IN_BANK5b;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, SPRITES+100*8, 4*8);
         }
 	    SWITCH_IN_PREV_BANK(old);
@@ -277,34 +295,49 @@ void wrapPlayerFlameSmall() {
         vdpchar(100*8+0x0800, 0x00);						// turn the 1 pixel off for low flame
     } else if (playership != SHIP_SELENA) {
         if (f18a) {
-            SWITCH_IN_BANK14;
+            SWITCH_IN_BANK14a;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, F18PLAYERFLAMESMALL, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x800, F18PLAYERFLAMESMALL2, 4*8);
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8+0x1000, F18PLAYERFLAMESMALL3, 4*8);
         } else {
-    	    SWITCH_IN_BANK5;
+    	    SWITCH_IN_BANK5b;
 	        vdpmemcpy(gSPRITE_PATTERNS+100*8, PLAYERFLAMESMALL, 4*8);
         }
 	    SWITCH_IN_PREV_BANK(old);
     }
 } 
 
-void wrapCopyShip(const unsigned char *p, const unsigned char *c) {
+void wrapCopyShip(const unsigned char *p, const unsigned char *c, int idx) {
 	unsigned int old = nBank;
-	unsigned char i;
+	unsigned int i;
 
-	SWITCH_IN_BANK10;
+    // idx is 2,3,4 and tells us which ship so we can do the right bank
 
-	for (i=0; i<17; ++i) {
-		vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), c+(i*16*8), 16*8);
-		vdpmemcpy(0x0000+6*32*8+16*8+(i*32*8), p+(i*16*8), 16*8);
-	}
+    if (idx == 3) {
+        // split between banks
+        SWITCH_IN_BANK10a;
+	    for (i=0; i<17; ++i) {
+		    vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), c+(i*16*8), 16*8);
+	    }
+        SWITCH_IN_BANK10b;
+	    for (i=0; i<17; ++i) {
+		    vdpmemcpy(0x0000+6*32*8+16*8+(i*32*8), p+(i*16*8), 16*8);
+	    }
+    } else {
+        if (idx == 2) { SWITCH_IN_BANK10a; }
+        else if (idx == 4) { SWITCH_IN_BANK10b; }
+
+	    for (i=0; i<17; ++i) {
+		    vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), c+(i*16*8), 16*8);
+		    vdpmemcpy(0x0000+6*32*8+16*8+(i*32*8), p+(i*16*8), 16*8);
+	    }
+    }
 
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapGamWin() {
-	SWITCH_IN_BANK8;
+	SWITCH_IN_BANK8a;
 	gamwin();	// never returns
 }
 
@@ -322,7 +355,7 @@ void wrapLoadStoryFont() {
 
 void wrapLoadLadyScreen() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK11;
+	SWITCH_IN_BANK11b;
 	RLEUnpack(0x0000, LADYSCREENP, 6144);
 	RLEUnpack(0x2000, LADYSCREENC, 6144);
 	SWITCH_IN_PREV_BANK(old);
@@ -330,7 +363,7 @@ void wrapLoadLadyScreen() {
 
 void wrapldpic() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK9;
+	SWITCH_IN_BANK9a;
 	ldpic();
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -339,15 +372,16 @@ void wrapldpic() {
 void wrapLadyBugByte(int off) {
 	if (off < 6144) {
 		unsigned int old = nBank;
-		SWITCH_IN_BANK11;
+		SWITCH_IN_BANK11b;
 		vdpchar(off, LADYBUGP[off]);
+		SWITCH_IN_BANK11a;
 		vdpchar(0x2000+off, LADYBUGC[off]);
 		SWITCH_IN_PREV_BANK(old);
 	}
 }
 
 // draw one character on a bitmap screen at off (pattern table only)
-void wrapDrawLastRowText(char txt, unsigned int off) {
+void wrapDrawLastRowText(int txt, unsigned int off) {
 	unsigned int old = nBank;
 
 	if (txt <= 32) return;
@@ -362,7 +396,7 @@ void wrapDrawLastRowText(char txt, unsigned int off) {
 void wraploadgnat1() {
 	// needs the full screen - also needs to check music interrupts
 	unsigned int old = nBank;
-	SWITCH_IN_BANK12;
+	SWITCH_IN_BANK12b;
 	RLEUnpackInt(gnat1rlep, gnat1rlec, 6144);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -370,7 +404,7 @@ void wraploadgnat1() {
 void wraploadgnat2() {
 	// only need the top 2/3rd
 	unsigned int old = nBank;
-	SWITCH_IN_BANK12;
+	SWITCH_IN_BANK13b;
 	RLEUnpackInt(gnat2rlep, gnat2rlec, 4096);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -378,7 +412,7 @@ void wraploadgnat2() {
 void wraploadgnat3() {
 	// only need the top 2/3rd
 	unsigned int old = nBank;
-	SWITCH_IN_BANK13;
+	SWITCH_IN_BANK13a;
 	RLEUnpackInt(gnat3rlep, gnat3rlec, 4096);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -386,7 +420,7 @@ void wraploadgnat3() {
 void wraploadgnat4() {
 	// only need the top 2/3rd
 	unsigned int old = nBank;
-	SWITCH_IN_BANK13;
+	SWITCH_IN_BANK13a;
 	RLEUnpackInt(gnat4rlep, gnat4rlec, 4096);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -394,14 +428,14 @@ void wraploadgnat4() {
 void wraploadgnat5() {
 	// only need the top 2/3rd
 	unsigned int old = nBank;
-	SWITCH_IN_BANK13;
+	SWITCH_IN_BANK5a;
 	RLEUnpackInt(gnat5rlep, gnat5rlec, 4096);
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapwarpout() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK7;
+	SWITCH_IN_BANK8a;
     warpout();
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -414,7 +448,7 @@ void wrapLoadFinalSnowball() {
         VDP_SET_REGISTER(F18A_REG_ECM, 0);
     }
 
-    SWITCH_IN_BANK5;
+    SWITCH_IN_BANK5b;
 
     // straight ship and shields (0-15, 16-31)
 	vdpmemcpy(0x3800, SNOWBALL, 8*4*8);
@@ -431,7 +465,7 @@ void wrapFinalSnowballBig() {
 
     // F18A not used in this end sequence
 
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 
     // flame big (32-35)
     vdpmemcpy(0x3800+8*4*8, SPRITES+100*8, 4*8);
@@ -442,7 +476,7 @@ void wrapFinalSnowballBig() {
 void wrapFinalSnowballSmall() {
     unsigned int old = nBank;
 
-	SWITCH_IN_BANK5;
+	SWITCH_IN_BANK5b;
 
     // flame big (32-35)
     vdpmemcpy(0x3800+8*4*8, PLAYERFLAMESMALL, 4*8);
@@ -453,9 +487,9 @@ void wrapFinalSnowballSmall() {
 void wrapldcruiserend() {
     unsigned int old = nBank;
 
-    SWITCH_IN_BANK3;
+    SWITCH_IN_BANK2b;
 	RLEUnpack(0x2000, cruiserend_c, 6144);
-    SWITCH_IN_BANK4;
+    SWITCH_IN_BANK12a;
     RLEUnpack(0x0000, cruiserend_p, 6144);
     SWITCH_IN_PREV_BANK(old);
 }
@@ -463,17 +497,31 @@ void wrapldcruiserend() {
 void wrapLoadSnowballBase() {
     unsigned int old = nBank;
 
-    SWITCH_IN_BANK1;
+    SWITCH_IN_BANK1b;
     RLEUnpackInt(SNOWBALLBASEP, SNOWBALLBASEC, 6144);
     SWITCH_IN_PREV_BANK(old);
 }
 
+const unsigned int f18bosspal4[] = {
+0x0000,0x0220,0x0222,0x0236,
+0x0444,0x0540,0x0665,0x0760,
+0x0788,0x0980,0x0994,0x09Ab,
+0x0bA0,0x0cB0,0x0cDd,0x0eD3
+};
+const unsigned int f18bosspal5[] = {
+0x0000,0x0000,0x0202,0x0313,
+0x0424,0x0515,0x0635,0x0726,
+0x0747,0x0828,0x0958,0x0939,
+0x0b4a,0x0b7a,0x0d6c,0x0e9f
+};
+
+
 // returns 0 if finished
-unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
+unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
     unsigned int old = nBank;
     unsigned char ret = 1;
 
-    SWITCH_IN_BANK15;
+    SWITCH_IN_BANK15a;
 
     // we load the F18A boss one scanline at a time in place of the shifting code
     // the largest boss only needs about 2k of data
@@ -540,7 +588,7 @@ unsigned char wrapLoadBossF18A(unsigned char n, unsigned char scanline) {
 void wrapLoadF18MainPalette() {
     unsigned int old = nBank;
 
-    SWITCH_IN_BANK14;
+    SWITCH_IN_BANK14a;
     loadpal_f18a(F18PALETTE, 0, 64);
     SWITCH_IN_PREV_BANK(old);
 }
@@ -549,11 +597,11 @@ void wrapInitCruiser() {
 	unsigned int old = nBank;
 
     if (f18a) {
-        SWITCH_IN_BANK14;
+        SWITCH_IN_BANK14a;
         initCruiserf18();
         loadpal_f18a(F18CRUISERPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
-	    SWITCH_IN_BANK5;
+	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
     }
 
@@ -564,11 +612,12 @@ void wrapInitSnowball() {
 	unsigned int old = nBank;
 
     if (f18a) {
-        SWITCH_IN_BANK14;
+        SWITCH_IN_BANK13b;
         initSnowballf18();
+        SWITCH_IN_BANK14a;
         loadpal_f18a(F18SNOWBALLPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
-    	SWITCH_IN_BANK5;
+    	SWITCH_IN_BANK5b;
     	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
     }
 
@@ -579,11 +628,12 @@ void wrapInitLadybug() {
 	unsigned int old = nBank;
 
     if (f18a) {
-	    SWITCH_IN_BANK14;
+	    SWITCH_IN_BANK9b;
         initLadybugf18();
+	    SWITCH_IN_BANK14a;
         loadpal_f18a(F18LADYBUGPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
-	    SWITCH_IN_BANK5;
+	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
     }
 
@@ -594,11 +644,12 @@ void wrapInitGnat() {
 	unsigned int old = nBank;
 
     if (f18a) {
-	    SWITCH_IN_BANK15;
+	    SWITCH_IN_BANK15b;
         initGnatf18();
+	    SWITCH_IN_BANK14a;
         loadpal_f18a(F18GNATPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
-	    SWITCH_IN_BANK5;
+	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
     }
 
@@ -609,14 +660,76 @@ void wrapInitSelena() {
 	unsigned int old = nBank;
 
     if (f18a) {
-	    SWITCH_IN_BANK15;
+	    SWITCH_IN_BANK15b;
         initSelenaf18();
+	    SWITCH_IN_BANK14a;
         loadpal_f18a(F18SELENAPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
-	    SWITCH_IN_BANK5;
+	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
         vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
     }
 
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapLoadBossGfx() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    loadBossGfx();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapRestoreBossGfx() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    restoreBossGfx();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapAddDestroyed(unsigned int ptr) {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    AddDestroyed(ptr);
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapbossdraw() {
+	unsigned int old = nBank;
+
+    switch(level) {
+        case 1: 
+            SWITCH_IN_BANK7b;
+            draw1();
+            break;
+        case 2: 
+            SWITCH_IN_BANK7b;
+            draw2();
+            break;
+        case 3: 
+            SWITCH_IN_BANK7b;
+            draw3();
+            break;
+        case 4: 
+            SWITCH_IN_BANK14b;
+            draw4();
+            break;
+        case 5: 
+            SWITCH_IN_BANK14b;
+            draw5();
+            break;
+    }
+
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapladybugwin() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK1a;
+    ladybugwin();
 	SWITCH_IN_PREV_BANK(old);
 }

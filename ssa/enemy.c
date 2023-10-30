@@ -50,12 +50,12 @@ const unsigned char oddstable[6][8] = {
 /*5*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_MINE,   ENEMY_BEAMGEN, ENEMY_HELICOPTER, ENEMY_SWIRLY,     ENEMY_BOMB,       ENEMY_SAUCER }
 };
 
-uint8 enr[12], enc[12];					// enemy row and col
-unsigned char ent[12];					// enemy type
-uint8 ech[12], eec[12], esc[12];		// enemy animation - character, end character, start character
-char ers[12], ecs[12];					// enemy row speed, column speed - used for shots and sometimes flags
-char ep[6];								// enemy power (hit points)
-void (*en_func[12])(uint8);				// pointer to enemy handler function
+int enr[12], enc[12];					// enemy row and col
+unsigned int ent[12];					// enemy type
+int ech[12], eec[12], esc[12];		    // enemy animation - character, end character, start character
+int ers[12], ecs[12];					// enemy row speed, column speed - used for shots and sometimes flags
+int ep[6];								// enemy power (hit points)
+void (*en_func[12])(int);				// pointer to enemy handler function
 unsigned char MineTipPos;
 
 // generators
@@ -203,7 +203,7 @@ void enout() {
 
 	/*shoot?*/
     {
-	    unsigned char k=rndnum()&15;
+	    unsigned int k=rndnum()&15;
 	    if (k<nDifficulty) {	// 1, 3 or 7
 		    if ((ent[k+6]==ENEMY_NONE)&&((ent[k]==ENEMY_SAUCER)||(ent[k]==ENEMY_JET))) { 
 			    shootplayer(k, k+6);
@@ -212,7 +212,7 @@ void enout() {
     }
 }
 
-void enemysaucer(uint8 x) {
+void enemysaucer(int x) {
 	enr[x]+=4;
 	enc[x]+=sinemove[(enr[x]>>2)&0x1f];
 
@@ -224,7 +224,7 @@ void enemysaucer(uint8 x) {
 	}
 }
 
-void enemyjet(uint8 x) {
+void enemyjet(int x) {
 	// since there's no animation esc is used as a flag that the turn has already happened
 	// if esc==ech, it has not
 	enr[x]+=8;
@@ -319,8 +319,8 @@ void enemyjet(uint8 x) {
 	}
 }
 
-void enemymine(uint8 x) {
-	unsigned char r,c;
+void enemymine(int x) {
+	unsigned int r,c;
 
 	/*move enemies */
 	spposn(PLAYER_SPRITE,r,c);
@@ -337,7 +337,7 @@ void enemymine(uint8 x) {
 	}
 }
 
-void enemyhelicopter(uint8 x) {
+void enemyhelicopter(int x) {
 	if (ers[x] <= 4) {
 		enr[x]+=ers[x]; 
 		ers[x] = 0;
@@ -365,7 +365,7 @@ void enemyhelicopter(uint8 x) {
 	}
 }
 
-void enemyhelipause(uint8 x) {
+void enemyhelipause(int x) {
 	// handle helicopter frames
 	++ent[x];
 	if (ent[x] == ENEMY_HELISHOOT1) {
@@ -398,7 +398,7 @@ void enemyhelipause(uint8 x) {
 	}
 }
 
-void enemyhelileave(uint8 x) {
+void enemyhelileave(int x) {
 	enr[x]-=4;
 	enc[x]+=ecs[x];
 
@@ -416,7 +416,7 @@ void enemyhelileave(uint8 x) {
 	}
 }
 
-void enemyswirly(uint8 x) {
+void enemyswirly(int x) {
 	unsigned char c;
 
 	/*move enemies */
@@ -440,7 +440,7 @@ void enemyswirly(uint8 x) {
 	}
 }
 
-void enemybomb(uint8 x) {
+void enemybomb(int x) {
 	enr[x]+=3;
 	enc[x]++;
 
@@ -456,7 +456,7 @@ void enemybomb(uint8 x) {
 const unsigned int bulletColor1[4] = { 0x00d0, 0x0e22 };   // green on red
 const unsigned int bulletColor2[4] = { 0x0e22, 0x00d0 };   // red on green
 
-void enemyshot(uint8 x) {
+void enemyshot(int x) {
 	static unsigned char cnt=0;
 
 	/* used to count half frames */
@@ -490,7 +490,7 @@ void enemyshot(uint8 x) {
 
 // ONLY '7' is legal for input, and we assume 8-11 are follower sprites!
 // so we ignore the input and just assume the indexes for better performance
-void enemyhominglaser(uint8 a) {
+void enemyhominglaser(int a) {
 	unsigned char oldc = enc[7];
 	char x;
 	(void)a;
@@ -556,7 +556,7 @@ void enemyhominglaser(uint8 a) {
 }
 
 // boss homing shot - slower than laser and no trail
-void enemyhoming(uint8 a) {
+void enemyhoming(int a) {
 	unsigned char oldc = enc[a];
 	char x;
 
@@ -584,7 +584,7 @@ void enemyhoming(uint8 a) {
 	}
 }
 
-void enemyengine(uint8 x) {
+void enemyengine(int x) {
 	ech[x]+=4;
 	if (ech[x]>eec[x]) {
 		ech[x]=esc[x];
@@ -592,13 +592,13 @@ void enemyengine(uint8 x) {
 	sppat(x+ENEMY_SPRITE,ech[x]);
 }
  
-void enemynull(uint8 x) {
+void enemynull(int x) {
 	(void)x;
 	// boss cockpit and others with no task to do - note, not even drawn!
 	//sploct(x+ENEMY_SPRITE,enr[x],enc[x]); 
 }
 
-void enemyexplosion(uint8 x) {
+void enemyexplosion(int x) {
 	ech[x]+=4;
 	if (ech[x]>eec[x]) {
 		ech[x]=esc[x];
@@ -608,7 +608,7 @@ void enemyexplosion(uint8 x) {
 	sppat(x+ENEMY_SPRITE,ech[x]);
 }
 
-void enemybeamgen(uint8 x) {
+void enemybeamgen(int x) {
 	unsigned char bmax, bmin;
 
 	enr[x]++;	// always slow downward movement
@@ -696,7 +696,7 @@ void enemybeamgen(uint8 x) {
 	}
 }
 
-void enemydeadbeam(uint8 x) {
+void enemydeadbeam(int x) {
 	// whatever it was, we're set up with the right position and pattern,
 	// so we just keep moving down
 	enr[x]++;	// always slow downward movement
@@ -710,7 +710,7 @@ void enemydeadbeam(uint8 x) {
 
 void enemy()
 { 
-	uint8 x;
+	int x;
 
 	// move enemies according to their handlers
 	for (x=0; x<12; x++) {
@@ -755,9 +755,9 @@ void enemy()
 	}
 }
  
-void shootplayer(unsigned char en, unsigned char shot) {
+void shootplayer(unsigned int en, unsigned int shot) {
 	int z,y;
-	unsigned char r,c;
+	unsigned int r,c;
 
 	spposn(PLAYER_SPRITE,r,c);
 	r=r+12; c=c+16;
@@ -803,10 +803,10 @@ void shootplayer(unsigned char en, unsigned char shot) {
 	}
 }
 
-void helishoot(unsigned char en) {
+void helishoot(unsigned int en) {
 	// helicopters steal shots from other enemies
 	// so this is just a little search
-	unsigned char i;
+	unsigned int i;
 
 	// enemy shots from 6-10
 	for (i=11; i>5; i--) {
@@ -820,7 +820,7 @@ void helishoot(unsigned char en) {
 }
 
 void enemyinit() {
-	unsigned char a;
+	unsigned int a;
 
 	for (a=0; a<12; a++) {
 		ent[a]=ENEMY_NONE;
@@ -830,7 +830,7 @@ void enemyinit() {
     initGenerators();
 }
 
-void pwr(uint8 x)
+void pwr(int x)
 { 
 	/* decides if pwr up to come out*/
 	if ((playership != SHIP_GNAT)&&(playership != SHIP_SELENA)) {		// no powerups for the gnat or Selena

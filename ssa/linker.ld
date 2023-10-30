@@ -85,6 +85,7 @@ SECTIONS {
     bank1a :
     {
         enemy.o(.text .rodata)
+        winhard2.o(.text .rodata)
         PROVIDE(ebank1a = .);
     } > CART1A AT> FLASH
     
@@ -103,6 +104,8 @@ SECTIONS {
 
     bank2b 0x6000 :
     {
+        human2.o(.text .rodata)
+        cruiserendc.o(.text .rodata)
         PROVIDE(ebank2b = .);
     } > CART2B AT> FLASH
 
@@ -116,14 +119,12 @@ SECTIONS {
     {
         selena_end_c.o(.text .rodata)
         selena_end_p.o(.text .rodata)
-        cruiserendc.o(.text .rodata)
         PROVIDE(ebank3b = .);
     } > CART3B AT> FLASH
 
     bank4a 0x6000 :
     {
         difficulty.o(.text .rodata)
-        cruiserendp.o(.text .rodata)
         PROVIDE(ebank4a = .);
     } > CART4A AT> FLASH
 
@@ -140,6 +141,8 @@ SECTIONS {
         boss3.o(.text .rodata)
         boss4.o(.text .rodata)
         boss5.o(.text .rodata)
+        gnat5rlec.o(.text .rodata)
+        gnat5rlep.o(.text .rodata)
         PROVIDE(ebank5a = .);
     } > CART5A AT> FLASH
 
@@ -159,13 +162,13 @@ SECTIONS {
     bank6b 0x6000 :
     {
         outfile3.o(.text .rodata)
+        font.o(.text .rodata)
         PROVIDE(ebank6b = .);
     } > CART6B AT> FLASH
 
     bank7a 0x6000 :
     {
         boss.o(.text .rodata)
-        font.o(.text .rodata)
         PROVIDE(ebank7a = .);
     } > CART7A AT> FLASH
 
@@ -179,11 +182,13 @@ SECTIONS {
     {
         wineasy.o(.text .rodata)
         winmed.o(.text .rodata)
+        ssd_inc2.o(.text .rodata)
+        bossdat.o(.text .rodata)
         PROVIDE(ebank8a = .);
     } > CART8A AT> FLASH
 
     bank8b 0x6000 :
-    {
+    {	
         winhard.o(.text .rodata)
         PROVIDE(ebank8b = .);
     } > CART8B AT> FLASH
@@ -200,6 +205,7 @@ SECTIONS {
     {
         ship1_c.o(.text .rodata)
         ship1_p.o(.text .rodata)
+        f18load3.o(.text .rodata)
         PROVIDE(ebank9b = .);
     } > CART9B AT> FLASH
 
@@ -238,6 +244,7 @@ SECTIONS {
         qwertianc.o(.text .rodata)
         qwertianp.o(.text .rodata)
         attract.o(.text .rodata)
+        cruiserendp.o(.text .rodata)
         PROVIDE(ebank12a = .);
     } > CART12A AT> FLASH
 
@@ -245,8 +252,6 @@ SECTIONS {
     {
         gnat1rlec.o(.text .rodata)
         gnat1rlep.o(.text .rodata)
-        gnat2rlec.o(.text .rodata)
-        gnat2rlep.o(.text .rodata)
         PROVIDE(ebank12b = .);
     } > CART12B AT> FLASH
 
@@ -261,8 +266,9 @@ SECTIONS {
 
     bank13b 0x6000 :
     {
-        gnat5rlec.o(.text .rodata)
-        gnat5rlep.o(.text .rodata)
+        gnat2rlep.o(.text .rodata)
+        gnat2rlec.o(.text .rodata)
+        f18load4.o(.text .rodata)
         PROVIDE(ebank13b = .);
     } > CART13B AT> FLASH
 
@@ -275,6 +281,7 @@ SECTIONS {
     bank14b 0x6000 :
     {
         f18load.o(.text .rodata)
+        bossdraw2.o(.text .rodata)
         PROVIDE(ebank14b = .);
     } > CART14B AT> FLASH
 

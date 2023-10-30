@@ -33,13 +33,13 @@ CFLAGS=\
 .PHONY: all clean
 
 # crt0 must be first!
-OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o bg.o boss.o bossdraw.o enemy.o music.o wineasy.o \
-        winhard.o title_c.o title_p.o boss1.o boss2.o boss3.o boss4.o boss5.o outfile0.o outfile1.o \
+OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o boss.o bossdat.o bossdraw.o bossdraw2.o enemy.o music.o wineasy.o \
+        winhard.o winhard2.o title_c.o title_p.o boss1.o boss2.o boss3.o boss4.o boss5.o outfile0.o outfile1.o \
         outfile2.o outfile3.o font.o difficulty.o selena_end_c.o selena_end_p.o titlepage.o ship1_c.o ship1_p.o \
         ship2_c.o ship2_p.o ship3_c.o ship3_p.o ship4_c.o ship4_p.o qwertianc.o qwertianp.o attract.o sfxs.o \
         ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
         gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
-        human.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18abosses.o
+        human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o
 
 # List of all files needed in executable
 PREREQUISITES=\
@@ -68,15 +68,21 @@ clean:
 
 ssd_inc.o: ssd_inc.c
 	$(CC) $(CFLAGS) $(INCPATH) -o ssd_inc.o ssd_inc.c
+ssd_inc2.o: ssd_inc2.c
+	$(CC) $(CFLAGS) $(INCPATH) -o ssd_inc2.o ssd_inc2.c
 
 bg.o: bg.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o bg.o bg.c
 
 boss.o: boss.c game.h boss.h
 	$(CC) $(CFLAGS) $(INCPATH) -o boss.o boss.c
+bossdat.o: bossdat.c game.h boss.h
+	$(CC) $(CFLAGS) $(INCPATH) -o bossdat.o bossdat.c
 
 bossdraw.o: bossdraw.c boss.h
 	$(CC) $(CFLAGS) $(INCPATH) -o bossdraw.o bossdraw.c
+bossdraw2.o: bossdraw2.c boss.h
+	$(CC) $(CFLAGS) $(INCPATH) -o bossdraw2.o bossdraw2.c
 
 enemy.o: enemy.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o enemy.o enemy.c
@@ -86,6 +92,8 @@ music.o: music.c game.h
 
 human.o: human.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o human.o human.c
+human2.o: human2.c game.h
+	$(CC) $(CFLAGS) $(INCPATH) -o human2.o human2.c
 
 superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h
 	$(CC) $(CFLAGS) $(INCPATH) -o superspaceacer.o superspaceacer.c
@@ -104,6 +112,8 @@ winmed.o: winmed.c game.h
 
 winhard.o: winhard.c game.h boss.h trampoline.h music.h human.h
 	$(CC) $(CFLAGS) $(INCPATH) -o winhard.o winhard.c
+winhard2.o: winhard2.c game.h boss.h trampoline.h music.h human.h
+	$(CC) $(CFLAGS) $(INCPATH) -o winhard2.o winhard2.c
 
 title_c.o: title_c.c
 	$(CC) $(CFLAGS) $(INCPATH) -o title_c.o title_c.c
@@ -183,6 +193,10 @@ f18load.o: f18load.c
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load.o f18load.c
 f18load2.o: f18load2.c
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load2.o f18load2.c
+f18load3.o: f18load3.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18load3.o f18load3.c
+f18load4.o: f18load4.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18load4.o f18load4.c
 f18abosses.o: f18abosses.c
 	$(CC) $(CFLAGS) $(INCPATH) -o f18abosses.o f18abosses.c
 

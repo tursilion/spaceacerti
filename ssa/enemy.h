@@ -45,25 +45,24 @@ enum {
 
 void enout();
 void enemy();
-void shootplayer(unsigned char en, unsigned char shot);
-void helishoot(unsigned char en);
+void shootplayer(unsigned int en, unsigned int shot);
+void helishoot(unsigned int en);
 void enemyinit();
-void enemyexplosion(uint8);
-void enemyengine(uint8);
-void enemyshot(uint8);
-void enemyhominglaser(uint8);
-void enemyhoming(uint8);
-void enemymine(uint8);
-void enemynull(uint8);
-void enemysaucer(uint8 x);
-void enemyjet(uint8 x);
-void enemyhelicopter(uint8 x);
-void enemyhelipause(uint8 x);
-void enemyhelileave(uint8 x);
-void enemybeamgen(uint8 x);
-void enemydeadbeam(uint8 x);
-void enemyhelileave(uint8 x);
-void enemyswirly(uint8 x);
-void enemybomb(uint8 x);
+void enemyexplosion(int);
+void enemyengine(int);
+void enemyshot(int);
+void enemyhominglaser(int);
+void enemyhoming(int);
+void enemymine(int);
+void enemynull(int);
+void enemysaucer(int x);
+void enemyjet(int x);
+void enemyhelicopter(int x);
+void enemyhelipause(int x);
+void enemyhelileave(int x);
+void enemybeamgen(int x);
+void enemydeadbeam(int x);
+void enemyswirly(int x);
+void enemybomb(int x);
 
 #endif

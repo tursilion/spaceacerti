@@ -22,42 +22,6 @@
 // 6	cockpit (invisible collision sprite)
 // 7-11	shots
 
-// a scaled difficulty level for the boss motion
-uint8 scaledLevel;
-#define HOMINGFRAMES 10
-
-// some graphics copies so we don't need to page flip for graphics during the final boss
-const unsigned char beamleftgfx[] = {
-	// beam moving left (104)
-	0x00,0x00,0x00,0x00,0x04,0x08,0x19,0x11,0x11,0x19,0x08,0x04,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x20,0x40,0x80,0x80,0x00,0x00,0x80,0x80,0x40,0x20,0x00,0x00,0x00
-};
-const unsigned char f18beamleftgfx[] = {
-    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-};
-const unsigned char f18beamleftgfx2[] = {
-    0x00,0x00,0x00,0x00,0x04,0x08,0x19,0x11,0x11,0x19,0x08,0x04,0x00,0x00,0x00,0x00,
-    0x00,0x00,0x00,0x20,0x40,0x80,0x80,0x00,0x00,0x80,0x80,0x40,0x20,0x00,0x00,0x00,
-};
-
-const unsigned char hominggfx[] = {
-    0x00,0x00,0x00,0x03,0x04,0x0B,0x17,0x17,0x17,0x17,0x0B,0x04,0x03,0x00,0x00,0x00,
-    0x00,0x00,0x00,0xC0,0x20,0xD0,0xE8,0xE8,0xE8,0xE8,0xD0,0x20,0xC0,0x00,0x00,0x00
-};
-const unsigned char f18hominggfx[] = {
-    0x00,0x00,0x00,0x03,0x04,0x0B,0x17,0x17,0x17,0x17,0x0B,0x04,0x03,0x00,0x00,0x00,
-    0x00,0x00,0x00,0xC0,0x20,0xD0,0xE8,0xE8,0xE8,0xE8,0xD0,0x20,0xC0,0x00,0x00,0x00
-};
-const unsigned char f18hominggfx2[] = {
-    0x00,0x00,0x00,0x00,0x03,0x07,0x0F,0x0F,0x0F,0x0F,0x07,0x03,0x00,0x00,0x00,0x00,
-    0x00,0x00,0x00,0x00,0xC0,0xE0,0xF0,0xF0,0xF0,0xF0,0xE0,0xC0,0x00,0x00,0x00,0x00
-};
-const unsigned char f18hominggfx3[] = {
-    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-};
-
 //*BOSSES
 // Number Rows, Number Columns
 // 3 sets of Engine Row, Engine Column
@@ -70,64 +34,13 @@ const char BOSTAB[] = {
 	9,15,	5,15,	6,50,	5,84,	COLOR_MAGENTA
 };
 
-// boss shapes for cockpit (per row, min/max character)
-const unsigned char bossShape1[8*2] = {
-    2*8,7*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    2*8,7*8-8,
-    3*8,6*8-8,
-    4*8,5*8-8
-};
-const unsigned char bossShape2[11*2] = {
-    0*8,10*8-8,
-    0*8,10*8-8,
-    2*8,7*8-8,
-    3*8,6*8-8,
-    4*8,5*8-8,
-    4*8,5*8-8,
-    3*8,6*8-8,
-    3*8,6*8-8,
-    3*8,6*8-8,
-    3*8,6*8-8,
-    4*8,5*8-8
-};
-const unsigned char bossShape3[7*2] = {
-    0*8,9*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    0*8,9*8-8,
-    1*8,8*8-8,
-    2*8,7*8-8
-};
-const unsigned char bossShape4[12*2] = {
-    0*8,10*8-8,
-    0*8,10*8-8,
-    0*8,10*8-8,
-    0*8,10*8-8,
-    0*8,10*8-8,
-    0*8,10*8-8,
-    3*8,5*8-8,
-    3*8,6*8-8,
-    2*8,7*8-8,
-    2*8,7*8-8,
-    2*8,7*8-8,
-    3*8,6*8-8
-};
-const unsigned char bossShape5[9*2] = {
-    0*8,13*8-8,
-    0*8,13*8-8,
-    0*8,13*8-8,
-    0*8,13*8-8,
-    1*8,12*8-8,
-    2*8,11*8-8,
-    4*8,9*8-8,
-    5*8,8*8-8,
-    6*8,7*8-8
-};
+// different from Coleco - we have more RAM than ROM, so copy the
+// appropriate bossShape into this array
+unsigned int bossShape[8*2];
+
+// a scaled difficulty level for the boss motion
+uint8 scaledLevel;
+#define HOMINGFRAMES 10
 
 // all white boss palette for hit flash
 const unsigned int f18WhitePalette[] = {
@@ -137,19 +50,12 @@ const unsigned int f18WhitePalette[] = {
 
 char br,bd;			// these ones need to be signed
 unsigned char bc;	// but this one doesn't
-unsigned char BNR,BNC;
+unsigned int BNR,BNC;
 char bossminepower;
-void (*bossdraw)();
 unsigned char bosscnt=0;
 unsigned char enginer[3], enginec[3];   // offsets
-const unsigned char *bossShape;
 
 // boss draw functions
-void draw1();
-void draw2();
-void draw3();
-void draw4();
-void draw5();
 void drawf18();
 
 extern const unsigned int f18BlackPal[4];
@@ -166,24 +72,18 @@ void bosscol(char col) {
 
 void boss()
 { /* boss routine */
-	unsigned char i,p;
-	unsigned char x_idx;
-	unsigned char x_r;
+	unsigned int i,p;
+	unsigned int x_idx;
+	unsigned int x_r;
 
 	shutup();
 	p=(level-1)*9;
 
 	BNR=BOSTAB[p++];
 	BNC=BOSTAB[p++];
-    // F18A will ignore the bossdraw function
-	switch (level) {
-		default:
-		case 1:	bossdraw = draw1; bossShape=bossShape1; break;
-		case 2:	bossdraw = draw2; bossShape=bossShape2; break;
-		case 3:	bossdraw = draw3; bossShape=bossShape3; break;
-		case 4:	bossdraw = draw4; bossShape=bossShape4; break;
-		case 5:	bossdraw = draw5; bossShape=bossShape5; break;
-	}
+
+    // LoadBossGfx below sets up the shape and draw function now
+
     if (f18a) {
         // set up the bml width and height registers
         VDP_SET_REGISTER(F18A_REG_BMLW, 128);   // always 128 pixels wide
@@ -255,13 +155,7 @@ void boss()
 	if ((nDifficulty == DIFFICULTY_EASY)&&(scaledLevel > 2)) scaledLevel=2;
 
 	// copy in the homing graphics overtop of the beam left
-    if (f18a) {
-    	vdpmemcpy(104*8+0x0800, f18hominggfx, 4*8);	// load sprite patterns
-    	vdpmemcpy(104*8+0x1000, f18hominggfx2, 4*8);	// load sprite patterns
-    	vdpmemcpy(104*8+0x1800, f18hominggfx3, 4*8);	// load sprite patterns
-    } else {
-    	vdpmemcpy(104*8+0x0800, hominggfx, 4*8);	// load sprite patterns
-    }
+    wrapLoadBossGfx();
 
 	// start the music now
 	StartMusic(BOSSMUS, 1);
@@ -275,11 +169,15 @@ void boss()
 	br=-BNR;
 	if (scoremode == 3) {
 		// invisible enemies
-        // overwrite the boss palette - it uses 4 4-color palettes
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+4, 4);
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+8, 4);
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+12, 4);
+        if (f18a) {
+            // overwrite the boss palette - it uses 4 4-color palettes
+            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
+            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+4, 4);
+            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+8, 4);
+            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+12, 4);
+        } else {
+            bosscol(COLOR_BLACK);
+        }
 	} else {
 		bosscol(BOSTAB[p]);
 	}
@@ -378,12 +276,7 @@ void boss()
     erboss();
 
     // restore the beam graphics
-    if (f18a) {
-    	vdpmemcpy(104*8+0x0800, f18beamleftgfx, 4*8);	// load sprite patterns
-    	vdpmemcpy(104*8+0x1000, f18beamleftgfx2, 4*8);	// load sprite patterns
-    } else {
-    	vdpmemcpy(104*8+0x0800, beamleftgfx, 4*8);	// load sprite patterns
-    }
+    wrapRestoreBossGfx();
 }
 
 // sadly we are out of vblank before this function is done
@@ -419,7 +312,7 @@ void drboss() {
     	// update pattern table for scroll pos (0-3 subpixels)
         VDP_SET_REGISTER(VDP_REG_PDT, 3+to);
 	    // handle the inline draw function
-	    bossdraw();
+	    wrapbossdraw();
     }
 
 	// engines (lowest offset is -8, highest is 20)
@@ -736,9 +629,9 @@ void mboss() {
 	}
 }
 
-uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr) {
-	uint8 b;
-	unsigned char rd,cd;
+int checkdamage(int sr, int sc, int pwr) {
+	int b;
+	int rd,cd;
 	unsigned int p;
 
 	rd=sr>>3;
@@ -866,33 +759,6 @@ void whoded() {
 	}
 }
 
-void warpout() {
-    int qw, tmp;
-    uint8 a, x;
-
-	for (qw=0; qw<81; qw++){ 
-		x=11186/(qw+200);
-		a=x&0xf;	// low nibble of freq
-
-		tmp=(x>>4)+(a<<8)+0xc000;
-		SOUND=0xf0;
-		SOUND=(tmp>>8);
-		SOUND=tmp&0xff;
-		SOUND=0xe7;
-		SOUND=0xdf;
-
-		wrapPlayerFlameBig();
-		if ((SHIP_R<192)||(SHIP_R>200)) { 
-			SHIP_R-=6; 
-            playmv(); 
-		} else {
-			spdall();
-		}
-		wrapstars();
-		SOUND=0xff;
-	}
-}
- 
 void byboss() { 
 	/*boss is dead...blow him up!*/
 	int tmp, qw;
@@ -998,7 +864,7 @@ void byboss() {
 			    }
 		    } else if (x==EXPLOSION_CHAR) {
 			    x=r*BNC+c+BOSS_START;					    // draw blank if already explosion shape - this gets correct char in the boss pattern
-			    AddDestroyed((x<<3)+gPATTERN);              // this wipes the char in all tables
+			    wrapAddDestroyed((x<<3)+gPATTERN);          // this wipes the char in all tables
 			    xchar(br+r, tc+c, x);                       // and this replaces the explosion char with the original (now blank)
 		    }
         }
@@ -1094,7 +960,7 @@ void byboss() {
     }
 
     // fly off screen
-    warpout();
+    wrapwarpout();
 	flag=MAIN_LOOP_ACTIVE;
 }
  
@@ -1149,31 +1015,6 @@ void AddDamageF18a(unsigned int ptr) {
     VDPWD = 1;          // command to go
 }
 
-// erase a character on all tables for the boss
-void AddDestroyed(unsigned int ptr) {
- 	// clear out 8 bytes at ptr (like AddDamage, but no noise or random)
- 	// also need to shift it through the other 3 tables
- 	unsigned char idx,idx2;
-	unsigned short mask = 0x00ff;
-
-	// do initial pattern
-	memset(tmpbuf, 0, 8);
-	vdpmemset(ptr, 0, 8);
-
-	// do the rest of the patterns
-	for (idx=0; idx<3; idx++) {
- 		ptr+=SCROLL_OFFSET;				// offset is to the next table
- 		vdpmemread(ptr, tmpbuf, 16);
-		mask>>=2;		// shift 2 pixels right
-		mask|=0xc000;	// preserve shifted in pixels
- 		for (idx2=0; idx2<8; idx2++) {
- 			tmpbuf[idx2]&=(mask>>8)&0xff;
- 			tmpbuf[idx2+8]&=mask&0xff;
- 		}
- 		vdpmemcpy(ptr,tmpbuf,16);
- 	}
-}
-
 void AddDestroyedF18a(unsigned int ptr) {
     // we have a GPU program to do this
     VDP_SET_ADDRESS_WRITE(GPU_DAMAGEIN);
@@ -1189,7 +1030,7 @@ void AddDestroyedF18a(unsigned int ptr) {
 // idx indicates the target scroll table (0-3)
 // r indicates the boss row (0-(BNR-1))
 // Not used by F18A
-void PrepareBoss(unsigned char idx, unsigned char r) {
+void PrepareBoss(unsigned int idx, unsigned int r) {
 	unsigned char idx2;
 	char c;
 	unsigned int p,basep;

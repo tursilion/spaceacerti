@@ -72,7 +72,6 @@ checksfx:
         if (NULL != pSfx) {
             // SFX data format:
             // number registers, [register number, register data]
-            // SWITCH_IN_BANKxx;
             unsigned char regs = *(pSfx++);
             if (0 == regs) {
                 pSfx = NULL;
@@ -90,7 +89,6 @@ checksfx:
         if (NULL != pShoot) {
             // SFX data format:
             // number registers, [register number, register data]
-            // SWITCH_IN_BANKxx;
             unsigned char regs = *(pShoot++);
             if (0 == regs) {
                 pShoot = NULL;
@@ -133,7 +131,6 @@ void doSfxInstead() {
         if (NULL != pSfx) {
             // SFX data format:
             // number registers, [register number, register data]
-            // SWITCH_IN_BANKxx;
             unsigned char regs = *(pSfx++);
             if (0 == regs) {
                 pSfx = NULL;
@@ -149,7 +146,6 @@ void doSfxInstead() {
         if (NULL != pShoot) {
             // SFX data format:
             // number registers, [register number, register data]
-            // SWITCH_IN_BANKxx;
             unsigned char regs = *(pShoot++);
             if (0 == regs) {
                 pShoot = NULL;
@@ -163,7 +159,7 @@ void doSfxInstead() {
     }
 }
 
-void StartMusic(const unsigned char *p, unsigned int inBank, unsigned char idx, unsigned char bLoop) {
+void StartMusic(const unsigned char *p, unsigned int inBank, unsigned int idx, unsigned int bLoop) {
 	unsigned int old = nBank;
 
 	// no music in demo

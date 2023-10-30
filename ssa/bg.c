@@ -75,7 +75,7 @@ void stars() {
  
 // note: does not draw the stars
 void initstars() {
-	unsigned char a;
+	unsigned int a;
 
 	for (a=0; a<NUM_SMALL_STARS; a++) { 
         stdata[a*3]=rndnum()&0x1f; 

@@ -13,7 +13,7 @@ void boss();
 void drboss();
 void erboss();
 void mboss();
-uint8 checkdamage(uint8 sr, uint8 sc, uint8 pwr);
+int checkdamage(int sr, int sc, int pwr);
 void warpout();
 void whoded();
 void byboss();
@@ -21,6 +21,14 @@ void AddDamage(unsigned int vptr);
 void AddDamageF18a(unsigned int vptr);
 void AddDestroyed(unsigned int vptr);
 void AddDestroyedF18a(unsigned int vptr);
-void PrepareBoss(unsigned char idx, unsigned char r);
+void PrepareBoss(unsigned int idx, unsigned int r);
+void loadBossGfx();
+void restoreBossGfx();
+
+void draw1();
+void draw2();
+void draw3();
+void draw4();
+void draw5();
 
 #endif

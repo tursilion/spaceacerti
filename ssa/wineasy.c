@@ -39,6 +39,7 @@ void gamwin() {
 
 	// select game win routine (for all difficulties)
 	if (nDifficulty == DIFFICULTY_HARD) {
+        // todo: this is in bank 8b
 		gamewinhard();
 	}
 
