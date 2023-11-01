@@ -1,18 +1,12 @@
-#note: no cart in this one
-# todo: I need to make my own linker to go from the ELF to the cartridge,
-# similar to the Coleco MakeMegacart
-
 # Paths to TMS9900 compilation tools
 GAS=/home/tursilion/gcc9900/bin/tms9900-as
 LD=/home/tursilion/gcc9900/bin/tms9900-ld
 CC=/home/tursilion/gcc9900/bin/tms9900-gcc
 CP=/usr/bin/cp
-NAME=gromcfg
+NAME=ssa
 
 # Path to elf2cart conversion utility
-ELF2CART=/home/tursilion/elf2cart
-ELF2EA5=/home/tursilion/elf2ea5
-EA5PLIT=/home/tursilion/ea5split/ea5split
+ELF2CART=/mnt/d/work/ti/Elf2BankedCart/elf2bankedcart
 
 # Flags used during linking
 #
@@ -45,24 +39,12 @@ OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o bo
 PREREQUISITES=\
   $(OBJECT_LIST_EA5) $(OBJECT_LIST)
 
-all: buildti
-	d:/work/coleco/tursi/makemegacart/release/makemegacart.exe -map crt0.s crt0.ihx ssa.rom
-
-# crt0.s contains a reference to each segment in order, so they can be linked up - put files into segments there
-# if makemegacart complains about data in RAM, see if a segment is missing there
-
-buildti: $(PREREQUISITES)
+all: $(PREREQUISITES)
 	$(LD) $(OBJECT_LIST) $(LIBS) $(LIBPATH) $(LDFLAGS_EA5) -o $(NAME).ea5.elf > ea5.map
-	$(ELF2EA5) $(NAME).ea5.elf $(NAME).ea5.bin
-	$(EA5PLIT) $(NAME).ea5.bin
-	$(CP) GROMCF* /cygdrive/c/classic99/dsk1/
-
-# banks - all defined the same way, we just need to declare them -- can we use this with GCC?
-BANKS = "-Wl -b_bank1=0xc000" "-Wl -b_bank2=0xc000" "-Wl -b_bank3=0xc000" "-Wl -b_bank4=0xc000" "-Wl -b_bank5=0xc000" "-Wl -b_bank6=0xc000" "-Wl -b_bank7=0xc000" \
-		"-Wl -b_bank8=0xc000" "-Wl -b_bank9=0xc000" "-Wl -b_bank10=0xc000" "-Wl -b_bank11=0xc000" "-Wl -b_bank12=0xc000" "-Wl -b_bank13=0xc000" "-Wl -b_bank14=0xc000" "-Wl -b_bank15=0xc000"
+	$(ELF2CART) $(NAME).ea5.elf $(NAME)8.bin
 
 clean:
-	-rm *.o *.map *.lst *.sym *.asm *.ihx *.rom
+	-rm *.o *.map *.lst *.sym *.ihx *.rom
 
 # Since we don't need custom segment tags anymore, we could in theory just use a generic recipe...
 
@@ -247,5 +229,5 @@ cruiserfinalp.o : cruiserfinal_p.c
 	$(CC) $(CFLAGS) $(INCPATH) -o cruiserfinalp.o cruiserfinal_p.c
 
 # libti99 crt0 copied into folder
-crt0.o: crt0_ea5.asm
-	$(GAS) $(AFLAGS) crt0_ea5.asm -o crt0.o
+crt0.o: crt0_bankcart.asm
+	$(GAS) $(AFLAGS) crt0_bankcart.asm -o crt0.o

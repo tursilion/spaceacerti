@@ -146,9 +146,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\setup.bat" />
-    <None Include="crt0.map" />
-    <None Include="crt0.s" />
+    <None Include="crt0_bankcart.asm" />
+    <None Include="ea5.map" />
     <None Include="f18a_asm.a99" />
+    <None Include="linker.ld" />
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>

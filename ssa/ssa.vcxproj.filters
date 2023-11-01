@@ -187,9 +187,6 @@
     <ClCompile Include="gnat5rlep.c">
       <Filter>Gfx</Filter>
     </ClCompile>
-    <ClCompile Include="f18abosses.c">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="bossDraw.c">
       <Filter>Src</Filter>
     </ClCompile>
@@ -219,6 +216,9 @@
     </ClCompile>
     <ClCompile Include="f18load4.c">
       <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="f18abosses.c">
+      <Filter>Gfx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -284,12 +284,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\setup.bat" />
-    <None Include="crt0.map" />
-    <None Include="crt0.s" />
     <None Include="Makefile" />
     <None Include="f18a_asm.a99">
       <Filter>Src</Filter>
     </None>
+    <None Include="ea5.map" />
+    <None Include="linker.ld" />
+    <None Include="crt0_bankcart.asm" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
