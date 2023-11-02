@@ -86,8 +86,6 @@ SECTIONS {
     
     bank1a :
     {
-        enemy.o(.text .rodata)
-        winhard2.o(.text .rodata)
         PROVIDE(ebank1a = .);
     } > CART1A AT> FLASH
     
@@ -177,6 +175,8 @@ SECTIONS {
     bank7b :
     {
         bossdraw.o(.text .rodata)
+        f18load.o(.text .rodata)
+        bossdraw2.o(.text .rodata)
         PROVIDE(ebank7b = .);
     } > CART7B AT> FLASH
 
@@ -282,8 +282,8 @@ SECTIONS {
 
     bank14b :
     {
-        f18load.o(.text .rodata)
-        bossdraw2.o(.text .rodata)
+        enemy.o(.text .rodata)
+        winhard2.o(.text .rodata)
         PROVIDE(ebank14b = .);
     } > CART14B AT> FLASH
 

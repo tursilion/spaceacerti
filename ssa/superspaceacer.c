@@ -356,16 +356,6 @@ void loadcharset() {
 	    vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*3), colecofont, 768);
     }
 
-#if 0
-	// makes the font, then we saved it off
-	charsetlc();
-	for (idx=gPattern+0x100; idx<gPattern+0x400; idx++) {
-		unsigned char x = vdpreadchar(idx);
-		x=(x) | (x>>1);
-		vdpchar(idx, x);
-	}
-#endif
-
 	// because 'y' and 'z' are overwritten by boss chars and color,
 	// we move them down to '_' and '\' respectively
 	patcpy('y', '[');
@@ -728,22 +718,9 @@ void deshieldf18() {
 extern void draw1();
 extern char br,bc,bd;
 
-#if 0
-// 5000 cycle music test			//	hit count
-unsigned int mycnt_newcmd = 0;		//	 1410
-unsigned int mycnt_run = 0;			//	16949
-unsigned int mycnt_fixed = 0;		//	 1962
-unsigned int mycnt_inc = 0;			//	 4805
-									//  25126 hits total - avg 5 calls per cycle (over 12 streams)
-void getcnts(unsigned int *i1, unsigned int *i2, unsigned int *i3, unsigned int *i4);
-#endif
-
 extern void selenawin();
 void main() {
 	unsigned char i;
-
-	// init this just once (why doesn't auto-init work? Probably because my CRT0 isn't loading it... and this still does not work.)
-	playership = 255;
 
 	// check for a score saved off above stack. If it's there, we can load it and also zero playership
 	memcpy(tmpbuf, SAVEDSCORE, 4);
@@ -780,7 +757,7 @@ void main() {
     if (f18a) {
         // TODO: this needs the graphics in 14a - maybe we can copy them to the top of the 32k if we can get fixed down?
         // Otherwise, it's one time, it's okay if it's a bit slower
-        SWITCH_IN_BANK14b;
+        SWITCH_IN_BANK7b;
         initF18GPU();                           // and load the GPU code and init the graphics
     }
 
@@ -983,7 +960,7 @@ void space()
 		stars();
 
 		// frame 1
-		SWITCH_IN_BANK1a;		// covers enout and enemy
+		SWITCH_IN_BANK14b;		// covers enout and enemy
 		if (flag == MAIN_LOOP_ACTIVE) {
 			enout();
 		}
@@ -1101,7 +1078,7 @@ void ispace() {
 	SWITCH_IN_BANK2b;
 	playerinit();
 	
-	SWITCH_IN_BANK1a;
+	SWITCH_IN_BANK14b;
 	enemyinit();
 
 	distns=distns+100*level;

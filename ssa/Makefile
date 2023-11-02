@@ -22,7 +22,7 @@ LIBPATH=-L/mnt/d/work/libti99ALL -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBS=-lti99 -ltivgm2
 
 CFLAGS=\
-  -O2 -std=c99 -c -s --save-temp -DTI99
+  -Os -std=c99 -c -s --save-temp -DTI99
 
 .PHONY: all clean
 

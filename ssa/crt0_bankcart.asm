@@ -1,5 +1,6 @@
 * Bank cart header by Tursi
 * based on original CRT0 by Insomniac for GCC ELF
+* Designed for up to 24k of fixed space loaded to >A000
 
  def _start
  def _init_data
@@ -112,18 +113,17 @@ cpcode:
 * then switch the page and copy the whole thing,
 * then reset bank and return. Only copies first 16k
 * (minus the header bits)
+  li r2,>6002       * next page
+  li r3,3           * number of iterations
 cplp:
   mov *r1+,*r0+     * first copy loop
   ci r1,>8000
   jne cplp
 
-  li r0,>6000       * restart copy
-  clr @>6002        * but on page 1
-
-cplp2:
-  mov *r1+,*r0+     * second copy loop
-  ci r1,>8000
-  jne cplp2
+  li r1,>6000       * restart copy
+  clr *r2+          * but on next page, and increment
+  dec r3            * check if more
+  jne cplp
 
   clr @>6000        * restore page 0
   b *r11            * back to caller

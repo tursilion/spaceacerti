@@ -40,14 +40,14 @@ void ladybugwin(void);
 
 void wrapenemy() {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK1a;
+	SWITCH_IN_BANK14b;
 	enemy();
 	SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapnoen(int x) {
 	unsigned int old = nBank;
-	SWITCH_IN_BANK1a;
+	SWITCH_IN_BANK14b;
 	noen(x);
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -732,11 +732,11 @@ void wrapbossdraw() {
             draw3();
             break;
         case 4: 
-            SWITCH_IN_BANK14b;
+            SWITCH_IN_BANK7b;
             draw4();
             break;
         case 5: 
-            SWITCH_IN_BANK14b;
+            SWITCH_IN_BANK7b;
             draw5();
             break;
     }
@@ -747,7 +747,7 @@ void wrapbossdraw() {
 void wrapladybugwin() {
 	unsigned int old = nBank;
 
-    SWITCH_IN_BANK1a;
+    SWITCH_IN_BANK14b;
     ladybugwin();
 	SWITCH_IN_PREV_BANK(old);
 }
