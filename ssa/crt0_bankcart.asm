@@ -100,7 +100,14 @@ cpsclp:
   bl @>8320
 
 * Create the stack
-  li sp, 0x4000
+* reserved stack space:
+* 3FF8 - unused
+* 3FF9 - F18A flag
+* 3FFA - saved score
+* 3FFC - inverted score
+* 3FFE - saved score mode
+* 3FFF - attract mode flag
+  li sp, 0x3ff8
 
 * Start running C code
   bl @main

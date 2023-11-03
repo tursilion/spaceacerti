@@ -1289,14 +1289,14 @@ void reboot() {
 	memcpy(SAVEDSCORE, tmpbuf, 4);
 
 	// also save off the scoremode (only 0-9, so we can store a count here too to init the seed with)
-	*SAVEDMODE = ((*SAVEDMODE+0x10)&0xf0) | scoremode;
+	*SAVEDMODE = (((*SAVEDMODE+0x10)&0xf0) | scoremode)&0xff;
 	// save off the last attract ship too
 	x = *SAVEDATTRACT;
 	x = (attractShip<<4)|(x&1);
-	*SAVEDATTRACT = x;
+	*SAVEDATTRACT = x&0xff;
 
     // save off the detected F18A state (partly to save redetect, mostly to save if it was disabled)
-    *SAVEDF18A = f18a;
+    *SAVEDF18A = f18a&0xff;
 
 	hwreboot();	// never returns
 }

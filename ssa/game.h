@@ -168,10 +168,10 @@ struct _sprite {
 extern struct _sprite SpriteTab[32];
 
 // some pointers above the stack to store data across reboots
-#define SAVEDSCORE ((unsigned char*)0x73fa)
-#define SAVEDMODE ((unsigned char*)0x73fe)
-#define SAVEDATTRACT ((unsigned char*)0x73ff)
-#define SAVEDF18A ((unsigned char*)0x73f9)
+#define SAVEDSCORE ((unsigned char*)0x3ffa)
+#define SAVEDMODE ((unsigned char*)0x3ffe)
+#define SAVEDATTRACT ((unsigned char*)0x3fff)
+#define SAVEDF18A ((unsigned char*)0x3ff9)
 
 // functions
 //void memset(char *p, unsigned char ch, int cnt);
