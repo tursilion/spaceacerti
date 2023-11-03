@@ -315,17 +315,16 @@ void wrapCopyShip(const unsigned char *p, const unsigned char *c, int idx) {
 
     if (idx == 3) {
         // split between banks
-        SWITCH_IN_BANK10a;
 	    for (i=0; i<17; ++i) {
+            SWITCH_IN_BANK10a;
 		    vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), c+(i*16*8), 16*8);
-	    }
-        SWITCH_IN_BANK10b;
-	    for (i=0; i<17; ++i) {
+            SWITCH_IN_BANK10b;
 		    vdpmemcpy(0x0000+6*32*8+16*8+(i*32*8), p+(i*16*8), 16*8);
 	    }
     } else {
         if (idx == 2) { SWITCH_IN_BANK10a; }
         else if (idx == 4) { SWITCH_IN_BANK10b; }
+        else { SWITCH_IN_BANK9b; }
 
 	    for (i=0; i<17; ++i) {
 		    vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), c+(i*16*8), 16*8);

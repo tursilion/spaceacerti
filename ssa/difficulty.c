@@ -479,14 +479,14 @@ redraw2:
 
 			break;
 		}
-		if (KSCAN_KEY == '*') {
+		if (KSCAN_KEY == ',') {
 			spdel(0);
 			spdel(1);
 
 			soundtest();
 			goto redraw;
 		}
-		if (KSCAN_KEY == '#') {
+		if (KSCAN_KEY == '.') {
 			if (doMusic == doAllMusic) {
 				doMusic = doSfxInstead;
 				centr(12, "Music Off");
@@ -497,7 +497,7 @@ redraw2:
 			shutup();
 			do {
 				kscanfast(joynum);
-			} while (KSCAN_KEY == '#');
+			} while (KSCAN_KEY == '.');
 		}
 
 		// handle the ship select at the bottom

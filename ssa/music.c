@@ -47,6 +47,8 @@ void doAllMusic() {
 	// no music in demo, but sfx are okay
 	if (joynum != 0) {
 	    // check whether we're playing
+	    SWITCH_IN_PREV_BANK(musBank);
+
         if (!(isSNPlaying)) {
 		    // loop music if needed
 		    if (pLoopMus != NULL) {
@@ -62,7 +64,6 @@ void doAllMusic() {
 		    }
 	    }
 
-	    SWITCH_IN_PREV_BANK(musBank);
         CALL_PLAYER_SN;
     }
      

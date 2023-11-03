@@ -305,10 +305,11 @@ SECTIONS {
     PROVIDE(edata = .);
     
     PROVIDE(sbss = .);
-    .bss :  { *(.bss)  } > STACK AT> FLASH
+    .bss :  { *(.bss) libti99.a:*(.bss)  } > STACK AT> FLASH
+
     PROVIDE(ebss = .);
 
-    songDatVars : { *(.songDatVars) } > SCRATCH AT> FLASH
+    songDatVars : { *(.songDatVars) } > STACK AT> FLASH
     
     _end = .; PROVIDE (end = .);
 }

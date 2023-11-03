@@ -23,7 +23,7 @@
 #include "f18sprites8.c"
 
 // full software reboot vector (warning: hard coded but defined by the crt0)
-static void (* const hwreboot)()=0x802c;
+static void (* const hwreboot)()=0x602a;
 
 // startup and init, central code
 #define SIZE_OF_CHARS		176
@@ -721,6 +721,9 @@ extern char br,bc,bd;
 extern void selenawin();
 void main() {
 	unsigned char i;
+
+    // Turn off most of the console interrupt routine
+    VDP_INT_CTRL = VDP_INT_CTRL_DISABLE_SPRITES|VDP_INT_CTRL_DISABLE_SOUND;
 
 	// check for a score saved off above stack. If it's there, we can load it and also zero playership
 	memcpy(tmpbuf, SAVEDSCORE, 4);

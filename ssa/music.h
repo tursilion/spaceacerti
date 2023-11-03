@@ -3,15 +3,15 @@
 
 extern const unsigned char outpack0[], outpack1[], outpack2[], outpack3[];
 
-#define STAGE1MUS		outpack1,0xfffc,0   /* driven */
-#define STAGE2MUS		outpack2,0xfff9,0   /* invasion */
-#define STAGE3MUS		outpack0,0xfffb,0   /* boxxIX */
-#define STAGE4MUS		outpack1,0xfffc,2   /* oddity */
-#define STAGE5MUS		outpack3,0xfff9,0   /* mystery */
-#define BOSSMUS			outpack2,0xfff9,1   /* storm */
-#define GAMEOVERMUS		outpack0,0xfffb,1   /* tursi gameover */
-#define WINSCROLLMUS	outpack1,0xfffc,1   /* what */
-#define WINANIMMUS		outpack0,0xfffb,2   /* gameover */
+#define STAGE1MUS		outpack1,0x600c,0   /* driven */
+#define STAGE2MUS		outpack2,0x6018,0   /* invasion */
+#define STAGE3MUS		outpack0,0x6012,0   /* boxxIX */
+#define STAGE4MUS		outpack1,0x600c,2   /* oddity */
+#define STAGE5MUS		outpack3,0x601a,0   /* mystery */
+#define BOSSMUS			outpack2,0x6018,1   /* storm */
+#define GAMEOVERMUS		outpack0,0x6012,1   /* tursi gameover */
+#define WINSCROLLMUS	outpack1,0x600c,1   /* what */
+#define WINANIMMUS		outpack0,0x6012,2   /* gameover */
 
 extern const unsigned char *pLoopMus;
 

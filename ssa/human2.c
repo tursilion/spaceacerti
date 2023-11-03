@@ -73,7 +73,7 @@ void player()
 		joystfast(joynum);
 
         // pause and music control
-		if (KSCAN_KEY == '#') {
+		if (KSCAN_KEY == '.') {
 			const unsigned char *oldLoop = pLoopMus;
 			if (doMusic == doAllMusic) {
 				doMusic = doSfxInstead;
@@ -87,11 +87,11 @@ void player()
 			// wait for release
 			do {
 				kscanfast(joynum);
-			} while (KSCAN_KEY == '#');
+			} while (KSCAN_KEY == '.');
 
 			centr(11, "         ");
 			pLoopMus = oldLoop;
-		} else if (KSCAN_KEY == '*') {
+		} else if (KSCAN_KEY == ',') {
 			const unsigned char *oldLoop = pLoopMus;
 
 			shutup();
@@ -100,19 +100,19 @@ void player()
 			// wait for release
 			do {
 				kscanfast(joynum);
-			} while (KSCAN_KEY == '*');
+			} while (KSCAN_KEY == ',');
 
 			// wait for new press
 			do {
 				kscanfast(joynum);
-			} while (KSCAN_KEY != '*');
+			} while (KSCAN_KEY != ',');
 
 			centr(11, "     ");
 
 			// wait for release
 			do {
 				kscanfast(joynum);
-			} while (KSCAN_KEY == '*');
+			} while (KSCAN_KEY == ',');
 
 			pLoopMus = oldLoop;
 		}

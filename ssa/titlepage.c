@@ -42,11 +42,7 @@ void animate(unsigned char x) {
 
 	switch (x) {
 		case 0:
-			// first frame doesn't need a trampoline
-			for (i=0; i<17; ++i) {
-				vdpmemcpy(0x2000+6*32*8+16*8+(i*32*8), SHIP1C+(i*16*8), 16*8);
-				vdpmemcpy(0x0000+6*32*8+16*8+(i*32*8), SHIP1P+(i*16*8), 16*8);
-			}
+			wrapCopyShip(SHIP1P, SHIP1C, 1);
 			break;
 
 		case 1:
