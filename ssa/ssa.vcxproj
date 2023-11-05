@@ -49,7 +49,7 @@
     <NMakeReBuildCommandLine>make clean all</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeOutput>C:\WORK\coleco\tursi\SuperSpaceAcer\ssa\ssa.rom</NMakeOutput>
-    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;TI99;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(Configuration)\</OutDir>
@@ -157,12 +157,13 @@
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\halt.h" />
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\kscan.h" />
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\sound.h" />
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\string.h" />
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\vdp.h" />
-    <ClInclude Include="..\..\..\libti99coleco\f18a.h" />
+    <ClInclude Include="..\..\..\libti99ALL\f18a.h" />
+    <ClInclude Include="..\..\..\libti99ALL\kscan.h" />
+    <ClInclude Include="..\..\..\libti99ALL\sound.h" />
+    <ClInclude Include="..\..\..\libti99ALL\string.h" />
+    <ClInclude Include="..\..\..\libti99ALL\system.h" />
+    <ClInclude Include="..\..\..\libti99ALL\vdp.h" />
+    <ClInclude Include="..\..\vgmcomp2\Players\libtivgm2\TISNPlay.h" />
     <ClInclude Include="attract.h" />
     <ClInclude Include="boss.h" />
     <ClInclude Include="enemy.h" />

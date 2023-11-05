@@ -225,21 +225,6 @@
     <ClInclude Include="game.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\halt.h">
-      <Filter>libti99</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\kscan.h">
-      <Filter>libti99</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\sound.h">
-      <Filter>libti99</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\string.h">
-      <Filter>libti99</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\coleco\libti99coleco\vdp.h">
-      <Filter>libti99</Filter>
-    </ClInclude>
     <ClInclude Include="trampoline.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -261,7 +246,25 @@
     <ClInclude Include="f18load.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libti99coleco\f18a.h">
+    <ClInclude Include="..\..\..\libti99ALL\f18a.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99ALL\kscan.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99ALL\sound.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99ALL\string.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99ALL\system.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libti99ALL\vdp.h">
+      <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vgmcomp2\Players\libtivgm2\TISNPlay.h">
       <Filter>libti99</Filter>
     </ClInclude>
   </ItemGroup>

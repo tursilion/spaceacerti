@@ -340,6 +340,16 @@ void wrapGamWin() {
 	gamwin();	// never returns
 }
 
+void wrapGameWinHard() {
+    // warning: gamewinhard() doesn't run cleanexit() like the other ones do!
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8b;
+    gamewinhard();
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
 void wrapLoadStoryFont() {
 	// this loads the ColecoVision ROM font like loadcharset, but instead of
 	// into the pattern table, it goes into the third bitmap table for story text

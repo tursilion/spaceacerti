@@ -23,7 +23,7 @@
 #include "f18sprites8.c"
 
 // full software reboot vector (warning: hard coded but defined by the crt0)
-static void (* const hwreboot)()=0x602a;
+static void (* const hwreboot)()=(void (*const)())0x602a;
 
 // startup and init, central code
 #define SIZE_OF_CHARS		176
@@ -1306,35 +1306,21 @@ void reboot() {
 
 // replacement for memmove
 void *memmove(void *dest, const void *src, unsigned int n) {
-    int *from = (int*)src;
-    int *to = (int*)dest;
+    unsigned char *f = (unsigned char *)src;
+    unsigned char *t = (unsigned char *)dest;
     
-    if ((from==to)||(n==0)) return dest;
+    if ((f==t)||(n==0)) return dest;
     
-    if ((to > from)&&(to-from < n)) {
+    if ((t > f)&&(t-f < n)) {
         // overlap, so copy backwards - just doing bytes
-        unsigned char *f=(unsigned char*)src;
-        unsigned char *t=(unsigned char*)dest;
         for (int i=n-1; i>=0; --i) {
-            to[i]=from[i];
+            t[i]=f[i];
         }
         return dest;
     } else {
         // overlap or not, copy forwards which is slightly faster
-        // if we're not odd aligned, then copy words. We could
-        // probably work out a misaligned word copy, but nah
-        if (((int)from&1)||((int)to&1)||(n&1)) {
-            unsigned char *f=(unsigned char*)src;
-            unsigned char *t=(unsigned char*)dest;
-            for (int i=0; i<n; ++i) {
-                to[i]=from[i];
-            }
-        } else {
-            // fully aligned word copy - fastest case
-            n>>=1;
-            while (n--) {
-                *(to++)=*(from++);
-            }
+        for (int i=0; i<n; ++i) {
+            t[i]=f[i];
         }
         return dest;
     }

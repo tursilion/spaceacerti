@@ -13,7 +13,7 @@
 extern const char TXTDAT[];
 extern const char WINTIPS[];
 extern const unsigned char colecofont[];
-char scorecountdown;
+int scorecountdown;
 
 // VDP map for ending scroll text
 // we have 8 pre-scrolled pattern tables, and
@@ -61,8 +61,8 @@ void musicvdpsync(unsigned int reg1, unsigned int reg2) {
 }
 
 // map characters into fontstr
-void reparse(unsigned char *str, unsigned char offset) {
-	unsigned char c, idx;
+void reparse(unsigned char *str, unsigned int offset) {
+	unsigned int c, idx;
 	const unsigned char *p;
 
 	for (idx = 0; idx<32; idx++) {
@@ -93,7 +93,7 @@ void reparse(unsigned char *str, unsigned char offset) {
 void movesprites() {
 	if (scorecountdown > 0) {
 		// moving up the screen (4 sprites)
-		unsigned char tmp = 0xc8-scorecountdown;
+		unsigned int tmp = (0xc8-scorecountdown)&0xff;
 		VDP_SET_ADDRESS_WRITE(0x780);
 		VDPWD=tmp;
 		VDP_SAFE_DELAY();
@@ -111,11 +111,12 @@ void movesprites() {
 }
 
 void gamewinmedium() { 
-	unsigned char idx,i2,c,st;
+	unsigned int idx,i2,c,st;
 	unsigned int srcCpy, dstCpy;
-	unsigned char finalcountdown = 0;
+	unsigned int finalcountdown = 0;
 	const char *txt;
 	const char *oldtxt;
+    unsigned int table;
 
 	// prepare score handler
 	scorecountdown = 0;
@@ -161,9 +162,11 @@ void gamewinmedium() {
 		// now we write into VDP memory 8 times, shifting a bit each time
 		// using memmove is probably a little slower, too, but hopefully it's fast enough,
 		// since this part is not realtime
+        table = idx<<3;     // idx*8
 		for (i2 = 0; i2<8; i2++) {
-			vdpmemcpy((idx*8)+0+(0x800*i2), tmpbuf, 8);
-			vdpmemcpy((idx*8)+64*8+(0x800*i2), &tmpbuf[8], 8);
+			vdpmemcpy(table, tmpbuf, 8);
+			vdpmemcpy(table+64*8, &tmpbuf[8], 8);
+            table += 0x800;
 
 			memmove(tmpbuf, &tmpbuf[1], 15);
 			tmpbuf[15]=0;
@@ -198,13 +201,20 @@ void gamewinmedium() {
 		musicvdpsync(0x8201,0x8400);
 
 		// for each frame, we copy one row of text to the other screen
-		for (idx = 0, st = 0; idx<23; idx++) {
+        table = 0x83ff; // we'll increment on the first cycle
+        st = 0;
+		for (idx = 0; idx<23; idx++) {
 			if (st == 0) {
 				// move sprites
 				movesprites();
-			}
-			++st; if (st == 3) st = 0;
-			musicvdpsync(0x8201,0x8400+(idx/3));	// sets the pattern
+                // and scroll the text
+                ++table;
+            }
+			++st; 
+            if (st == 3) {
+                st = 0;
+            }
+			musicvdpsync(0x8201,table);	// sets the pattern
 			// copy one line to the other buffer
 			vdpmemread(srcCpy, tmpbuf, 32);
 			vdpmemcpy(dstCpy, tmpbuf, 32);
@@ -235,13 +245,16 @@ void gamewinmedium() {
 		// ** second loop **
 
 		// for each frame, we copy one row of text to the other screen
+        table = 0x83ff; // we'll increment on the first cycle
 		for (idx = 0, st = 0; idx<23; idx++) {
 			if (st == 0) {
 				// move sprites
 				movesprites();
+                // and scroll the text
+                ++table;
 			}
 			++st; if (st == 3) st = 0;
-			musicvdpsync(0x8203,0x8400+(idx/3));	// sets the pattern
+			musicvdpsync(0x8203,table);	// sets the pattern
 			// copy one line to the other buffer
 			vdpmemread(srcCpy, tmpbuf, 32);
 			vdpmemcpy(dstCpy, tmpbuf, 32);

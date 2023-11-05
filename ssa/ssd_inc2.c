@@ -1,6 +1,6 @@
 
 // this seems fast enough that we don't have to pre-process the characters
-// TODO: Not sure these two text blocks will line up, but GCC has a 1k limit
+// Not sure these two text blocks will line up, but GCC has a 1k limit
 // on text strings, else it crashes with "stack smashing detected"
 const char TXTDAT[] =
  " ============================== "
@@ -35,8 +35,10 @@ const char TXTDAT[] =
  "     Tadd Nuznov (RushJet1)     "
  " ============================== "
  "          EXTRA THANKS          ";
+// space is character 0 in my font anyway, so deleting the
+// first space in this one helps the text all line up
 const char TXTDAT2[] = 
- "          ============          "
+ "         ============          "  
  "         Gord (again!!)         "
  "          Steve Brent           "
  "        Justin Goddard          "
