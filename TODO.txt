@@ -1,3 +1,28 @@
+Cruiser ending
+- working
+
+Snowball ending
+- no player ship on warp out sequence, otherwise fine
+
+Ladybird ending
+- working
+
+Gnat ending
+- working
+
+Selena ending
+- left half of text does not display
+- a bit slow
+
+Regular Game 
+- not tested
+
+Invisible game
+- not tested
+
+F18A game
+- not tested
+
 VRAM map (except for ending routines)
 --------
  >0000	Screen Image Table
