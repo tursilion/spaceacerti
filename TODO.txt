@@ -1,3 +1,7 @@
+New compiler might well solve the issues for us!
+- But, it has a weakness. When we shift words to get at the MSB, it shifts as requested, then shifts back for the byte access. (Or, probably better, just use inline assembly). The point is that >>8 to get a byte from the MSB is not optimized and results in /two/ 8 bit shifts, very expensive.
+
+
 Cruiser ending
 - working
 

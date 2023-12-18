@@ -483,7 +483,7 @@ void RLEUnpack(unsigned int p, const unsigned char *buf, unsigned int nMax) {
 	while (cnt > 0) {
 		z=*buf;
 		if (z&0x80) {
-			// run of bytes
+			// run of byte
 			buf++;
 			z&=0x7f;
 			raw_vdpmemset(*buf, z);

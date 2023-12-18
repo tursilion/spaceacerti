@@ -1,7 +1,10 @@
 # Paths to TMS9900 compilation tools
-GAS=/home/tursilion/gcc9900/bin/tms9900-as
-LD=/home/tursilion/gcc9900/bin/tms9900-ld
-CC=/home/tursilion/gcc9900/bin/tms9900-gcc
+#GAS=/home/tursilion/gcc9900/bin/tms9900-as
+#LD=/home/tursilion/gcc9900/bin/tms9900-ld
+#CC=/home/tursilion/gcc9900/bin/tms9900-gcc
+GAS=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-as
+LD=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-ld
+CC=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-gcc
 CP=/usr/bin/cp
 NAME=ssa
 
@@ -21,7 +24,7 @@ INCPATH=-I/mnt/d/work/libti99ALL -I/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBPATH=-L/mnt/d/work/libti99ALL -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBS=-lti99 -ltivgm2
 
-CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99
+CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin
 
 
 .PHONY: all clean
