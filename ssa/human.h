@@ -16,16 +16,16 @@ void playerright();
 void playerinit();
 void dyen(unsigned int x);
 
-void initCruiser();
-void initSnowball();
-void initLadybug();
-void initGnat();
-void initSelena();
+void initCruiserBase();
+void initSnowballBase();
+void initLadybugBase();
+void initGnatBase();
+void initSelenaBase();
 
 // these are now just flags, though FLAME_BIG is used to init the sprite
-// pattern 104 is no longer related though
-#define FLAME_BIG 100
-#define FLAME_SMALL 104
+#define FLAME_BIG 2
+#define FLAME_SMALL 0
+#define FLAME_CHAR 100
 
 extern int pwrlvl;
 extern int oldpwrlvl;

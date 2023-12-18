@@ -1,0 +1,40 @@
+Secret Game Modes
+-----------------
+
+Hold 0 when powering on until the HarmlessLion screen to disable F18A enhancements. Only works from cold start.
+
+'0' also ends delays in three places:
+- title page - goes to attract mode
+- Qwertian screen - back to title page
+- Game Over - after the music - back to title page
+
+Hold fire when moving left and right to access the ships GNAT and PRINCESS
+	-GNAT is tiny and has only a single gun with no powerups (game mode '1' on score last digit)
+	-PRINCESS has fully powered homing shots but has only one life (game mode '2' on score last digit)
+
+Hold DOWN when selecting SNOWBALL for cloaked enemy mode (game mode '3' on score last digit)
+
+Hold UP when starting for cheat mode. You are invincible, plus each key does something different in cheat mode:
+	0 - no shields
+	2 - add shields
+	3 - add life
+	4 - warp to boss
+	5 - increment powerup (loops)
+	7 - kill boss
+	8 - disable cheats
+(Game mode '9' on score last digit)
+
+Press '*' on the difficulty screen for music test. 
+
+Press JOY_DOWN+'0' on music test for end sequence for currently selected ship. (Might delete this.)
+
+Press '#' anytime except title page to mute/unmute music (muted music will play sfx on the stock hardware).
+
+Interesting gotcha: Ladybug, once it has shields, extends the shields with collisions, so bosses that drop mines 
+can essentially give it infinite shields (till the mines stop). That really helps on the final boss, once you know it!
+
+Conversely, the gnat is too weak to do much against boss mines, so really needs to rely on dodging
+
+Do not shoot during the stage, then destroy the boss without missing, and earn 10,000 points "for using the force". (Good luck pulling this off, though ;) ).
+
+If you have an AY sound chip (Phoenix, SGM), then sound effects will be played on it.

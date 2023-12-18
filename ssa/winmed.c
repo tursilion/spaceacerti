@@ -155,7 +155,10 @@ void gamewinmedium() {
 	// it will save trampoline space. If it's fast enough
 	// (even a second or so is okay) then it's okay.
 	for (idx=0; idx<64; idx++) {
-		c = fontstr[idx]-32;									// which character to process
+		c = fontstr[idx];									// which character to process
+        // special case - make lowercase 'j' an uppercase 'Z'
+        if (c=='j') c='Z';
+        c-=32;
 		memset(tmpbuf, 0, 16);									// prepare the work buf
 		wrapgetfontbytes(&tmpbuf[8], colecofont+(c<<3), 8);		// get the whole character into the work buffer (now we have a 16 byte char)
 

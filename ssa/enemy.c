@@ -46,7 +46,7 @@ const unsigned char oddstable[6][8] = {
 /*1*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_SAUCER, ENEMY_JET,     ENEMY_SAUCER,     ENEMY_JET,        ENEMY_SAUCER,     ENEMY_JET },
 /*2*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_MINE,   ENEMY_JET,     ENEMY_SAUCER,     ENEMY_JET,        ENEMY_SAUCER,     ENEMY_JET },
 /*3*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_MINE,   ENEMY_JET,     ENEMY_SAUCER,     ENEMY_HELICOPTER, ENEMY_SAUCER,     ENEMY_HELICOPTER },
-/*4*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_MINE,   ENEMY_HELICOPTER, ENEMY_BEAMGEN, ENEMY_JET,        ENEMY_HELICOPTER, ENEMY_BEAMGEN },
+/*4*/    {   ENEMY_SAUCER, ENEMY_BEAMGEN,   ENEMY_MINE,   ENEMY_HELICOPTER, ENEMY_JET,        ENEMY_JET,        ENEMY_HELICOPTER, ENEMY_BEAMGEN },
 /*5*/    {   ENEMY_SAUCER, ENEMY_JET, ENEMY_MINE,   ENEMY_BEAMGEN, ENEMY_HELICOPTER, ENEMY_SWIRLY,     ENEMY_BOMB,       ENEMY_SAUCER }
 };
 
@@ -86,9 +86,7 @@ void enout() {
                 // generators are always active
 			    unsigned char a=rndnum()&7;
                 // this counts!
-                genx[idx]=rndnum();                     // x pos
-				if (genx[idx] < 64) genx[idx]+=64;		// stay off the edges in case speed is 0
-				else if (genx[idx] > 192) genx[idx] -= 64;
+                genx[idx]=rndnum()&0x7f+64;             // x pos, stay off the edges
 				gentype[idx] = oddstable[level][a];     // rebase into an enemy type
 				if (gentype[idx] == ENEMY_BEAMGEN) {
 					// only one beamgen generator at a time please
@@ -141,8 +139,17 @@ void enout() {
                 gentime[idx] = genmax[idx];
                 --gencount[idx];
 
-                if ((genx[idx]<28)||(genx[idx]>227)) {
-                    continue;  // too close to edge
+                // if too close to edge - snap and reverse direction
+                // it's okay if it wraps, but if we needed it and it
+                // wasn't ready, we are getting dead areas that are
+                // too long.
+                if (genx[idx]<28) {
+                    genx[idx]=28;
+                    if (genspeed[idx] < 0) genspeed[idx]=-genspeed[idx];
+                }
+                if (genx[idx]>227) {
+                    genx[idx]=226;
+                    if (genspeed[idx] > 0) genspeed[idx]=-genspeed[idx];
                 }
                 for (unsigned char b=0; b<maxgen; ++b) {
                     if (b==idx) continue;
@@ -183,7 +190,7 @@ void enout() {
 					case ENEMY_SAUCER:		eec[k]=0; esc[k]=0; ep[k]=2; if (!f18a) c=COLOR_MEDGREEN; else c=PAL_SAUCER; en_func[k]=enemysaucer; if (enc[k]<32) enc[k]+=32; if (enc[k]>216) enc[k]-=48; break;
 					case ENEMY_JET:			eec[k]=4; esc[k]=4; ep[k]=3; ecs[k]=0; if (!f18a) c=COLOR_LTBLUE; else c=PAL_JET; en_func[k]=enemyjet; break;
 					case ENEMY_MINE:		eec[k]=8; esc[k]=8; ep[k]=10; if (!f18a) c=COLOR_CYAN; else c=PAL_MINE; en_func[k]=enemymine; break;
-					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (!f18a) c=COLOR_MAGENTA; else c=PAL_COPTER; ers[k]=(rndnum()&0x7f)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
+					case ENEMY_HELICOPTER:	eec[k]=24; esc[k]=12; ep[k]=5; if (!f18a) c=COLOR_MAGENTA; else c=PAL_COPTER; ers[k]=(rndnum()&0x7e)+1; ecs[k]=(rndnum()&0x07); if (enc[k]>127) ecs[k]=-ecs[k]; en_func[k]=enemyhelicopter; break;
 					case ENEMY_SWIRLY:		eec[k]=40; esc[k]=28; ep[k]=8; if (!f18a) c=COLOR_MEDRED; else c=PAL_SWIRL; en_func[k]=enemyswirly; break;
 					case ENEMY_BOMB:		eec[k]=44; esc[k]=44; ep[k]=20; if (!f18a) c=COLOR_DKYELLOW; else c=PAL_BOMB; en_func[k]=enemybomb; break;
 					case ENEMY_BEAMGEN:		
@@ -452,9 +459,9 @@ void enemybomb(int x) {
 	}
 }
 
-// TODO: F18A 8-color bullets - need a change?
-const unsigned int bulletColor1[4] = { 0x00d0, 0x0e22 };   // green on red
-const unsigned int bulletColor2[4] = { 0x0e22, 0x00d0 };   // red on green
+// F18A 8-color bullets - offset 4 in palette 8
+const unsigned int bulletColor1[3] = { 0x00C0,0x0E1E,0x0DD0 };   // green on red
+const unsigned int bulletColor2[3] = { 0x0DD0,0x0E1E,0x00C0 };   // red on green
 
 void enemyshot(int x) {
 	static unsigned char cnt=0;
@@ -465,10 +472,10 @@ void enemyshot(int x) {
 	// flash the enemy bullets
     if (f18a) {
         if (cnt == 4) {
-            loadpal_f18a(bulletColor1, PAL_SHOT*4+1, 2);
+            loadpal_f18a(bulletColor1, PAL_SHOT*4+4, 3);
         } else if (cnt == 8) {
             cnt = 0;
-            loadpal_f18a(bulletColor2, PAL_SHOT*4+1, 2);
+            loadpal_f18a(bulletColor2, PAL_SHOT*4+4, 3);
         }
     } else {
         // change the color

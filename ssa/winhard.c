@@ -141,6 +141,16 @@ const signed char gnathop[] = {
 };
 
 const char snowBallTxt1[] = "          *";  // just for a simple delay
+const char snowBallCloak[] = 
+//	012345678901234567890123456789012
+    "                                "
+    "                                "
+    "  Incredibly, Bob was able to   "
+	" defeat the Qwertians even with "
+	" their advanced cloaking system "
+    "                                "
+    "                                "
+    "*";
 const char snowBallTxt2[] = 
 //	012345678901234567890123456789012
     "                                "
@@ -733,6 +743,7 @@ void snowballwin() {
 
     level = 6;  // flag end music
     shield = 0; // clear any remaining shield
+    flameOffset = 32;   // might not be initialized if we shortcutted
     
     wrapInitSnowball(); // needed if we shortcutted to the ending
     wrapispace();   // it does a lot of banking, so we need to wrap it
@@ -743,11 +754,10 @@ void snowballwin() {
         delaystars(3);
 
         // player flame
-	    if (flst == FLAME_SMALL) {
-            flst=FLAME_BIG; 
+        flst = (++flst)&0x03;
+	    if (flst & FLAME_BIG) {
             wrapPlayerFlameBig();
-	    } else {
-            flst=FLAME_SMALL;
+        } else {
             wrapPlayerFlameSmall();
 	    }
     }
@@ -861,7 +871,11 @@ void snowballwin() {
 #undef CUTLINE
 
     // hold here for a second by printing some spaces
-    runText(snowBallTxt1);
+    if (scoremode == 3) {
+        runText(snowBallCloak);
+    } else {
+        runText(snowBallTxt1);
+    }
     runText(snowBallTxt2);
     delayText(DELAYT);
     runText(snowBallTxt3);
@@ -1175,6 +1189,10 @@ void cruiserwin() {
 }
 
 void gamewinhard() {
+    // reload the default main palette since shields probably changed it
+    if (f18a) {
+        wrapLoadF18MainPalette();
+    }
 	if (playership == SHIP_SELENA) selenawin();
     else if (playership == SHIP_LADYBUG) { wrapladybugwin(); cleanexit(); }
 	else if (playership == SHIP_GNAT) gnatwin();

@@ -8,6 +8,7 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
+#include <f18a.h>
 
 // game
 #include "game.h"
@@ -404,10 +405,19 @@ void pboom()
 		spcolr(PLAYER_SPRITE+3,playerColor);
 		wrapplayerstraight(); delaystars(4);		// straight
 		wrapplayerleft(); delaystars(4);			// tilt left
-		spcolr(PLAYER_SPRITE,9); 
-		spcolr(PLAYER_SPRITE+1,9);				// set ship lt red
-		spcolr(PLAYER_SPRITE+2,9); 
-		spcolr(PLAYER_SPRITE+3,9);
+        if (f18a) {
+            // set a palette that gives us red explosion sprites
+		    spcolr(PLAYER_SPRITE,3); 
+		    spcolr(PLAYER_SPRITE+1,3);
+		    spcolr(PLAYER_SPRITE+2,3); 
+		    spcolr(PLAYER_SPRITE+3,3);
+        } else {
+            // set lt red
+		    spcolr(PLAYER_SPRITE,9); 
+		    spcolr(PLAYER_SPRITE+1,9);
+		    spcolr(PLAYER_SPRITE+2,9); 
+		    spcolr(PLAYER_SPRITE+3,9);
+        }
 		wrapplayerstraight(); delaystars(4);		// straight
 		wrapplayerright(); delaystars(4);			// tilt right
 	}
@@ -419,10 +429,17 @@ void pboom()
 		patsprcpy(EXPLOSION_COPY,248);					// copy the boss explosion character in to sprite space
 	} else {
 		// gnat gets tiny explosion sprites too
-		vdpmemset(248*8+0x0800, 0, 32);					// zero the pattern
-		vdpchar(248*8+0x0800+8, 0x01);					// one pixel near the center
-	}
-	sppat(PLAYER_SPRITE,248); sppat(PLAYER_SPRITE+1,248);			// overwrite all four player sprites
+		vdpmemset(248*8+0x0800, 0, 7);					// zero the pattern
+		vdpchar(248*8+0x0800+7, 0x01);					// one pixel near the center
+    }
+    if (f18a) {
+        // because we're F18A, erase the other pixel tables (will thus be color 1)
+        vdpmemset(248*8+0x0808, 0, 24);     // rest of first table
+        vdpmemset(248*8+0x1000, 0, 32);     // all of second table
+        vdpmemset(248*8+0x1800, 0, 32);     // all of third table
+    }
+    
+    sppat(PLAYER_SPRITE,248); sppat(PLAYER_SPRITE+1,248);			// overwrite all four player sprites
 	sppat(PLAYER_SPRITE+2,248); sppat(PLAYER_SPRITE+3,248);			// shield is off, so we ignore it
 
 	// fake the automotion for a few frames
@@ -496,7 +513,7 @@ void dyen(unsigned int x) {
 			eec[x]=72;
 			esc[x]=52;
 			en_func[x] = enemyexplosion;
-			spcolr(x+ENEMY_SPRITE,f18a?8:COLOR_LTRED);
+			spcolr(x+ENEMY_SPRITE,f18a?PAL_EXPLODE:COLOR_LTRED);
 		} else {
 			playsfx_nukebomb(); // overrides previous
 			spposn(x+ENEMY_SPRITE,r,c);

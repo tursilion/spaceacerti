@@ -185,5 +185,7 @@ void initSnowballf18() {
 	vdpmemcpy(124*8+0x1800, F18ALTSNOWBALL3, 4*4*8);		// straight
 	vdpmemcpy(156*8+0x1800, &F18ALTSNOWBALL3[4*4*8], 4*4*8);// left
 	vdpmemcpy(188*8+0x1800, &F18ALTSNOWBALL3[8*4*8], 4*4*8);// right
+
+    loadpal_f18a(F18SNOWBALLPAL, PAL_PLAYSHIP*4+1, 7);
 }
 

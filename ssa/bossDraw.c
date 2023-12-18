@@ -251,7 +251,8 @@ inline void BOSS_SAFE_DELAY(void) {	}
 	VDPWD=ch++;			\
 	BOSS_SAFE_DELAY();
 
-inline void BOSS_SET_ADDRESS_WRITE(unsigned int x)	{	VDPWA=((x)&0xff); VDPWA=((((x)>>8)&0x3f)|0x40); }
+// now writes a tiny buffer at the top if out of range - >3FF0. 16 chars is always enough for one boss row.
+inline void BOSS_SET_ADDRESS_WRITE(unsigned int x)	{ if (x<0x4000)	VDP_SET_ADDRESS_WRITE(x); else VDP_SET_ADDRESS_WRITE(0x3ff0); }
 
 void draw1() {
 	unsigned char ch=BOSS_START+1;	// skipping the first 1

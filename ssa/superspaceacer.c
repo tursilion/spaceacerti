@@ -20,7 +20,9 @@
 #include "f18load.h"
 
 #define BIN2INC_HEADER_ONLY
-#include "f18sprites8.c"
+#include "f18sprites8sl.c"
+#include "harmlesslion_c.c"
+#include "harmlesslion_p.c"
 
 // full software reboot vector (warning: hard coded but defined by the crt0)
 static void (* const hwreboot)()=(void (*const)())0x602a;
@@ -52,6 +54,8 @@ int ch;
 int playership = 255;
 // how many pixels down does the sprite start? (for smaller ones)
 unsigned int playerOffset;
+// how far down to draw the flame? (was the same before the F18A sprites)
+unsigned int flameOffset;
 // old shield color - used to detect changes so we don't upload the graphics every frame
 int oldshield = 0;
 // force bonus - if you never shoot except during the boss, and never miss, you get it
@@ -84,7 +88,8 @@ unsigned char tmpbuf[64];
 unsigned int nBank = 0xffff;
 
 // used for the cloaked enemy mode!
-const unsigned int f18BlackPal[4] = { 0,0,0,0 };
+const unsigned int f18BlackPal[16] = { 0,0,0,0,0,0,0,0,
+                                       0,0,0,0,0,0,0,0 };
 
 void sprStart0() {
 	// copy sprites 0-31 in order (simplest case)
@@ -349,9 +354,9 @@ void loadcharset() {
 
 	SET_COLECO_FONT_BANK;
 
-    vdpmemcpy(gPATTERN+(32*8)+SCROLL_OFFSET, colecofont, 768);
+    vdpmemcpy(gPATTERN+(32*8), colecofont, 768);
     if (!f18a) {
-	    vdpmemcpy(gPATTERN+(32*8), colecofont, 768);
+	    vdpmemcpy(gPATTERN+(32*8)+SCROLL_OFFSET, colecofont, 768);
 	    vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*2), colecofont, 768);
 	    vdpmemcpy(gPATTERN+(32*8)+(SCROLL_OFFSET*3), colecofont, 768);
     }
@@ -370,9 +375,9 @@ void patcpy(int from, int to) {
 	if (from) {
 		vdpmemread(((int)from<<3)+gPATTERN, tmpbuf, 8);
 	}
-	vdpmemcpy(((int)to<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);
+	vdpmemcpy(((int)to<<3)+gPATTERN, tmpbuf, 8);
     if (!f18a) {
-	    vdpmemcpy(((int)to<<3)+gPATTERN, tmpbuf, 8);
+	    vdpmemcpy(((int)to<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);
 	    vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*2), tmpbuf, 8);
 	    vdpmemcpy(((int)to<<3)+gPATTERN+(SCROLL_OFFSET*3), tmpbuf, 8);
     }
@@ -380,7 +385,7 @@ void patcpy(int from, int to) {
 
 // copies a VDP character pattern to sprite table
 void patsprcpy(int from, int to) {
-	vdpmemread((from<<3)+gPATTERN+SCROLL_OFFSET, tmpbuf, 8);    // this is the only one guaranteed in F18A mode
+	vdpmemread((from<<3)+gPATTERN, tmpbuf, 8);
 	vdpmemcpy((to<<3)+gSPRITE_PATTERNS, tmpbuf, 8);
 }
 
@@ -580,14 +585,13 @@ unsigned char grf1() {
 
 	x = set_graphics_raw(VDP_SPR_16x16);
 	// we separate sprites and patterns
+    // f18a uses one pattern table at 0x2000. Non-F18 has 4 tables for boss scrolling (2000,2800,3000,3800)
+    // However, F18A has 3 sprite descriptor tables at 0800,1000,1800 (to get 8 colors)
     if (f18a) {
-        // we'll really use 0x2000 for patterns, but all the code assumes four sets starting at 0x1800 so lying below
-    	VDP_SET_REGISTER(VDP_REG_PDT, 0x04);
         VDP_SET_REGISTER(F18A_REG_ECM, 3);  // sprites have 3 bitplanes
-    } else {
-        VDP_SET_REGISTER(VDP_REG_PDT, 0x03);    
     }
-    gPattern = 0x1800;  // set it, but we usually use the macro version
+   	VDP_SET_REGISTER(VDP_REG_PDT, 0x04);
+    gPattern = 0x2000;  // set it, but we usually use the macro version
 
 	// clear the screen
 	cls();
@@ -715,6 +719,33 @@ void deshieldf18() {
     spdel(PLAYER_SHIELD+3);
 }
 
+void displayHLLogo() {
+	unsigned char i;
+
+	shutup();
+
+	i=intpic();
+	
+	SWITCH_IN_BANK14a;
+	RLEUnpack(0x0000, hl_logoP, 6144);
+	SWITCH_IN_BANK12a;
+	RLEUnpack(0x2000, hl_logoC, 6144);
+
+	spdall();
+	// enable the screen
+	VDP_SET_REGISTER(VDP_REG_MODE1, i);
+	FIX_KSCAN(i);
+
+    for (i=0; i<180; ++i) {
+        VDP_WAIT_VBLANK_CRU;
+        VDP_CLEAR_VBLANK;
+        kscanfast(1);
+        if (KSCAN_KEY == JOY_FIRE) break;
+        kscanfast(2);
+        if (KSCAN_KEY == JOY_FIRE) break;
+    }
+}
+
 extern void draw1();
 extern char br,bc,bd;
 
@@ -754,6 +785,9 @@ void main() {
                 f18a=0;
             }
         }
+
+        // since it's the first run, do the HL logo
+        displayHLLogo();
 	}
 	if (seed == 0) ++seed;
 
@@ -798,9 +832,9 @@ titleagain:
 	loadcharset();
 	
 	SWITCH_IN_BANK5b;
-	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
+	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
     if (!f18a) {
-    	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
+    	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
     	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*2), CHARS, SIZE_OF_CHARS);
     	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*3), CHARS, SIZE_OF_CHARS);
     }
@@ -828,6 +862,7 @@ titleagain:
 	spdall();
 	// set background to black
 	screen(COLOR_BLACK);
+    waitforstep();
 
 	// load in the sprites (patterns were modified by getDifficulty)
     if (f18a) {
@@ -847,7 +882,10 @@ titleagain:
 	spdall();	// clears sprite table
 	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
 
-	// load the correct ship
+    // flameoffset is 32 for all but a few F18A sprites, overridden below
+    flameOffset = 32;
+    
+    // load the correct ship
 	switch (playership) {
 	case SHIP_CRUISER:
 		wrapInitCruiser();
@@ -865,12 +903,17 @@ titleagain:
 		wrapInitSelena();
 		break;
 	}
+    if (f18a) {
+        // these are fixed on F18A
+        playerColor = PAL_PLAYSHIP;
+	    shieldsOn = shieldf18;
+	    shieldsOff = deshieldf18;
 
-    if ((f18a)&&(scoremode == 3)) {
-        // enemies are going to be bgcolor -- which is always black so we can assume
-        // going to fix this by setting the palettes appropriately
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
-        loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+4, 4);
+        if (scoremode == 3) {
+            // enemies are going to be bgcolor -- which is always black so we can assume
+            // going to fix this by setting the palettes appropriately
+            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 8);
+        }
     }
 
 	while (1) {		/*forever*/
@@ -1100,16 +1143,15 @@ void gamovr()
 	spdall();
 
 	for (;;) {
-    //	if (pDone) {
         if (!(isSNPlaying)) {
 			shutup();
 		} else {
 			nCnt=240;
 		}
 	
-		SWITCH_IN_BANK6a;
-		stars();
-		 
+        // using wrap will handle the bank switch for us
+		wrapstars();
+
 		nCnt--;
 		if (nCnt == 0) {
 			level=9;	// change flag to go back to title pic
@@ -1121,15 +1163,18 @@ void gamovr()
 			if (btnok) {
 				break;
 			}
-		} else {
+        } else if (KSCAN_KEY == '0') {
+            if (btnok) {
+                nCnt=1; // force early timeout
+            }
+        } else {
 			btnok = 1;
 		}
 	}
 }
 
 // used by boss and player in multiple places to position and center player sprites
-void playmv()
-{ 
+void playmv() { 
 	/* locate the ship at SHIP_R,SHIPC (PLAYER_SPRITE already moved) */
 	uint8 x;
 
@@ -1145,19 +1190,19 @@ void playmv()
 	    sploct(PLAYER_SHIELD+3,SHIP_R+16,SHIP_C+16);
     }
 	
-    sploct(PLAYER_FLAME,SHIP_R+32,SHIP_C+8);
+    sploct(PLAYER_FLAME,SHIP_R+flameOffset,SHIP_C+8);
 	
 	// set shield color
 	if (shield != oldshield) {
-		if (oldshield == 0) {
-			// new shield must not be zero, so turn on the shield patterns
-			shieldsOn();
-		}
-
         if (f18a) {
             unsigned int old = nBank;
             SWITCH_IN_BANK14a;
 
+		    if (oldshield == 0) {
+			    // new shield must not be zero, so turn on the shield patterns
+			    shieldsOn();
+		    }
+            
 		    if (shield > 70) {
                 loadpal_f18a(F18SHIELDMAX, PAL_PLAYSHIELD*4+1, 7);
 		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
@@ -1171,7 +1216,12 @@ void playmv()
 
             SWITCH_IN_PREV_BANK(old);
         } else {
-		    if (shield > 70) {
+		    if (oldshield == 0) {
+			    // new shield must not be zero, so turn on the shield patterns
+			    shieldsOn();
+		    }
+            
+            if (shield > 70) {
 			    x=COLOR_WHITE;
 		    } else if (shield > 40) {   // also find the code that plays sfx_shieldwarn
 			    x=COLOR_DKYELLOW;

@@ -1201,7 +1201,7 @@ const unsigned int F18SNOWBALLPAL[] = {
 };
 
 const unsigned int F18LADYBUGPAL[] = {
-0x0000,0x0A00,0x0D00,0x0000,0x0000,0x0000,0x0000
+0x0700,0x0300,0x0911,0x0000,0x0B44,0x0544,0x0A99
 };
 
 #if 0
@@ -1255,6 +1255,8 @@ void initCruiserf18() {
 	vdpmemcpy(156*8+0x1800, &F18ALTSHIELDS3[4*4*8], 4*4*8);	// left
 	vdpmemcpy(188*8+0x1800, &F18ALTSHIELDS3[8*4*8], 4*4*8);	// right
 #endif
+
+    loadpal_f18a(F18CRUISERPAL, PAL_PLAYSHIP*4+1, 7);   // remember to skip the transparent colors
 }
 
 #else

@@ -247,6 +247,7 @@ SECTIONS {
         qwertianp.o(.text .rodata)
         attract.o(.text .rodata)
         cruiserendp.o(.text .rodata)
+        hllogoc.o(.text .rodata)
         PROVIDE(ebank12a = .);
     } > CART12A AT> FLASH
 
@@ -277,6 +278,7 @@ SECTIONS {
     bank14a :
     {
         f18sprites.o(.text .rodata)
+        hllogop.o(.text .rodata)
         PROVIDE(ebank14a = .);
     } > CART14A AT> FLASH
 

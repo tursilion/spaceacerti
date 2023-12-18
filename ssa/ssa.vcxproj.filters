@@ -220,6 +220,15 @@
     <ClCompile Include="f18abosses.c">
       <Filter>Gfx</Filter>
     </ClCompile>
+    <ClCompile Include="..\harmlesslion_c.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\harmlesslion_p.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
+    <ClCompile Include="f18sprites8sl.c">
+      <Filter>Gfx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

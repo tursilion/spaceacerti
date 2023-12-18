@@ -33,8 +33,10 @@
 #include "cruiserend_p.c"
 #include "snowballbase_c.c"
 #include "snowballbase_p.c"
-#include "f18sprites8.c"
+#include "f18sprites8sl.c"
 #include "f18abosses.c"
+
+extern const unsigned int f18BlackPal[16];
 
 void ladybugwin(void);
 
@@ -116,7 +118,7 @@ void wrapunpackboss(unsigned int level) {
 		case 1:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS1, (BNR*BNC)<<3); break;
 		case 2:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS2, (BNR*BNC)<<3); break;
 		case 3:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS3, (BNR*BNC)<<3); break;
-		case 4:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS4, (BNR*BNC)<<3); vdpmemcpy(84*8+0x0800, HOMING, 4*8); break;
+		case 4:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS4, (BNR*BNC)<<3); break;
 		case 5:	RLEUnpack(gPATTERN+BOSS_START*8, BOSS5, (BNR*BNC)<<3); break;
 	}
 	SWITCH_IN_PREV_BANK(old);
@@ -562,7 +564,12 @@ unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat1[scanline*(F18BOSS1W/4)], F18BOSS1W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS1W/4), 0, 32-(F18BOSS1W/4));
             } else {
-                loadpal_f18a(f18bosspal1, PAL_BOSS*4, 16);
+	            if (scoremode == 3) {
+                    // invisible enemies
+                    loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 16);
+                } else {
+                    loadpal_f18a(f18bosspal1, PAL_BOSS*4, 16);
+                }
                 ret = 0;
             }
             break;
@@ -572,7 +579,12 @@ unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat2[scanline*(F18BOSS2W/4)], F18BOSS2W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS2W/4), 0, 32-(F18BOSS2W/4));
             } else {
-                loadpal_f18a(f18bosspal2, PAL_BOSS*4, 16);
+	            if (scoremode == 3) {
+                    // invisible enemies
+                    loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 16);
+                } else {
+                    loadpal_f18a(f18bosspal2, PAL_BOSS*4, 16);
+                }
                 ret = 0;
             }
             break;
@@ -582,7 +594,12 @@ unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat3[scanline*(F18BOSS3W/4)], F18BOSS3W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS3W/4), 0, 32-(F18BOSS3W/4));
             } else {
-                loadpal_f18a(f18bosspal3, PAL_BOSS*4, 16);
+	            if (scoremode == 3) {
+                    // invisible enemies
+                    loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 16);
+                } else {
+                    loadpal_f18a(f18bosspal3, PAL_BOSS*4, 16);
+                }
                 ret = 0;
             }
             break;
@@ -592,7 +609,12 @@ unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat4[scanline*(F18BOSS4W/4)], F18BOSS4W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS4W/4), 0, 32-(F18BOSS4W/4));
             } else {
-                loadpal_f18a(f18bosspal4, PAL_BOSS*4, 16);
+	            if (scoremode == 3) {
+                    // invisible enemies
+                    loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 16);
+                } else {
+                    loadpal_f18a(f18bosspal4, PAL_BOSS*4, 16);
+                }
                 ret = 0;
             }
             break;
@@ -602,7 +624,12 @@ unsigned int wrapLoadBossF18A(unsigned int n, unsigned int scanline) {
                 vdpmemcpy(scanline*32+BOSS_PATTERN, &f18bossdat5[scanline*(F18BOSS5W/4)], F18BOSS5W/4);
                 vdpmemset(scanline*32+BOSS_PATTERN+(F18BOSS5W/4), 0, 32-(F18BOSS5W/4));
             } else {
-                loadpal_f18a(f18bosspal5, PAL_BOSS*4, 16);
+	            if (scoremode == 3) {
+                    // invisible enemies
+                    loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 16);
+                } else {
+                    loadpal_f18a(f18bosspal5, PAL_BOSS*4, 16);
+                }
                 ret = 0;
             }
             break;
@@ -616,7 +643,7 @@ void wrapLoadF18MainPalette() {
     unsigned int old = nBank;
 
     SWITCH_IN_BANK14a;
-    loadpal_f18a(F18PALETTE, 0, 64);
+    loadpal_f18a(F18PALETTE, 0, 56);    // load all but the player ship palette
     SWITCH_IN_PREV_BANK(old);
 }
 
@@ -626,11 +653,13 @@ void wrapInitCruiser() {
     if (f18a) {
         SWITCH_IN_BANK14a;
         initCruiserf18();
-        loadpal_f18a(F18CRUISERPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, &SPRITES[108*8], 24*4*8);	// ship sprites
     }
+
+    SWITCH_IN_BANK2b;
+    initCruiserBase();
 
     SWITCH_IN_PREV_BANK(old);
 }
@@ -642,13 +671,15 @@ void wrapInitSnowball() {
         SWITCH_IN_BANK13b;
         initSnowballf18();
         SWITCH_IN_BANK14a;
-        loadpal_f18a(F18SNOWBALLPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
     	SWITCH_IN_BANK5b;
     	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
     }
 
-   	SWITCH_IN_PREV_BANK(old);
+    SWITCH_IN_BANK2b;
+    initSnowballBase();
+    
+    SWITCH_IN_PREV_BANK(old);
 }
 
 void wrapInitLadybug() {
@@ -657,12 +688,13 @@ void wrapInitLadybug() {
     if (f18a) {
 	    SWITCH_IN_BANK9b;
         initLadybugf18();
-	    SWITCH_IN_BANK14a;
-        loadpal_f18a(F18LADYBUGPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, LADYBUG, 24*4*8);			// ship sprites
     }
+
+    SWITCH_IN_BANK2b;
+    initLadybugBase();
 
 	SWITCH_IN_PREV_BANK(old);
 }
@@ -673,12 +705,13 @@ void wrapInitGnat() {
     if (f18a) {
 	    SWITCH_IN_BANK15b;
         initGnatf18();
-	    SWITCH_IN_BANK14a;
-        loadpal_f18a(F18GNATPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, GNAT, 24*4*8);				// ship sprites
     }
+
+    SWITCH_IN_BANK2b;
+    initGnatBase();
 
     SWITCH_IN_PREV_BANK(old);
 }
@@ -689,13 +722,14 @@ void wrapInitSelena() {
     if (f18a) {
 	    SWITCH_IN_BANK15b;
         initSelenaf18();
-	    SWITCH_IN_BANK14a;
-        loadpal_f18a(F18SELENAPAL, PAL_PLAYSHIP*4+1, 7);
     } else {
 	    SWITCH_IN_BANK5b;
 	    vdpmemcpy(108*8+0x0800, SELENA, 24*4*8);			// ship sprites
         vdpmemcpy(96*8+0x0800, HOMING, 4*8);                // homing shot
     }
+
+    SWITCH_IN_BANK2b;
+    initSelenaBase();
 
 	SWITCH_IN_PREV_BANK(old);
 }

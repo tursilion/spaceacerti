@@ -1,8 +1,9 @@
 #include <vdp.h>
 #include <f18a.h>
+#include "game.h"
 #include "f18load.h"
 #define BIN2INC_HEADER_ONLY
-#include "f18sprites8.c"
+#include "f18sprites8sl.c"
 
 // GPU code:
 // INP  - 3C80 - input address to work on

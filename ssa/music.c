@@ -127,6 +127,11 @@ void wrapAYcmd(unsigned char reg, unsigned char dat) {
 // which I will do in real time since it's still quicker than 
 // the music player was
 void doSfxInstead() {
+    // if any music is active, stop it
+    if (isSNPlaying) {
+        StopSong();
+        // don't shutup and don't kill loop music, in case it gets turned back on
+    }
     // run sound effects at 30 hz
     if (VDP_INT_COUNTER & 1) {
         if (NULL != pSfx) {
@@ -203,6 +208,10 @@ void shutup()
     AY_DATA_WRITE = 0x0;
     AY_REGISTER = AY_VOLC;
     AY_DATA_WRITE = 0x0;
+    // To work around another Phoenix AY bug, make sure the tone C generator is 
+    // running at an audible rate
+    AY_REGISTER = AY_PERIODC_LOW;
+    AY_DATA_WRITE = 0x10;
 #endif
 }
 

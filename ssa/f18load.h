@@ -34,7 +34,7 @@ void initSelenaf18();
 #define PAL_INVISIBLE   4
 #define PAL_SHOT        9
 #define PAL_BOSS        4       // boss uses 4 palettes
-#else
+#elsif 0
 // palette indexes (8 color sprite mode)
 // Still need to define the palettes as if they were 4 color, but the least significant bit is ignored
 #define PAL_SAUCER      4
@@ -61,5 +61,35 @@ void initSelenaf18();
 
 #define PAL_PLAYSHIELD  14
 #define PAL_PLAYSHIP    12
+#else
+// SL rendered 8 color palettes
+// Still need to define the palettes as if they were 4 color, but the least significant bit is ignored
+#define PAL_SAUCER      4
+#define PAL_JET         6
+#define PAL_MINE        10
+#define PAL_COPTER      6
+#define PAL_SWIRL       10
+#define PAL_BOMB        12
+#define PAL_EXPLODE     12
+#define PAL_BOSSFLAME   12
+#define PAL_PULSE       8
+#define PAL_SHIPFLAME   12
+#define PAL_BEAM        8
+#define PAL_MINETIP     12
+#define PAL_SPREAD      8
+#define PAL_PLAYHOME    8
+#define PAL_BEAMGEN     4
+#define PAL_BOSSHOMETIP 2
+#define PAL_BOSSHOMELT  0
+#define PAL_BOSSHOMEDK  4
+#define PAL_SHOT        8
+
+// PAL_BOSS and PAL_INVISIBLE need to be the same
+#define PAL_INVISIBLE   4
+#define PAL_BOSS        4       // boss uses 2 8-color palettes, 4 4-color
+
+#define PAL_PLAYSHIELD  0       // we steal a color from the normal TI palette
+#define PAL_PLAYSHIP    14
 #endif
+
 

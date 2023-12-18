@@ -40,7 +40,7 @@ unsigned int bossShape[8*2];
 
 // a scaled difficulty level for the boss motion
 uint8 scaledLevel;
-#define HOMINGFRAMES 10
+#define HOMINGFRAMES 15
 
 // all white boss palette for hit flash
 const unsigned int f18WhitePalette[] = {
@@ -169,13 +169,7 @@ void boss()
 	br=-BNR;
 	if (scoremode == 3) {
 		// invisible enemies
-        if (f18a) {
-            // overwrite the boss palette - it uses 4 4-color palettes
-            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4, 4);
-            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+4, 4);
-            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+8, 4);
-            loadpal_f18a(f18BlackPal, PAL_INVISIBLE*4+12, 4);
-        } else {
+		if (!f18a) {
             bosscol(COLOR_BLACK);
         }
 	} else {
@@ -304,13 +298,13 @@ void drboss() {
             VDP_SET_REGISTER(F18A_REG_BMLADR, 160);  // make sure base address is right
             VDP_SET_REGISTER(F18A_REG_BMLH, BNR*8);  // remember BR is negative
             VDP_SET_REGISTER(F18A_REG_BMLX, bc*2);   // directly?
-            VDP_SET_REGISTER(F18A_REG_BMLY, br*8);   // I think we move down one
+            VDP_SET_REGISTER(F18A_REG_BMLY, br*8+3);   // I think we move down one
         }
         // and set the control register
         VDP_SET_REGISTER(F18A_REG_BMLCFG, 0xf4);    // enable, over tiles, transparent, fat pixels, palette 4
     } else {
     	// update pattern table for scroll pos (0-3 subpixels)
-        VDP_SET_REGISTER(VDP_REG_PDT, 3+to);
+        VDP_SET_REGISTER(VDP_REG_PDT, 4+to);
 	    // handle the inline draw function
 	    wrapbossdraw();
     }
@@ -500,10 +494,10 @@ void mboss() {
 						ecs[a]=0;
 						ent[a]=ENEMY_SHOT; 
 						en_func[a]=enemyhoming;
-						ech[a]=HOMINGFRAMES;
+						ech[a]=HOMINGFRAMES+nDifficulty;    // how many frames we can home for (difficulty adds 1, 3, 7 frames)
 						enr[a]=71+(br<<3); 
 						enc[a]=(bc<<1)+35;
-						sprite(a+ENEMY_SPRITE,84,f18a?PAL_BOSSHOMETIP:COLOR_WHITE,enr[a],enc[a]);
+						sprite(a+ENEMY_SPRITE,104,f18a?PAL_BOSSHOMETIP:COLOR_WHITE,enr[a],enc[a]);
 						break;
 					}
 				}
@@ -599,29 +593,32 @@ void mboss() {
 					break;
 
 				case 0x80:
-					// homing laser shot - we assume the bullets are all free!
-                    // TODO: the colors are not good, but we'll need to see when we get the final palettes
-					ers[7]=0;	// start static
-					ecs[7]=0;
-					ent[7]=ENEMY_SHOT; 
-					en_func[7]=enemyhominglaser;	// ONLY 7 is legal!
-					ech[7]=HOMINGFRAMES+HOMINGFRAMES;
-					enr[7]=50+(br<<3); 
-					enc[7]=(bc<<1)+48;
-					sprite(7+ENEMY_SPRITE,104,f18a?PAL_BOSSHOMETIP:COLOR_WHITE,enr[7],enc[7]);
-					for (unsigned char a=8; a<12; ++a) {
-						ers[a]=0;	// start static
-						ecs[a]=0;
-						ent[a]=ENEMY_EXPLOSION;	// no collision, just a trail
-						en_func[a]=enemynull;
-						enr[a]=enr[7]; 
-						enc[a]=enc[7];
-                        if (f18a) {
-    						sprite(a+ENEMY_SPRITE,104,a<10?PAL_BOSSHOMELT:PAL_BOSSHOMEDK,enr[a],enc[a]);
-                        } else {
-    						sprite(a+ENEMY_SPRITE,104,a<10?COLOR_LTBLUE:COLOR_DKBLUE,enr[a],enc[a]);
-                        }
-					}
+                    // don't fire homing laser if we are not fully onscreen
+                    if (br >= 1) {
+					    // homing laser shot - we assume the bullets are all free!
+                        // TODO: the colors are not good, but we'll need to see when we get the final palettes
+					    ers[7]=0;	// start static
+					    ecs[7]=0;
+					    ent[7]=ENEMY_SHOT; 
+					    en_func[7]=enemyhominglaser;	// ONLY 7 is legal!
+					    ech[7]=HOMINGFRAMES+HOMINGFRAMES;
+					    enr[7]=50+(br<<3); 
+					    enc[7]=(bc<<1)+48;
+					    sprite(7+ENEMY_SPRITE,104,f18a?PAL_BOSSHOMETIP:COLOR_WHITE,enr[7],enc[7]);
+					    for (unsigned char a=8; a<12; ++a) {
+						    ers[a]=0;	// start static
+						    ecs[a]=0;
+						    ent[a]=ENEMY_EXPLOSION;	// no collision, just a trail
+						    en_func[a]=enemynull;
+						    enr[a]=enr[7]; 
+						    enc[a]=enc[7];
+                            if (f18a) {
+    						    sprite(a+ENEMY_SPRITE,104,a<10?PAL_BOSSHOMELT:PAL_BOSSHOMEDK,enr[a],enc[a]);
+                            } else {
+    						    sprite(a+ENEMY_SPRITE,104,a<10?COLOR_LTBLUE:COLOR_DKBLUE,enr[a],enc[a]);
+                            }
+					    }
+                    }
 					break;
 			}
 			next+=16;
@@ -759,6 +756,12 @@ void whoded() {
 	}
 }
 
+// I want to use color 4, rather than 1, so copy to the third table (F18A only)
+void bosssprcpy(uint8 from, uint8 to) {
+	vdpmemread((from<<3)+gPATTERN, tmpbuf, 8);
+	vdpmemcpy((to<<3)+gSPRITE_PATTERNS+0x1000, tmpbuf, 8);
+}
+
 void byboss() { 
 	/*boss is dead...blow him up!*/
 	int tmp, qw;
@@ -771,18 +774,20 @@ void byboss() {
 	shutup();
 	// erase enemies and shots
 	DelSprButPlayer(PLAYER_FLAME);
+	playmv();			// redraw the shield, DelSprButPlayer will have erased it
 
 	// straighten player
 	wrapplayerstraight();
-	playmv();			// redraw the shield, DelSprButPlayer will have erased it
+    wrapPlayerFlameSmall();
 
     // for F18a, we need to copy over the explosion character into the sprite table (just the first for now)
     if (f18a) {
         // use the beam left/boss homing sprite - we need to convert from character to sprite though
-        patsprcpy(EXPLOSION_FIRST,104);
+        bosssprcpy(EXPLOSION_FIRST,104);
         // because we're F18A, erase the rest
-        vdpmemset(104*8+0x0808, 0, 24);     // rest of first table
+        vdpmemset(104*8+0x1808, 0, 24);     // rest of third table
         vdpmemset(104*8+0x1000, 0, 32);     // all of second table
+        vdpmemset(104*8+0x0800, 0, 32);     // all of first table
         // we're going to use tmpbuf[64] to remember where the sprites are
         memset(tmpbuf, 0, sizeof(tmpbuf));
     }
@@ -836,7 +841,7 @@ void byboss() {
                         unsigned char bossr = r<<1;
                         if (((c<<3) >= bossShape[bossr])&&((c<<3) <= bossShape[bossr+1]+1)) {
                             // palette 8 is flames/explosions - this is the f18a only mode
-                            sprite(sp, 104, PAL_EXPLODE, (r<<3)+br*8, (c<<3)+bc*2);
+                            sprite(sp, 104, PAL_EXPLODE, (r<<3)+br*8, (c<<3)+bc*2+4);
                             tmpbuf[sp*2]=r<<3;
                             tmpbuf[sp*2+1]=c<<3;
                         }
@@ -877,9 +882,9 @@ void byboss() {
 			if (f18a) {
                 VDP_SET_REGISTER(F18A_REG_BMLX, ((qw>>1)&0x02) ? bc*2 : bc*2+6);
                 // animate sprite version of explosions
-                patsprcpy(EXPLOSION_FIRST+((qw>>2)&3),104);
+                bosssprcpy(EXPLOSION_FIRST+((qw>>2)&3),104);
             } else {
-                VDP_SET_REGISTER(VDP_REG_PDT, 3+((qw>>1)&0x2));
+                VDP_SET_REGISTER(VDP_REG_PDT, 4+((qw>>1)&0x2));
 			    // animate explosions
 			    patcpy(EXPLOSION_FIRST+((qw>>2)&3), EXPLOSION_CHAR);
             }
@@ -890,8 +895,8 @@ void byboss() {
 	erboss();
 	shutup();
 
-	// set pattern table back to default >1800
-    VDP_SET_REGISTER(VDP_REG_PDT, 3);
+	// set pattern table back to default >2000
+    VDP_SET_REGISTER(VDP_REG_PDT, 4);
 
 	// boss destroyed announcement
 	centr(11, "BOSS DESTROYED BONUS");
@@ -929,15 +934,16 @@ void byboss() {
 
     // check for end of game bonus
     if ((level == 5)&&(nDifficulty > DIFFICULTY_EASY)) {
+        color(15, COLOR_WHITE, COLOR_TRANS);  // so the 'x' shows up
         if (playership == SHIP_SELENA) {
             centr(14, "10000 BEST PRINCESS BONUS");
             addscore(100);
             delaystars(120);
         } else if ((playership == SHIP_SNOWBALL)||(playership==SHIP_LADYBUG)||(playership==SHIP_GNAT)) {
-            centr(14, "SPARE LIVES BONUS 0x100");
+            centr(14, "SPARE LIVES BONUS 0x10000");
             for (x=0; x<=lives; ++x) {
                 delaystars(30);
-                vdpchar((int)(gIMAGE+448+22), x+'0');
+                vdpchar((int)(gIMAGE+448+21), x+'0');
                 vdpchar((int)(gIMAGE+738+(lives-x)), ' ');
                 addscore(100);
             }
@@ -945,17 +951,23 @@ void byboss() {
         } else if (playership == SHIP_CRUISER) {
             // 0,25,50,75 are only valid values
             x=0;
-            centr(14, "SPARE SHIELD BONUS 0x100");
+            centr(14, "SPARE SHIELD BONUS 0x10000");
             while (shield >= 25) {
                 delaystars(30);
                 ++x;
-                vdpchar((int)(gIMAGE+448+22), x+'0');
+                vdpchar((int)(gIMAGE+448+21), x+'0');
                 vdpchar((int)(gIMAGE+738+(lives-x)), ' ');
                 addscore(100);
                 shield -= 25;
                 playmv();   // force a shield image update
             }
             delaystars(120);
+        }
+        if (scoremode == 3) {
+            // cloaked enemies
+            centr(15,"INCREDIBLE CLOAKED BONUS 20000");
+            addscore(200);
+            delaystars(60);
         }
     }
 

@@ -2,6 +2,7 @@
 #include <vdp.h>
 #include <sound.h>
 #include <kscan.h>
+#include <f18a.h>
 
 // game
 #include "game.h"
@@ -47,10 +48,8 @@ const signed char SINEISH[128] = {
 void player()
 { /* move the player based on joystick 'joynum' */
 	// animate flame
-	if (playership != SHIP_SELENA) {
-		if (flst == FLAME_SMALL) flst=FLAME_BIG; else flst=FLAME_SMALL;
-	} else {
-		// wing animation for Selena
+	if (playership == SHIP_SELENA) {
+		// wing animation for Selena - we do the other ships below so we can use the Y axis to alter the flame
 		flst = (++flst)&0x03;
 		switch (flst) {
 		case 0:
@@ -211,7 +210,8 @@ void player()
 			wrapcheckdamage(SHIP_R+playerOffset, SHIP_C+8, 0);	// add damage to boss body
 		}
 	}
-	if (flst == FLAME_BIG) {
+    // these functions do nothing if player is Selena, so we don't need to check
+	if (flst&FLAME_BIG) {
 		wrapPlayerFlameBig();
 	} else {
 		wrapPlayerFlameSmall();
@@ -337,13 +337,13 @@ void playerinit() {
         spdel(PLAYER_SHIELD+1);
         spdel(PLAYER_SHIELD+2);
         spdel(PLAYER_SHIELD+3);
-    	sprite(PLAYER_FLAME,FLAME_BIG,PAL_SHIPFLAME,224,120);
+    	sprite(PLAYER_FLAME,FLAME_CHAR,PAL_SHIPFLAME,224,120);
     } else {
 	    sprite(PLAYER_SHIELD,124,COLOR_BLACK,192,112);
 	    sprite(PLAYER_SHIELD+1,128,COLOR_BLACK,192,128);
 	    sprite(PLAYER_SHIELD+2,132,COLOR_BLACK,208,112);
 	    sprite(PLAYER_SHIELD+3,136,COLOR_BLACK,208,128);
-    	sprite(PLAYER_FLAME,FLAME_BIG,COLOR_LTYELLOW,224,120);
+    	sprite(PLAYER_FLAME,FLAME_CHAR,COLOR_LTYELLOW,224,120);
     }
 	oldshield = 0;		// force an update for cruiser
 
@@ -367,18 +367,10 @@ void playerinit() {
 	}
 }
 
-void initCruiser() {
-    wrapInitCruiser();
-
-    if (f18a) {
-        playerColor = 12;   // player is always on palette 12
-	    shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-    } else {
-    	playerColor = COLOR_MEDRED;
-	    shieldsOn = shieldCruiser;
-	    shieldsOff = deShieldCruiser;
-    }
+void initCruiserBase() {
+    playerColor = COLOR_MEDRED;
+	shieldsOn = shieldCruiser;
+	shieldsOff = deShieldCruiser;
 
     wrapPlayerFlameSmall();
 	
@@ -386,20 +378,16 @@ void initCruiser() {
 	shotOffset = -7;
 	playerXspeed = 10;
 	playerYspeed = 6;
-}
-
-void initSnowball() {
-    wrapInitSnowball();
 
     if (f18a) {
-    	playerColor = 12;
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-    } else {
-        shieldsOn = shieldSnowball;
-	    shieldsOff = deShieldSnowball;
-    	playerColor = COLOR_GRAY;
+        flameOffset = 30;
     }
+}
+
+void initSnowballBase() {
+    shieldsOn = shieldSnowball;
+	shieldsOff = deShieldSnowball;
+    playerColor = COLOR_GRAY;
 
     wrapPlayerFlameSmall();
 
@@ -409,18 +397,11 @@ void initSnowball() {
 	playerYspeed = 8;
 }
 
-void initLadybug() {
-    wrapInitLadybug();
-
-    if (f18a) {
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-    } else {
-        shieldsOn = shieldLadybug;
-	    shieldsOff = deShieldLadybug;
-	    playerColor = COLOR_MEDRED;
-    }
+void initLadybugBase() {
+    // f18 will override
+    shieldsOn = shieldLadybug;
+	shieldsOff = deShieldLadybug;
+	playerColor = COLOR_MEDRED;
 
     wrapPlayerFlameSmall();
 
@@ -431,18 +412,13 @@ void initLadybug() {
 	playerYspeed = 8;
 }
 
-void initGnat() {
-    wrapInitGnat();
-
-    if (f18a) {
-	    shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-    } else {
-	    shieldsOn = shieldGnat;
-	    shieldsOff = deShieldGnat;
-	    playerColor = COLOR_MEDGREEN;
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
+void initGnatBase() {
+    // f18 will override
+	shieldsOn = shieldGnat;
+	shieldsOff = deShieldGnat;
+	playerColor = COLOR_MEDGREEN;
+    if (!f18a) {
+        vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites by default
     }
 
     playerOffset = 22;
@@ -452,19 +428,14 @@ void initGnat() {
 	playerYspeed = 8;
 }
 
-void initSelena() {
-    wrapInitSelena();
-
-    if (f18a) {
-        shieldsOn = shieldf18;
-	    shieldsOff = deshieldf18;
-	    playerColor = 12;
-    } else {
-    	vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
-        shieldsOn = shieldSelena;
-	    shieldsOff = deShieldSelena;
-	    playerColor = COLOR_LTBLUE;
+void initSelenaBase() {
+    if (!f18a) {
+        vdpmemset(100*8+0x0800, 0, 4*8);					// zero the flame sprites
     }
+    // f18 will override
+    shieldsOn = shieldSelena;
+	shieldsOff = deShieldSelena;
+	playerColor = COLOR_LTBLUE;
 
 	playerOffset = 8;
 	shotOffset = -8;

@@ -36,7 +36,8 @@ OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o bo
         ship2_c.o ship2_p.o ship3_c.o ship3_p.o ship4_c.o ship4_p.o qwertianc.o qwertianp.o attract.o sfxs.o \
         ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
         gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
-        human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o
+        human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o \
+        harmlesslion_c.o harmlesslion_p.o
 
 # List of all files needed in executable
 PREREQUISITES=\
@@ -59,7 +60,7 @@ ssd_inc2.o: ssd_inc2.c
 bg.o: bg.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o bg.o bg.c
 
-boss.o: boss.c game.h boss.h
+boss.o: boss.c game.h boss.h f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o boss.o boss.c
 bossdat.o: bossdat.c game.h boss.h
 	$(CC) $(CFLAGS) $(INCPATH) -o bossdat.o bossdat.c
@@ -69,24 +70,24 @@ bossdraw.o: bossdraw.c boss.h
 bossdraw2.o: bossdraw2.c boss.h
 	$(CC) $(CFLAGS) $(INCPATH) -o bossdraw2.o bossdraw2.c
 
-enemy.o: enemy.c game.h
+enemy.o: enemy.c game.h f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o enemy.o enemy.c
 
 music.o: music.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o music.o music.c
 
-human.o: human.c game.h
+human.o: human.c game.h f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o human.o human.c
 human2.o: human2.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o human2.o human2.c
 
-superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h
+superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o superspaceacer.o superspaceacer.c
 
 titlepage.o: titlepage.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o titlepage.o titlepage.c
 
-trampolines.o: trampolines.c game.h trampoline.h
+trampolines.o: trampolines.c game.h trampoline.h f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o trampolines.o trampolines.c
 
 wineasy.o: wineasy.c game.h
@@ -105,6 +106,12 @@ title_c.o: title_c.c
 
 title_p.o: title_p.c
 	$(CC) $(CFLAGS) $(INCPATH) -o title_p.o title_p.c
+
+harmlesslion_c.o: harmlesslion_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o harmlesslion_c.o harmlesslion_c.c
+
+harmlesslion_p.o: harmlesslion_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o harmlesslion_p.o harmlesslion_p.c
 
 boss1.o: boss1.bmp
 	$(CC) $(CFLAGS) $(INCPATH) -oboss1.o boss1.c
@@ -172,15 +179,15 @@ attract.o: attract.c attract.h
 sfxs.o: sfxs.c
 	$(CC) $(CFLAGS) $(INCPATH) -o sfxs.o sfxs.c
 
-f18sprites.o: f18sprites8.c
-	$(CC) $(CFLAGS) $(INCPATH) -o f18sprites.o f18sprites8.c
-f18load.o: f18load.c
+f18sprites.o: f18sprites8sl.c
+	$(CC) $(CFLAGS) $(INCPATH) -o f18sprites.o f18sprites8sl.c
+f18load.o: f18load.c f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load.o f18load.c
-f18load2.o: f18load2.c
+f18load2.o: f18load2.c f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load2.o f18load2.c
-f18load3.o: f18load3.c
+f18load3.o: f18load3.c f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load3.o f18load3.c
-f18load4.o: f18load4.c
+f18load4.o: f18load4.c f18load.h
 	$(CC) $(CFLAGS) $(INCPATH) -o f18load4.o f18load4.c
 f18abosses.o: f18abosses.c
 	$(CC) $(CFLAGS) $(INCPATH) -o f18abosses.o f18abosses.c

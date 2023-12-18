@@ -77,7 +77,7 @@ extern unsigned int nBank;
 #define gCOLOR 0x0380
 #define gCOLOR2 0x03C0
 #define gSPRITE_PATTERNS 0x0800
-#define gPATTERN 0x1800
+#define gPATTERN 0x2000
 
 // dynamic sprite tables
 extern const unsigned char SPRITES[],ALTSHIELDS[],PLAYERFLAMESMALL[];
@@ -288,6 +288,7 @@ extern unsigned int BNR,BNC;
 extern unsigned int  musBank;
 extern unsigned int playerColor;
 extern unsigned int playerOffset;
+extern unsigned int flameOffset;
 extern int shotOffset;
 extern int playership;
 extern unsigned int playerXspeed, playerYspeed;

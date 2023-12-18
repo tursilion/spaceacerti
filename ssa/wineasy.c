@@ -82,37 +82,31 @@ void gamewineasy() {
 	unsigned char idx;
 	unsigned int x;
 
-    if (f18a) {
-        vdpmemcpy(gPATTERN+0x800+96*8, smallcapsfont, 28*8);
-	    vdpmemcpy(gPATTERN+0x800+121*8, easypats, 8*3);
-	    // and zero out whatever used to be the space character
-	    vdpmemset(gPATTERN+0x800+32*8, 0, 8);
-    } else {
-        vdpmemcpy(gPATTERN+96*8, smallcapsfont, 28*8);
-	    vdpmemcpy(gPATTERN+121*8, easypats, 8*3);
-	    // and zero out whatever used to be the space character
-	    vdpmemset(gPATTERN+32*8, 0, 8);
-    }
-	patcpy('y', '[');
-	patcpy('z', '\\');
+    vdpmemcpy(gPATTERN+96*8, smallcapsfont, 28*8);          // full lowercase letters
+	vdpmemcpy(gPATTERN+40*8, easypats, 8*3);                // overwrite #$% 35-37  40-42
+	// and zero out whatever used to be the space character
+	vdpmemset(gPATTERN+32*8, 0, 8);                         // space
+
+    color(5, COLOR_MAGENTA, COLOR_TRANS);                   // for the grid
+    color(15, COLOR_WHITE, COLOR_TRANS);                    // fix y and z color
 
 	for (idx = 0; idx < 32; idx++) {
-		vchar(1,idx,123,22);
+		vchar(1,idx,42,22);
 		if (idx == 0) {
-			xchar(0,0,121);
-			xchar(23,0,122);
+			xchar(0,0,40);
+			xchar(23,0,41);
 		} else if (idx == 31) {
-			xchar(0,31,123);
+			xchar(0,31,42);
 		} else {
-			xchar(0,idx,121);
-			xchar(23,idx,122);
+			xchar(0,idx,40);
+			xchar(23,idx,41);
 		}
 		waitforstep();
 		waitforstep();
 		waitforstep();
 	}
 	for (idx = 0; idx<23; idx++) {
-		hchar(idx, 0, 121, 31);
+		hchar(idx, 0, 40, 31);
 		waitforstep();
 		waitforstep();
 		waitforstep();
@@ -155,13 +149,12 @@ void gamewineasy() {
 	slowcenter(5, "Congratulations!");
 	slowcenter(7, tmpbuf);
 	slowcenter(9, "Simulation complete!");
-	slowcenter(11, "You are now read[ to challenge");
-	slowcenter(13, "the higher difficult[ levels!");
+	slowcenter(11, "You are now ready to challenge");
+	slowcenter(13, "the higher difficulty levels!");
 
 	centr(17, "GAME OVER");
 	StartMusic(GAMEOVERMUS, 0);
 
-//	while (!pDone) {
     while (isSNPlaying) {
 		waitforstep();
 	}

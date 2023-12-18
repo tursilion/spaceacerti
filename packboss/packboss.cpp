@@ -49,7 +49,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (nOffset != 0x3e) {
 		printf("Offset not as expected for mono BMP! Will try anyway.\n");
 	}
-	nMaxSize-=nOffset;
+	nMaxSize-=nOffset;	// in buf 2, there's no header
 
 	int nWidth = buf[0x12] | (buf[0x13]<<8) | (buf[0x14]<<16) | (buf[0x15]<<24);
 	int nHeight= buf[0x16] | (buf[0x17]<<8) | (buf[0x18]<<16) | (buf[0x19]<<24);
@@ -85,6 +85,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	fprintf(fp, "const unsigned char %s[] = {\n", argv[3]);
 	nLineCnt=0;
 
+	// debug info
+	int dataSize = nWidth*nHeight/8;
+	if (dataSize < nMaxSize) nMaxSize = dataSize;
+	printf("Maximum bytes in image: %d (%dx%d chars)\n", nMaxSize, nWidth/8, nHeight/8);
+	if (nWidth%8) printf("Warning: width is not a multiple of 8! (%d)\n", nWidth);
+	if (nHeight%8) printf("Warning: height is not a multiple of 8! (%d)\n", nHeight);
+	int nPackedCnt = 0;
+
 	// now work on buf2, which is formatted appropriately
 	nOffset=0;
 	while (nOffset < nMaxSize) {
@@ -98,8 +106,10 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (i>=nMaxSize) break;
 				if (i-nOffset >= 127) break;
 			}
+//			printf("Byte: %3d (%02X)\n", i-nOffset, buf2[nOffset]);
 			outbyte(0x80|(i-nOffset), fp);
 			outbyte(buf2[nOffset], fp);
+			nPackedCnt += (i-nOffset);
 			nOffset=i;
 		} else {
 			// not worth doing RLE -- see for how long
@@ -109,13 +119,18 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (i>=nMaxSize) break;
 				if (i-nOffset >= 127) break;
 			}
+//			printf("Run : %3d (%02X ...)\n", i-nOffset, buf2[nOffset]);
 			outbyte(i-nOffset, fp);
+			nPackedCnt += (i-nOffset);
 			for (int idx=0; idx<i-nOffset; idx++) {
 				outbyte(buf2[nOffset+idx], fp);
 			}
 			nOffset=i;
 		}
 	}
+
+	printf("Final parsed bytes in image: %d\n", nOffset);
+	printf("Final packed bytes in image: %d\n", nPackedCnt);
 
 	// close the file
 	if (nLineCnt%16) fprintf(fp, "\n");

@@ -33,12 +33,16 @@ const char TXTDAT[] =
  "             MUSIC              "
  "             =====              "
  "     Tadd Nuznov (RushJet1)     "
- " ============================== "
- "          EXTRA THANKS          ";
+ " ============================== ";
 // space is character 0 in my font anyway, so deleting the
 // first space in this one helps the text all line up
 const char TXTDAT2[] = 
- "         ============          "  
+ "           PROPHET             "
+ "            =======             "
+ "          Greg jelmer           "     /* lowercase 'j' has the 'Z' character */
+ " ============================== "
+ "          EXTRA THANKS          "
+ "          ============          "  
  "         Gord (again!!)         "
  "          Steve Brent           "
  "        Justin Goddard          "
