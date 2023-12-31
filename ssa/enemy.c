@@ -182,7 +182,7 @@ void enout() {
 				ent[k]=gentype[idx];
 				enr[k]=1;
 				enc[k]=genx[idx];
-                c=COLOR_WHITE;  // why is this getting through?
+                c=COLOR_WHITE;
 
                 switch (gentype[idx]) {
 				    // minimum player damage is 2 for spread, 3 for pulse
@@ -223,7 +223,8 @@ void enemysaucer(int x) {
 	enr[x]+=4;
 	enc[x]+=sinemove[(enr[x]>>2)&0x1f];
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -318,7 +319,8 @@ void enemyjet(int x) {
 		}
 	}
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -336,7 +338,8 @@ void enemymine(int x) {
 	enr[x]+=target(r, enr[x])<<1;
 	enc[x]+=target(c, enc[x])<<1;
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -364,7 +367,8 @@ void enemyhelicopter(int x) {
 	}
 	sppat(x+ENEMY_SPRITE,ech[x]);
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -397,7 +401,8 @@ void enemyhelipause(int x) {
 	}
 	sppat(x+ENEMY_SPRITE,ech[x]);
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -415,7 +420,8 @@ void enemyhelileave(int x) {
 	}
 	sppat(x+ENEMY_SPRITE,ech[x]);
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -439,7 +445,8 @@ void enemyswirly(int x) {
 	}
 	sppat(x+ENEMY_SPRITE,ech[x]);
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -451,7 +458,8 @@ void enemybomb(int x) {
 	enr[x]+=3;
 	enc[x]++;
 
-	if (enr[x]>191) noen(x);	// no worries for top row will invisibly wrap around!
+	if (enr[x]<1) noen(x);
+	if (enr[x]>191) noen(x);
 	if (enc[x]>239) noen(x);	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
 	if (enc[x]<5) noen(x);
 	if (ent[x] != ENEMY_NONE) {
@@ -464,7 +472,7 @@ const unsigned int bulletColor1[3] = { 0x00C0,0x0E1E,0x0DD0 };   // green on red
 const unsigned int bulletColor2[3] = { 0x0DD0,0x0E1E,0x00C0 };   // red on green
 
 void enemyshot(int x) {
-	static unsigned char cnt=0;
+	static unsigned int cnt=0;
 
 	/* used to count half frames */
 	cnt++;
@@ -486,9 +494,9 @@ void enemyshot(int x) {
 	enr[x]+=ers[x];
 	enc[x]+=ecs[x];
 
-	// no worries for top row will invisibly wrap around!
 	// wider on right edge due to hotspot of sprite (need this to catch the bomb explosion bits)
-	if ((enr[x]>191)||(enc[x]>239)||(enc[x]<5)) {
+	// Does this make the gnat invincible on the right edge? Ah well. ;)
+	if ((enr[x]>191)||(enr[x]<1)||(enc[x]>239)||(enc[x]<5)) {
 		noen(x);
 	} else {
 		sploct(x+ENEMY_SPRITE,enr[x],enc[x]); 
@@ -498,8 +506,6 @@ void enemyshot(int x) {
 // ONLY '7' is legal for input, and we assume 8-11 are follower sprites!
 // so we ignore the input and just assume the indexes for better performance
 void enemyhominglaser(int a) {
-	unsigned char oldc = enc[7];
-	char x;
 	(void)a;
 
 	if (ent[7] == ENEMY_EXPLOSION) {
@@ -547,8 +553,7 @@ void enemyhominglaser(int a) {
 		}
 		enr[7]+=ers[7];
 		enc[7]+=ecs[7];
-		x=(signed)(oldc>>6)-(signed)(enc[7]>>6);	// divide horizonal into 4 quads and look for wraparound
-		if ((enr[7]==0)||(enr[7]>191)||(abs(x)>1)) {
+		if ((enr[7]>191)||(enr[7]<1)||(enc[7]<1)||(enc[7]>239)) {
 			// save position in unused animation vars for trail compare
 			esc[7]=enr[7];
 			eec[7]=enc[7];
@@ -564,9 +569,6 @@ void enemyhominglaser(int a) {
 
 // boss homing shot - slower than laser and no trail
 void enemyhoming(int a) {
-	unsigned char oldc = enc[a];
-	char x;
-
 	/* move the boss homing shots (much the same as the princess) */
 	/* homes for a short duration, or if they are moving up! */
 	if ((ech[a])||(ers[a]<0)) {
@@ -582,8 +584,7 @@ void enemyhoming(int a) {
 	}
 	enr[a]+=ers[a];
 	enc[a]+=ecs[a];
-	x=(signed)(oldc>>6)-(signed)(enc[a]>>6);	// divide horizonal into 4 quads and look for wraparound
-	if ((enr[a]==0)||(enr[a]>191)||(abs(x)>1)) {
+	if ((enr[a]>191)||(enr[a]<1)||(enc[a]<1)||(enc[a]>239)) {
 		// remove sprite
 		noen(a);
 	} else {

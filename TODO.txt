@@ -1,25 +1,36 @@
-New compiler might well solve the issues for us!
-- But, it has a weakness. When we shift words to get at the MSB, it shifts as requested, then shifts back for the byte access. (Or, probably better, just use inline assembly). The point is that >>8 to get a byte from the MSB is not optimized and results in /two/ 8 bit shifts, very expensive.
+Selena's scroll text runs too slow - port to asm
 
+Garbage on screen when ship explodes (same row as GAME OVER) - looks like 0x00 bytes clear instead of 0x20.
+    - this is a compiler bug. Reported. Could change the input type to int to resolve.
+Boss is completely borked (though it does TRY to appear)
+    - attract mode boss seemed to actually operate a moment, though extremely slowly
 
-Cruiser ending
-- working
+Implement SID for sound effects
 
-Snowball ending
-- no player ship on warp out sequence, otherwise fine
+Am I seeing things, or do the gnat bullets vanish sometimes?
 
-Ladybird ending
-- working
+Enemy collisions (at least on homing bullets) seem a bit loose, maybe we need to check that.
 
-Gnat ending
-- working
+Check the rest of the code for >191 and make sure <1 is also handled (enemy.c done)
 
-Selena ending
-- left half of text does not display
-- a bit slow
+--------------------------
 
-Regular Game 
-- not tested
+HarmlessLion screen working
+Title page working
+Attract screen working
+Difficulty select working
+Music test (and all music) working
+
+Cruiser Ending - working
+Snowball ending - working
+Ladybird ending - working
+Gnat ending - working
+Selena ending - a little too slow
+Scroll Text - working
+Attract mode game - working
+
+Regular Game - working
+- limited testing
 
 Invisible game
 - not tested

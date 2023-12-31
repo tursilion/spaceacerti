@@ -54,7 +54,7 @@ const char selenaTxt[] =
 
 const char gnatstory1[] = 
 //	012345678901234567890123456789012
-    "                                "
+    "^"
 	"REPORTER: We are here at the    "
 	"victory celebration for our new "
 	"champion, the amazing pilot GNAT"
@@ -65,21 +65,21 @@ const char gnatstory1[] =
 
 const char gnatstory2[] = 
 //	012345678901234567890123456789012
-    "                                "
-    "                                "
+    "^"
+    "^"
 	"GNAT: I'm here! Yes! I'm here!  "
 	"      I'm the GREATEST!!        "
-    "                                "
+    "^"
 	"*";
 
 const char gnatstory3[] = 
 //	012345678901234567890123456789012
-    "                                "
-    "                                "
+    "^"
+    "^"
 	"GNAT: Hey, can't anyone hear me?"
 	"      Hello?!?!                 "
-    "                                "
-    "                                "
+    "^"
+    "^"
     "*";
 
 // 32x6 bytes
@@ -143,33 +143,33 @@ const signed char gnathop[] = {
 const char snowBallTxt1[] = "          *";  // just for a simple delay
 const char snowBallCloak[] = 
 //	012345678901234567890123456789012
-    "                                "
-    "                                "
+    "^"
+    "^"
     "  Incredibly, Bob was able to   "
 	" defeat the Qwertians even with "
 	" their advanced cloaking system "
-    "                                "
-    "                                "
+    "^"
+    "^"
     "*";
 const char snowBallTxt2[] = 
 //	012345678901234567890123456789012
-    "                                "
-    "                                "
+    "^"
+    "^"
     "    Safely returning to the     "
 	" mothership, Bob celebrated the "
 	" hero's welcome that he always  "
     "           dreamt of.           "
-    "                                "
+    "^"
     "*";
 const char snowBallTxt3[] = 
 //	012345678901234567890123456789012
-    "                                "
-    "                                "
+    "^"
+    "^"
     "     But was it truly over?     "
-    "                                "
+    "^"
 	"      Only time will tell!!     "
-    "                                "
-    "                                "
+    "^"
+    "^"
     "*";
 
 // letters for the cruiser win
@@ -613,8 +613,17 @@ static void runText(const char *pTxt) {
 
 	// now loop, displaying characters until we get an asterisk.
 	while (*pTxt != '*') {
-		delayText(2);
-		vdpchar(scrn++, *(pTxt++));
+		if (*pTxt == '^') {
+			// emit a blank line to save some memory - we're just barely over 8k without it
+			for (int i=0; i<32; ++i) {
+				delayText(2);
+				vdpchar(scrn++, ' ');
+			}
+			++pTxt;
+		} else {
+			delayText(2);
+			vdpchar(scrn++, *(pTxt++));
+		}
 	}
 }
 

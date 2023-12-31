@@ -345,7 +345,7 @@ void soundtest() {
 }
 
 // selects difficulty
-char * const sSkillText[] = {
+const char * const sSkillText[] = {
 	"TO SELECT GAME OPTION,",
 	"PRESS BUTTON ON KEYPAD",
 	"",

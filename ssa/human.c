@@ -33,7 +33,7 @@ int lives;
 unsigned int score, oldscore;	// oldscore is used as a temporary during demo play
 unsigned int scoremode;		// indicates bonus modes played via score's last digit. 0=normal, 1=gnat, 2=Selena, 3=invisible enemies
 int shr[NUM_SHOTS+1], shc[NUM_SHOTS];	// player shots row and col - shr is plus 1 so the last index can always be 0, faster searches
-int shd[NUM_SHOTS];					// player shot x direction (y is constant)
+int shd[NUM_SHOTS];						// player shot x direction (y is constant)
 int shrd[NUM_SHOTS];					// player shot y direction (only for selena)
 unsigned int shield;
 unsigned int hittime;				// mostly for cruiser - shakes the ship when hit
@@ -55,7 +55,7 @@ void mvshot()
 	if (shr[a]) {										\
 		shr[a]-=8;										\
 		shc[a]+=shd[a];									\
-		if ((shr[a]>191)||(shc[a]>250)||(shc[a]<5)) {	\
+		if ((shr[a]<0)||(shc[a]>250)||(shc[a]<5)) {	\
             if (force == 2) force = 0;                  \
 			spdel(PLAYER_SHOT+a);						\
 			shr[a]=0;									\
@@ -116,7 +116,7 @@ void homingshot() {
         if (shd[a]<0) shd[a]++;                         \
 		shr[a]+=shrd[a];								\
         shc[a]+=shd[a];                                 \
-		if ((shr[a]==0)||(shr[a]>191)||(shc[a]>250)||(shc[a]<5)) {	\
+		if ((shr[a]<1)||(shc[a]>250)||(shc[a]<5)) {		\
             if (force == 2) force = 0;                  \
 			spdel(PLAYER_SHOT+a);						\
 			shr[a]=0;									\
@@ -131,7 +131,7 @@ void homingshot() {
         shd[a]+=target(enc[en],shc[a]);                 \
 		shr[a]+=shrd[a];								\
 		shc[a]+=shd[a];									\
-		if ((shr[a]==0)||(shr[a]>191)||(shc[a]>250)||(shc[a]<5)) {	\
+		if ((shr[a]<1)||(shc[a]>250)||(shc[a]<5)) {		\
             if (force == 2) force = 0;                  \
 			spdel(PLAYER_SHOT+a);						\
 			shr[a]=0;									\
@@ -200,8 +200,8 @@ void colchk(int half) {
 }
 
 void plycol() {
-	unsigned int x,y;
-	unsigned int r,c;
+	int x,y;
+	int r,c;
 	int a;
 
 	/*check player collisions */
@@ -384,12 +384,16 @@ void pdie()
 void pboom()
 {
 	/* do SSA ship explode routine */
-	unsigned char qw;
+	unsigned int qw;
 	int lp1, lp2;		// used to move instead of automotion
 
 	// delete 'boss approaching' if it's up
 	if (flag != BOSS_LOOP_ACTIVE) {
 		// the blimp gets corrupted by this - any other time worst case is we lose a star, I don't care about that :)
+		// TODO: Compiler bug here. It tries to copy the int 32 for length to the byte 32 for character, and just
+		// assumes a MOVB will work. It's in movqi but I don't know what to do to correct it. If we can't fix it,
+		// it might be easier to just change the type to int. This causes a line of character 0 (stars) across the center
+		// when the ship explodes. Not sure where else it might be happening.
 		hchar(11, 0, 32, 32);
 	}
 	DelSprButPlayer(killedby+ENEMY_SPRITE);
@@ -540,7 +544,7 @@ void dyen(unsigned int x) {
 					ers[k]=9;
 				}
 				if (k%3==0) {
-					//ecs[k]=-9;        // TODO: COMPILER CRASHES ON THIS LINE - invalid expression as operand
+					ecs[k]=-9;
 				}
 				if ((k-1)%3==0) {
 					ecs[k]=0;

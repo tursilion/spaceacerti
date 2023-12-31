@@ -247,7 +247,6 @@ SECTIONS {
         qwertianp.o(.text .rodata)
         attract.o(.text .rodata)
         cruiserendp.o(.text .rodata)
-        hllogoc.o(.text .rodata)
         PROVIDE(ebank12a = .);
     } > CART12A AT> FLASH
 
@@ -255,6 +254,7 @@ SECTIONS {
     {
         gnat1rlec.o(.text .rodata)
         gnat1rlep.o(.text .rodata)
+        hllogop.o(.text .rodata)
         PROVIDE(ebank12b = .);
     } > CART12B AT> FLASH
 
@@ -278,7 +278,6 @@ SECTIONS {
     bank14a :
     {
         f18sprites.o(.text .rodata)
-        hllogop.o(.text .rodata)
         PROVIDE(ebank14a = .);
     } > CART14A AT> FLASH
 
@@ -298,6 +297,7 @@ SECTIONS {
     bank15b :
     {
         f18load2.o(.text .rodata)
+        hllogoc.o(.text .rodata)
         PROVIDE(ebank15b = .);
     } > CART15B AT> FLASH
 

@@ -51,7 +51,7 @@ int flag;
 int ch;
 
 // which ship did the player choose?
-int playership = 255;
+unsigned int playership = 255;
 // how many pixels down does the sprite start? (for smaller ones)
 unsigned int playerOffset;
 // how far down to draw the flame? (was the same before the F18A sprites)
@@ -362,7 +362,7 @@ void loadcharset() {
     }
 
 	// because 'y' and 'z' are overwritten by boss chars and color,
-	// we move them down to '_' and '\' respectively
+	// we move them down to '[' and '\' respectively
 	patcpy('y', '[');
 	patcpy('z', '\\');
 
@@ -726,9 +726,9 @@ void displayHLLogo() {
 
 	i=intpic();
 	
-	SWITCH_IN_BANK14a;
+	SWITCH_IN_BANK12b;
 	RLEUnpack(0x0000, hl_logoP, 6144);
-	SWITCH_IN_BANK12a;
+	SWITCH_IN_BANK15b;
 	RLEUnpack(0x2000, hl_logoC, 6144);
 
 	spdall();
@@ -1000,6 +1000,8 @@ void space()
 	while ((flag == MAIN_LOOP_ACTIVE) || (flag == MAIN_LOOP_DONE)) { 
 		// frame 0
 		wrapplayer();   	// handles player and player shots
+		
+		SWITCH_IN_BANK2a;
 		colchk(0);			// first half - this means the gnat may still beat mines..
 		
 		SWITCH_IN_BANK6a;

@@ -76,11 +76,8 @@ bss_clear_end:
 
 * now copy the rest of the fixed data into RAM
 * we are lazy here and assume a load address of 0xA000
-* we also assume the rest of this page and all of page 1
-* for (almost) 16k, though right now itd be nice to have
-* all 24k somehow... if we can free up one more page ;)
-* there's enough room, if it's possible to move things
-* around. Anyway... to do this right we are going to
+* we also assume the rest of this page and all of page 1-2
+* for (almost) 24k. Anyway... to do this right we are going to
 * need to work from scratchpad - copy into >8320
 
   li r0,>8320
@@ -109,6 +106,9 @@ cpsclp:
 * 3FFF - attract mode flag
   li sp, 0x3ff8
 
+* prevent screen blank
+  inc @0x83d6
+
 * Start running C code
   bl @main
 
@@ -118,7 +118,7 @@ cpsclp:
 cpcode:
 * start from R1, copy the rest of the page,
 * then switch the page and copy the whole thing,
-* then reset bank and return. Only copies first 16k
+* then reset bank and return. Only copies first 24k
 * (minus the header bits)
   li r2,>6002       * next page
   li r3,3           * number of iterations

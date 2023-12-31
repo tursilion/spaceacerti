@@ -56,5 +56,6 @@ void wrapLoadBossGfx();
 void wrapRestoreBossGfx();
 void wrapAddDestroyed(unsigned int ptr);
 void wrapladybugwin();
-
+void wrapbossdraw();
+void wrapGameWinHard();
 #endif

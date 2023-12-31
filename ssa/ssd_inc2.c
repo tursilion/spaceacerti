@@ -18,10 +18,10 @@ const char TXTDAT[] =
  "            PROGRAM             "
  "            =======             "
  "      Mike Brent (again!)       "
- "      Released for TI-99        "
+ "       Released for TI-99       "
  "            in 1992             "
- "     Ported to ColecoVision     "
- "            for 2023            "
+ "       Ported back to TI        "
+ "            for 2024            "
  " ============================== "
  "            GRAPHICS            "
  "            ========            "
@@ -33,12 +33,12 @@ const char TXTDAT[] =
  "             MUSIC              "
  "             =====              "
  "     Tadd Nuznov (RushJet1)     "
- " ============================== ";
+ " ============================== "
+ "            PROPHET             ";    // this is the maximum length GCC will allow
 // space is character 0 in my font anyway, so deleting the
 // first space in this one helps the text all line up
 const char TXTDAT2[] = 
- "           PROPHET             "
- "            =======             "
+ "           =======             "
  "          Greg jelmer           "     /* lowercase 'j' has the 'Z' character */
  " ============================== "
  "          EXTRA THANKS          "
@@ -70,8 +70,9 @@ const char TXTDAT2[] =
  "       Final score              "
  "                                "
  "      now Harmlesslion.com      "
- "       ` 2023 Mike Brent        "
- "                                "
+ "       ` 2023 Mike Brent        ";
+const char TXTDAT3[] = 
+ "                               "      // remove one again...
  " ============================== "
  "@";
 

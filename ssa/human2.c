@@ -48,9 +48,9 @@ const signed char SINEISH[128] = {
 void player()
 { /* move the player based on joystick 'joynum' */
 	// animate flame
+	flst = (++flst)&0x03;
 	if (playership == SHIP_SELENA) {
 		// wing animation for Selena - we do the other ships below so we can use the Y axis to alter the flame
-		flst = (++flst)&0x03;
 		switch (flst) {
 		case 0:
 		case 1:

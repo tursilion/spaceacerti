@@ -74,8 +74,6 @@
     <ClCompile Include="..\demoship1p.c" />
     <ClCompile Include="..\demoship2c.c" />
     <ClCompile Include="..\demoship2p.c" />
-    <ClCompile Include="..\harmlesslion_c.c" />
-    <ClCompile Include="..\harmlesslion_p.c" />
     <ClCompile Include="..\selena_end_c.c" />
     <ClCompile Include="..\selena_end_p.c" />
     <ClCompile Include="..\title2\ship1_c.c" />
@@ -119,6 +117,8 @@
     <ClCompile Include="gnat4rlep.c" />
     <ClCompile Include="gnat5rlec.c" />
     <ClCompile Include="gnat5rlep.c" />
+    <ClCompile Include="harmlesslion_c.c" />
+    <ClCompile Include="harmlesslion_p.c" />
     <ClCompile Include="human.c" />
     <ClCompile Include="human2.c" />
     <ClCompile Include="ladybugc.c" />

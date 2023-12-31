@@ -1,10 +1,17 @@
-# Paths to TMS9900 compilation tools
-#GAS=/home/tursilion/gcc9900/bin/tms9900-as
-#LD=/home/tursilion/gcc9900/bin/tms9900-ld
-#CC=/home/tursilion/gcc9900/bin/tms9900-gcc
-GAS=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-as
-LD=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-ld
-CC=/home/tursilion/newtms9900-gcc/newgcc9900/bin/tms9900-gcc
+# Paths to TMS9900 compilation tools 
+# ( Set in environment to override paths )
+#TMS9900_DIR?=/home/tursilion/gcc9900/bin
+TMS9900_DIR?=/home/tursilion/newtms9900-gcc/newgcc9900/bin
+ELF2EA5_DIR?=/home/tursilion/gcc9900/bin
+EA5_SPLIT_DIR?=/home/tursilion/gcc9900/bin
+CLASSIC99_DSK1?=/mnt/d/classic99/DSK1/
+LIBTI99?=/mnt/d/work/ti/libti99/
+
+# Full paths to the executables used
+GAS=$(TMS9900_DIR)/tms9900-as
+LD=$(TMS9900_DIR)/tms9900-ld
+CC=$(TMS9900_DIR)/tms9900-gcc
+
 CP=/usr/bin/cp
 NAME=ssa
 
@@ -21,7 +28,7 @@ ELF2CART=/mnt/d/work/ti/Elf2BankedCart/elf2bankedcart
 LDFLAGS_EA5=-M -T linker.ld
 
 INCPATH=-I/mnt/d/work/libti99ALL -I/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
-LIBPATH=-L/mnt/d/work/libti99ALL -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
+LIBPATH=-L/mnt/d/work/libti99ALL/buildti -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBS=-lti99 -ltivgm2
 
 CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin
@@ -37,11 +44,10 @@ OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o bo
         ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
         gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
         human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o \
-        harmlesslion_c.o harmlesslion_p.o
+        hllogoc.o hllogop.o
 
 # List of all files needed in executable
-PREREQUISITES=\
-  $(OBJECT_LIST_EA5) $(OBJECT_LIST)
+PREREQUISITES=$(OBJECT_LIST)
 
 all: $(PREREQUISITES)
 	$(LD) $(OBJECT_LIST) $(LIBS) $(LIBPATH) $(LDFLAGS_EA5) -o $(NAME).ea5.elf > ea5.map
@@ -107,11 +113,11 @@ title_c.o: title_c.c
 title_p.o: title_p.c
 	$(CC) $(CFLAGS) $(INCPATH) -o title_p.o title_p.c
 
-harmlesslion_c.o: harmlesslion_c.c
-	$(CC) $(CFLAGS) $(INCPATH) -o harmlesslion_c.o harmlesslion_c.c
+hllogoc.o: harmlesslion_c.c
+	$(CC) $(CFLAGS) $(INCPATH) -o hllogoc.o harmlesslion_c.c
 
-harmlesslion_p.o: harmlesslion_p.c
-	$(CC) $(CFLAGS) $(INCPATH) -o harmlesslion_p.o harmlesslion_p.c
+hllogop.o: harmlesslion_p.c
+	$(CC) $(CFLAGS) $(INCPATH) -o hllogop.o harmlesslion_p.c
 
 boss1.o: boss1.bmp
 	$(CC) $(CFLAGS) $(INCPATH) -oboss1.o boss1.c

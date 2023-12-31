@@ -1,4 +1,7 @@
 #ifndef BIN2INC_HEADER_ONLY
+#include <vdp.h>
+#include <f18a.h>
+#include "f18load.h"
 
 const unsigned char F18SPRITES[] = {
 0x00,0x03,0x3F,0x77,0x67,0xC7,0x57,0x75,0x71,0x38,0x98,0x05,0x45,0x27,0x0B,0x00,
@@ -525,6 +528,8 @@ const unsigned char F18ALTSHIELDS3[] = {
 0x07,0x07,0x07,0x07,0x07,0x0F,0x06,0x06,0x06,0x06,0x64,0xFC,0xF8,0xF0,0xC0,0x00
 };
 
+#if 0
+
 const unsigned char F18SNOWBALL[] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x01,0x01,0x01,0x03,0x00,0x01,0x01,0x00,0x03,0x02,0x03,0x07,0x1F,0x1F,0x7F,
@@ -686,8 +691,6 @@ const unsigned char F18ALTSNOWBALL3[] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x0F,0x0F,0x0C,
 0x07,0x07,0x07,0x07,0x07,0x0F,0x0E,0x0E,0x1E,0x1E,0x1C,0x1C,0x98,0xD0,0xC0,0x00
 };
-
-#if 0
 
 const unsigned char F18LADYBUG[] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -1195,11 +1198,11 @@ const unsigned int F18CRUISERPAL[] = {
 0x0B22,0x0A00,0x0644,0x0600,0x0100,0x0C55,0x0AAA
 };
 
+#if 0
 const unsigned int F18SNOWBALLPAL[] = {
 0x0AAA,0x0778,0x0445,0x0112,0x0C55,0x0BBB,0x0DDD
 };
 
-#if 0
 const unsigned int F18LADYBUGPAL[] = {
 0x0700,0x0300,0x0911,0x0000,0x0B44,0x0544,0x0A99
 };
@@ -1219,6 +1222,46 @@ const unsigned int F18SELENAPAL[] = {
 const unsigned int F18SHIELDMAX[] = { 0x0000,0x02C4,0x05D7,0x0888,0x0CCC,0x0EEE,0x0FFF,  };
 const unsigned int F18SHIELDMED[] = { 0x0000,0x02C4,0x05D7,0x0880,0x0CC0,0x0EE0,0x0FF0,  };
 const unsigned int F18SHIELDLOW[] = { 0x0000,0x02C4,0x05D7,0x0800,0x0C00,0x0E00,0x0F00,  };
+
+void initCruiserf18() {
+    // add 32 to VDP address, 16 to sprite table address
+#if 1
+    // use a little less code space
+    for (int idx=0; idx<3; ++idx) {
+        // main
+        vdpmemcpy((108+idx*32)*8+0x800, &F18SPRITES[(108+16*idx)*8], 4*4*8);
+        vdpmemcpy((108+idx*32)*8+0x1000, &F18SPRITES2[(108+16*idx)*8], 4*4*8);
+        vdpmemcpy((108+idx*32)*8+0x1800, &F18SPRITES3[(108+16*idx)*8], 4*4*8);
+        // shields
+        vdpmemcpy((124+idx*32)*8+0x0800, &F18ALTSHIELDS[idx*4*4*8], 4*4*8);
+        vdpmemcpy((124+idx*32)*8+0x1000, &F18ALTSHIELDS2[idx*4*4*8], 4*4*8);
+        vdpmemcpy((124+idx*32)*8+0x1800, &F18ALTSHIELDS3[idx*4*4*8], 4*4*8);
+    }
+#else
+    vdpmemcpy(108*8+0x0800, &F18SPRITES[108*8], 4*4*8);	    // ship straight sprites layer 1
+    vdpmemcpy(140*8+0x0800, &F18SPRITES[124*8], 4*4*8);	    // ship left sprites layer 1
+    vdpmemcpy(172*8+0x0800, &F18SPRITES[140*8], 4*4*8);	    // ship right sprites layer 1
+    vdpmemcpy(108*8+0x1000, &F18SPRITES2[108*8], 4*4*8);	// ship straight sprites layer 2
+    vdpmemcpy(140*8+0x1000, &F18SPRITES2[124*8], 4*4*8);	// ship left sprites layer 2
+    vdpmemcpy(172*8+0x1000, &F18SPRITES2[140*8], 4*4*8);	// ship right sprites layer 2
+    vdpmemcpy(108*8+0x1800, &F18SPRITES3[108*8], 4*4*8);	// ship straight sprites layer 2
+    vdpmemcpy(140*8+0x1800, &F18SPRITES3[124*8], 4*4*8);	// ship left sprites layer 2
+    vdpmemcpy(172*8+0x1800, &F18SPRITES3[140*8], 4*4*8);	// ship right sprites layer 2
+    // shields
+    vdpmemcpy(124*8+0x0800, F18ALTSHIELDS, 4*4*8);			// straight
+	vdpmemcpy(156*8+0x0800, &F18ALTSHIELDS[4*4*8], 4*4*8);	// left
+	vdpmemcpy(188*8+0x0800, &F18ALTSHIELDS[8*4*8], 4*4*8);	// right
+    vdpmemcpy(124*8+0x1000, F18ALTSHIELDS2, 4*4*8);			// straight
+	vdpmemcpy(156*8+0x1000, &F18ALTSHIELDS2[4*4*8], 4*4*8);	// left
+	vdpmemcpy(188*8+0x1000, &F18ALTSHIELDS2[8*4*8], 4*4*8);	// right
+    vdpmemcpy(124*8+0x1800, F18ALTSHIELDS3, 4*4*8);			// straight
+	vdpmemcpy(156*8+0x1800, &F18ALTSHIELDS3[4*4*8], 4*4*8);	// left
+	vdpmemcpy(188*8+0x1800, &F18ALTSHIELDS3[8*4*8], 4*4*8);	// right
+#endif
+
+    loadpal_f18a(F18CRUISERPAL, PAL_PLAYSHIP*4+1, 7);   // remember to skip the transparent colors
+}
+
 
 #else
 
