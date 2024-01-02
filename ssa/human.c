@@ -49,7 +49,7 @@ void mvshot()
 { /* move the player's shots */
 
 #if 1
-	// WARNING: assumes NUM_SHOTS to be 9
+	// WARNING: assumes NUM_SHOTS to be 9, and assumes moving up only
 	// constant offsets are more efficient than array lookups by a lot in SDCC
 #define MOVE_ONE_SHOT(a)								\
 	if (shr[a]) {										\
@@ -81,7 +81,7 @@ void mvshot()
 		if (shr[a]) { 
 			shr[a]-=8;
 			shc[a]+=shd[a];
-			if ((shr[a]>191)||(shc[a]>250)||(shc[a]<5)) { 
+			if ((shr[a]<0)||(shr[a]>191)||(shc[a]>250)||(shc[a]<5)) { 
 				spdel(PLAYER_SHOT+a);  
 				shr[a]=0; 
 			} else {

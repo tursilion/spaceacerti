@@ -12,7 +12,7 @@
 #include "human.h"
 
 extern const unsigned char colecofont[];
-unsigned char bottomsprite, bottomrow;
+unsigned int bottomsprite, bottomrow;
 unsigned char gnaty;
 
 const char selenaTxt[] = 
@@ -263,6 +263,8 @@ void cleanexit() {
 	FIX_KSCAN(i);
 }
 
+// The TI version is just a LITTLE slow, the music ends with 2 rows left. I think I'll live with it.
+// my asm version wasn't really any faster, though it was just an adaptation
 void selenascroll() {
 	// do a vertical scroll of the rightmost 12 characters
 	// tmpbuf has the next 12 bytes to put at the bottom
@@ -332,7 +334,8 @@ void selenascroll() {
 		adr = (bottomsprite+3)*4*8+bottomrow + 0x3800;
 	}
 	for (idx = 0; idx<6; idx++) {
-		vdpchar(adr, 0);
+        VDP_SET_ADDRESS_WRITE(adr);
+        VDPWD = 0;
 		adr += 16;
 	}
 	musicsync();
@@ -458,17 +461,17 @@ void selenascroll() {
 		}
 #else
 		// six writes to copy back rows to the previous cells
-		vdpchar(adr-(8*32-7), *(((unsigned char*)&SpriteTab)));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)); VDPWD=*(((unsigned char*)&SpriteTab));	// copy back the top rows to the previous cells
 		VDP_SAFE_DELAY();
-		vdpchar(adr-(8*32-7)+8, *(((unsigned char*)&SpriteTab)+8));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+8); VDPWD=*(((unsigned char*)&SpriteTab)+8);	// copy back the top rows to the previous cells
 		VDP_SAFE_DELAY();
-		vdpchar(adr-(8*32-7)+16, *(((unsigned char*)&SpriteTab)+16));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+16); VDPWD=*(((unsigned char*)&SpriteTab)+16);	// copy back the top rows to the previous cells
 		VDP_SAFE_DELAY();
-		vdpchar(adr-(8*32-7)+24, *(((unsigned char*)&SpriteTab)+24));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+24); VDPWD=*(((unsigned char*)&SpriteTab)+24);	// copy back the top rows to the previous cells
 		VDP_SAFE_DELAY();
-		vdpchar(adr-(8*32-7)+32, *(((unsigned char*)&SpriteTab)+32));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+32); VDPWD=*(((unsigned char*)&SpriteTab)+32);	// copy back the top rows to the previous cells
 		VDP_SAFE_DELAY();
-		vdpchar(adr-(8*32-7)+40, *(((unsigned char*)&SpriteTab)+40));	// copy back the top rows to the previous cells
+		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+40); VDPWD=*(((unsigned char*)&SpriteTab)+40);	// copy back the top rows to the previous cells
 #endif
 
 		musicsync();
@@ -485,7 +488,8 @@ void selenascroll() {
 			row = 22*8-1;
 			*pDat = row;
 		}
-		vdpchar(adr, row);
+        VDP_SET_ADDRESS_WRITE(adr);
+        VDPWD=row;
 		adr+=4;
 		++pDat;
 	}
@@ -494,7 +498,8 @@ void selenascroll() {
 	// copy in the newest data from tmpbuf
 	adr=32*3*8 + 18*32*8 + 26*8 + 7;
 	for (idx=6; idx<12; idx++) {
-		vdpchar(adr, tmpbuf[idx]);
+        VDP_SET_ADDRESS_WRITE(adr);
+        VDPWD=tmpbuf[idx];
 		adr+=8;
 	}
 	musicsync();
@@ -502,7 +507,8 @@ void selenascroll() {
 	// add the data to the sprites too
 	adr = bottomsprite*4*8 + bottomrow + 0x3800;
 	for (idx = 0; idx<6; idx++) {
-		vdpchar(adr, tmpbuf[idx]);
+        VDP_SET_ADDRESS_WRITE(adr);
+        VDPWD=tmpbuf[idx];
 		adr += 16;
 	}
 	musicsync();
