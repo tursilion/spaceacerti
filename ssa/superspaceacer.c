@@ -769,10 +769,18 @@ void main() {
 		*SAVEDATTRACT = attractShip & 1;
 		attractShip >>= 4;
         f18a=*SAVEDF18A;
-	} else {
+        // be really careful on music - a bad pointer will crash us, so don't trust it
+        if ((void(*))(*SAVEDMUSIC) == doSfxInstead) {
+            doMusic = doSfxInstead;
+        } else {
+            doMusic = doAllMusic;
+        }
+    } else {
 		// it was junk
 		score = 0;
 		scoremode = 0;
+        doMusic = doAllMusic;
+        *SAVEDMUSIC = (unsigned int)doMusic;    // make sure the saved pointer is valid in case of early reboot // TODO: not 32-bit safe
 
         f18a = detect_f18a();
         if (f18a) {
@@ -822,6 +830,9 @@ titleagain:
 		} else {
 			// we'll do the demo play
 			*SAVEDATTRACT = 0;
+            // switch music to sound effects so it's not completely mute
+            *SAVEDMUSIC = (unsigned int)doMusic;    // TODO WARNING: not 32-bit safe
+			doMusic = doSfxInstead;
 		}
 	}
 
@@ -985,6 +996,13 @@ titleagain:
 		if (level==9) {
 			if (joynum == 0) {
 				score = oldscore;
+
+                // Don't trust the saved pointer - corruption would crash us
+                if ((void(*))(*SAVEDMUSIC) == doSfxInstead) {
+                    doMusic = doSfxInstead;
+                } else {
+                    doMusic = doAllMusic;
+                }
 			}
 			goto titleagain;		// level 9 is a flag from gamovr()
 		}
@@ -1352,6 +1370,11 @@ void reboot() {
 
     // save off the detected F18A state (partly to save redetect, mostly to save if it was disabled)
     *SAVEDF18A = f18a&0xff;
+
+    // and save the user's music state - only if not in demo
+    if (joynum) {
+        *SAVEDMUSIC = (unsigned int)doMusic;    // TOOD: not 32 bit safe?
+    }
 
 	hwreboot();	// never returns
 }

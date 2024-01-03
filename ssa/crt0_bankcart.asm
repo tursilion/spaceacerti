@@ -98,13 +98,14 @@ cpsclp:
 
 * Create the stack
 * reserved stack space:
+* 3FF6 - music flag for reboots
 * 3FF8 - unused
 * 3FF9 - F18A flag
 * 3FFA - saved score
 * 3FFC - inverted score
 * 3FFE - saved score mode
 * 3FFF - attract mode flag
-  li sp, 0x3ff8
+  li sp, 0x3ff6
 
 * prevent screen blank
   inc @0x83d6

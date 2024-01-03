@@ -168,6 +168,7 @@ struct _sprite {
 extern struct _sprite SpriteTab[32];
 
 // some pointers above the stack to store data across reboots
+#define SAVEDMUSIC ((unsigned int*)0x3ff6)
 #define SAVEDSCORE ((unsigned char*)0x3ffa)
 #define SAVEDMODE ((unsigned char*)0x3ffe)
 #define SAVEDATTRACT ((unsigned char*)0x3fff)

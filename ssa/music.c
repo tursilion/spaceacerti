@@ -218,7 +218,7 @@ void shutup()
 // do any necessary sound chip initialization
 void initSound() {
     shutup();
-    doMusic = doAllMusic;   // this is how we do music mute
+    //doMusic = doAllMusic;   // this is how we do music mute   (this is initialized early now as it's saved on the stack)
     a1=0;
     a2=0;
     b1=0;

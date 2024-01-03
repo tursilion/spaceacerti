@@ -31,7 +31,7 @@ int pwrlvl;				// pwrlvl: 0-2 = pulse wave level 1,2,3, 4-6=3-way level 1,2,3  (
 int oldpwrlvl;
 int lives;
 unsigned int score, oldscore;	// oldscore is used as a temporary during demo play
-unsigned int scoremode;		// indicates bonus modes played via score's last digit. 0=normal, 1=gnat, 2=Selena, 3=invisible enemies
+unsigned int scoremode;		    // indicates bonus modes played via score's last digit. 0=normal, 1=gnat, 2=Selena, 3=invisible enemies
 int shr[NUM_SHOTS+1], shc[NUM_SHOTS];	// player shots row and col - shr is plus 1 so the last index can always be 0, faster searches
 int shd[NUM_SHOTS];						// player shot x direction (y is constant)
 int shrd[NUM_SHOTS];					// player shot y direction (only for selena)
