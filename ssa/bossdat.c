@@ -16,7 +16,7 @@
 #define BIN2INC_HEADER_ONLY
 #include "f18abosses.c"
 
-extern unsigned int bossShape[8*2];
+extern unsigned int bossShape[12*2];
 
 // some graphics copies so we don't need to page flip for graphics during the final boss
 // well, so much for that ;)
@@ -129,11 +129,11 @@ void loadBossGfx() {
     // F18A will ignore the bossdraw function
 	switch (level) {
 		default:
-		case 1:	memcpy(bossShape, bossShape1, sizeof(bossShape)); break;
-		case 2:	memcpy(bossShape, bossShape2, sizeof(bossShape)); break;
-		case 3:	memcpy(bossShape, bossShape3, sizeof(bossShape)); break;
-		case 4:	memcpy(bossShape, bossShape4, sizeof(bossShape)); break;
-		case 5:	memcpy(bossShape, bossShape5, sizeof(bossShape)); break;
+		case 1:	memcpy(bossShape, bossShape1, sizeof(bossShape1)); break;
+		case 2:	memcpy(bossShape, bossShape2, sizeof(bossShape2)); break;
+		case 3:	memcpy(bossShape, bossShape3, sizeof(bossShape3)); break;
+		case 4:	memcpy(bossShape, bossShape4, sizeof(bossShape4)); break;
+		case 5:	memcpy(bossShape, bossShape5, sizeof(bossShape5)); break;
 	}
 }
 

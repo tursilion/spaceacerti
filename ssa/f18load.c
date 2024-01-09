@@ -48,6 +48,7 @@ void initF18GPU() {
     VDP_SET_REGISTER(F18A_REG_MAXSPR, 31);  // go ahead and disable flicker, we don't need it
     VDP_SET_REGISTER(F18A_REG_EXTRAPAL, 0); // default modes use the default palette
     VDP_SET_REGISTER(F18A_REG_SIZES, 0);    // 2k table sizes for pattern tables
+    VDP_SET_REGISTER(F18A_REG_BMLCFG, 0);   // make sure the BML is off
     vdpmemcpy(GPULOADADR, gpucode, sizeof(gpucode));    // and load the GPU
     // clear out the input registers
     VDP_SET_ADDRESS_WRITE(GPU_DAMAGEGO);

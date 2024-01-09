@@ -31,7 +31,7 @@ INCPATH=-I/mnt/d/work/libti99ALL -I/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBPATH=-L/mnt/d/work/libti99ALL/buildti -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBS=-lti99 -ltivgm2
 
-CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin
+CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin -minline_rtl
 
 
 .PHONY: all clean

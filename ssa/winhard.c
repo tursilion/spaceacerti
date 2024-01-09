@@ -263,8 +263,7 @@ void cleanexit() {
 	FIX_KSCAN(i);
 }
 
-// The TI version is just a LITTLE slow, the music ends with 2 rows left. I think I'll live with it.
-// my asm version wasn't really any faster, though it was just an adaptation
+// running fine now
 void selenascroll() {
 	// do a vertical scroll of the rightmost 12 characters
 	// tmpbuf has the next 12 bytes to put at the bottom
@@ -349,6 +348,7 @@ void selenascroll() {
 		// using loops was too slow, but this appears to work.
 		VDP_SET_ADDRESS_WRITE(adr);
 
+#if 0
 		// we copy 7 bytes then zero the 8th, copying to the previous row happens
 		// in a separate step
 		VDP_SAFE_DELAY();
@@ -452,6 +452,74 @@ void selenascroll() {
 		VDPWD=*(((unsigned char*)&SpriteTab)+47);
 		VDP_SAFE_DELAY();
 		VDPWD=0;
+#else
+		// we copy 7 bytes then zero the 8th, copying to the previous row happens
+		// in a separate step
+        __asm__ volatile (
+            "li r0,SpriteTab+1\n\t"
+            "li r1,>8c00\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0\n\t"
+
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "movb *r0+,*r1\n\t"
+            "clr *r1\n\t"
+            "inc r0"
+            : : : "r1" 
+        );
 #endif
 
 #if 0
@@ -474,7 +542,9 @@ void selenascroll() {
 		VDP_SET_ADDRESS_WRITE(adr-(8*32-7)+40); VDPWD=*(((unsigned char*)&SpriteTab)+40);	// copy back the top rows to the previous cells
 #endif
 
-		musicsync();
+#endif
+
+        musicsync();
 		adr += 8*32;
 	}
 
@@ -569,7 +639,7 @@ void selenawin() {
 		for (i=0; i<8; i++) {
 			for (i2=0; i2<12; i2++) {	// always 12 characters across
 				adr = ((*(pTxt+i2)-32)<<3) + i;
-				wrapgetfontbytes(&tmpbuf[i2], &colecofont[adr], 1);
+				wrapgetfontonebyte(&tmpbuf[i2], &colecofont[adr]);
 			}
 			selenascroll();
 		}

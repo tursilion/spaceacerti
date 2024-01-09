@@ -188,7 +188,7 @@ void player()
 	}
 
 	if (KSCAN_JOYY == JOY_UP) {
-		if (SHIP_R > playerYspeed) {
+		if (SHIP_R > playerYspeed+18) {
 			SHIP_R-=playerYspeed;
 			flst=FLAME_BIG;
 		}
@@ -238,7 +238,7 @@ void shoot()
 { 
 	uint8 a,a2,a3;
 	uint8 truepwr = pwrlvl & 0x0f;
-	uint8 r,c;
+	int r,c;
 
 	/* make player shoot if a shot available */
 

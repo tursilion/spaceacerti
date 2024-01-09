@@ -93,8 +93,8 @@ const unsigned int f18BlackPal[16] = { 0,0,0,0,0,0,0,0,
 
 void sprStart0() {
 	// copy sprites 0-31 in order (simplest case)
-	__asm__ (
-        "li r0,SpriteTab+0\n\t"
+	__asm__ volatile  (
+        "li r0,SpriteTab\n\t"
         "li r1,0x8C00\n\t"
         ".rept 128\n\t"
         "movb *r0+,*r1\n\t"
@@ -106,7 +106,7 @@ void sprStart0() {
 void sprStart4() {
 	// copy sprites 4-31, then 0-3
 	// decrement mode
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+124\n\t"
         "li r1,0x8C00\n\t"
         "li r2,-8\n\t"
@@ -115,7 +115,7 @@ void sprStart4() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         "li r0,SpriteTab+12\n\t"
@@ -124,7 +124,7 @@ void sprStart4() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         : : : "r0","r1","r2"
@@ -133,14 +133,14 @@ void sprStart4() {
 
 void sprStart8() {
 	// copy sprites 8-31, then 0-7
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+32\n\t"
         "li r1,0x8C00\n\t"
         ".rept 96\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
         
-        "li r0,SpriteTab+0\n\t"
+        "li r0,SpriteTab\n\t"
         ".rept 32\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
@@ -152,7 +152,7 @@ void sprStart8() {
 void sprStart12() {
 	// copy sprites 12-31, then 0-11
 	// decrement mode
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+124\n\t"
         "li r1,0x8C00\n\t"
         "li r2,-8\n\t"
@@ -161,7 +161,7 @@ void sprStart12() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         "li r0,SpriteTab+44\n\t"
@@ -170,7 +170,7 @@ void sprStart12() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         : : : "r0","r1","r2"
@@ -179,14 +179,14 @@ void sprStart12() {
 
 void sprStart16() {
 	// copy sprites 16-31, then 0-15
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+64\n\t"
         "li r1,0x8C00\n\t"
         ".rept 64\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
         
-        "li r0,SpriteTab+0\n\t"
+        "li r0,SpriteTab\n\t"
         ".rept 64\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
@@ -198,7 +198,7 @@ void sprStart16() {
 void sprStart20() {
 	// copy sprites 20-31, then 0-19
 	// decrement mode
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+124\n\t"
         "li r1,0x8C00\n\t"
         "li r2,-8\n\t"
@@ -207,7 +207,7 @@ void sprStart20() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         "li r0,SpriteTab+76\n\t"
@@ -216,7 +216,7 @@ void sprStart20() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         : : : "r0","r1","r2"
@@ -225,14 +225,14 @@ void sprStart20() {
 
 void sprStart24() {
 	// copy sprites 24-31, then 0-23
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+96\n\t"
         "li r1,0x8C00\n\t"
         ".rept 32\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
         
-        "li r0,SpriteTab+0\n\t"
+        "li r0,SpriteTab\n\t"
         ".rept 96\n\t"
         "movb *r0+,*r1\n\t"
         ".endr\n\t"
@@ -244,7 +244,7 @@ void sprStart24() {
 void sprStart28() {
 	// copy sprites 28-31, then 0-27
 	// decrement mode
-	__asm__ (
+	__asm__ volatile  (
         "li r0,SpriteTab+112\n\t"
         "li r1,0x8C00\n\t"
         "li r2,-8\n\t"
@@ -253,7 +253,7 @@ void sprStart28() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         "li r0,SpriteTab+108\n\t"
@@ -262,7 +262,7 @@ void sprStart28() {
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
         "movb *r0+,*r1\n\t"
-        "a r2,r1\n\t"
+        "a r2,r0\n\t"
         ".endr\n\t"
         
         : : : "r0","r1","r2"
@@ -272,7 +272,7 @@ void sprStart28() {
 int checkLimi() {
     int ret;
     
-    __asm__ (
+    __asm__ volatile  (
         "clr r12\n\tseto %0\n\ttb 2\n\tjne 2\n\tclr %0\n\tnop" 
         : "=rm"(ret) : : "r12" 
     );
@@ -290,7 +290,7 @@ void musicsync() {
 
 // end of frame handler - handles sprite copy unless we were late
 void waitforstep() {
-	static unsigned char nSpriteOffset=0;
+	static int nSpriteOffset=0;
 
 	// wait for one to occur
 	// note, if we were late, this will just trigger
@@ -309,9 +309,7 @@ void waitforstep() {
 
 	// there are 8 possible sprite rotations, select the correct one
 	// each function is a fully unrolled OUTI loop for the particular pattern
-	// to get the sprite table to the VDP ASAP. Takes a bit over 1k for all that.
-	// Note if nSpriteOffset is ever any other number, then we get no sprite updates
-	// for that frame!! Be careful!
+	// to get the sprite table to the VDP ASAP.
 	switch (nSpriteOffset&0x07) {
 	case 0:
 		sprStart0();
@@ -1022,8 +1020,7 @@ void space()
 		SWITCH_IN_BANK2a;
 		colchk(0);			// first half - this means the gnat may still beat mines..
 		
-		SWITCH_IN_BANK6a;
-		stars();
+		wrapstars();
 
 		// frame 1
 		SWITCH_IN_BANK14b;		// covers enout and enemy
@@ -1032,21 +1029,18 @@ void space()
 		}
 		enemy();
 
-		SWITCH_IN_BANK6a;
-		stars();
+		wrapstars();
 
 		// frame 2
+        SWITCH_IN_BANK2a;   // needed for plycol and colchk
 		if (ch) {
-    		SWITCH_IN_BANK2b;
-			cheat();
+			wrapcheat();
 		} else {
-            SWITCH_IN_BANK2a;
 			plycol();		// player collision first, otherwise the mines /never/ hit the gnat if it's shooting
 		}
 		colchk(1);			// second half
 		
-		SWITCH_IN_BANK6a;
-		stars();
+		wrapstars();
 		
 		if (flag == MAIN_LOOP_DONE) {
 			// check if all enemies dead (ent[0-5])

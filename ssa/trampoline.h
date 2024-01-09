@@ -23,6 +23,7 @@ void wrapbackground();
 void wrapcheckdamage(int sr, int sc, int pwr);
 void wrapLoadSelenaPic();
 void wrapgetfontbytes(unsigned char *dest, const unsigned char *src, unsigned int cnt);
+void wrapgetfontonebyte(unsigned char *dest, const unsigned char *src);
 void wrapspritescore(unsigned int sprpat, unsigned int sprtab, unsigned int row, unsigned int col, unsigned int ch);
 void wrapLoadEngineSprites();
 void wrapPlayerFlameBig();

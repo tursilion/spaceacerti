@@ -7,13 +7,6 @@ Am I seeing things, or do the gnat bullets vanish sometimes?
 
 Enemy collisions (at least on homing bullets) seem a bit loose, maybe we need to check that.
 
-I haven't really tested F18A yet - but the sprite for Snowball in F18A is wrong.
-
-Garbage on screen when ship explodes (same row as GAME OVER) - looks like 0x00 bytes clear instead of 0x20.
-    - this is a compiler bug. Reported. Could change the input type to int to resolve.
-    - might be fixed - patch suggested with help of JasonACT
-    - will leave this on here until the official patch or I finish, whichever comes first
-
 --------------------------
 
 HarmlessLion screen working
@@ -26,7 +19,7 @@ Cruiser Ending - working
 Snowball ending - working
 Ladybird ending - working
 Gnat ending - working
-Selena ending - a little too slow
+Selena ending - working
 Scroll Text - working
 Attract mode game - working
 

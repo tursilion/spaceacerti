@@ -203,6 +203,14 @@ void wrapLoadSelenaPic() {
 	SWITCH_IN_PREV_BANK(old);
 }
 
+void wrapgetfontonebyte(unsigned char *dest, const unsigned char *src) {
+	unsigned int old = nBank;
+	// this explicitly gets bytes from the font as requested	
+	SET_COLECO_FONT_BANK;
+    *dest = *src;
+	SWITCH_IN_PREV_BANK(old);
+}
+
 void wrapgetfontbytes(unsigned char *dest, const unsigned char *src, unsigned int cnt) {
 	unsigned int old = nBank;
 	// this explicitly gets bytes from the font as requested	
@@ -670,7 +678,6 @@ void wrapInitSnowball() {
     if (f18a) {
         SWITCH_IN_BANK13b;
         initSnowballf18();
-        SWITCH_IN_BANK14a;
     } else {
     	SWITCH_IN_BANK5b;
     	vdpmemcpy(108*8+0x0800, SNOWBALL, 24*4*8);			// ship sprites
@@ -761,25 +768,22 @@ void wrapAddDestroyed(unsigned int ptr) {
 void wrapbossdraw() {
 	unsigned int old = nBank;
 
+    SWITCH_IN_BANK7b;
+
     switch(level) {
         case 1: 
-            SWITCH_IN_BANK7b;
             draw1();
             break;
         case 2: 
-            SWITCH_IN_BANK7b;
             draw2();
             break;
         case 3: 
-            SWITCH_IN_BANK7b;
             draw3();
             break;
         case 4: 
-            SWITCH_IN_BANK7b;
             draw4();
             break;
         case 5: 
-            SWITCH_IN_BANK7b;
             draw5();
             break;
     }

@@ -35,8 +35,8 @@ const char BOSTAB[] = {
 };
 
 // different from Coleco - we have more RAM than ROM, so copy the
-// appropriate bossShape into this array
-unsigned int bossShape[8*2];
+// appropriate bossShape into this array - big enough to hold the largest one
+unsigned int bossShape[12*2];
 
 // a scaled difficulty level for the boss motion
 uint8 scaledLevel;
@@ -118,11 +118,6 @@ void boss()
 		ent[i]=ENEMY_NONE;
 	}
 
-	// clear shot table (Seems okay with this disabled!)
-	//for (i=0; i<=NUM_SHOTS; i++) {
-	//	shr[i]=0;	// note: ONLY shr is legal in this loop because it includes NUM_SHOTS
-	//}
-
     // no powerup either (should already be gone though)
 	ptp4=POWERUP_NONE;
 
@@ -176,7 +171,7 @@ void boss()
 		bosscol(BOSTAB[p]);
 	}
 
-	// we set this up now, though it will be partially up again when the boss is fully onscreen
+	// cockpit: we set this up now, though it will be partially up again when the boss is fully onscreen
 	// otherwise the enemy code crashes trying to process the enemy function
 	ent[6]=ENEMY_NONE;		// not active yet however!
 	en_func[6]=enemynull;	// an enemy who does nothing (I suppose the movement could go in there for consistency, but.. nah)
@@ -211,7 +206,7 @@ void boss()
 		wrapplayer();
 		wrapcolchk(1);
 		wrapstars();
-		
+
 		// frame 1
 		mboss();
 		wrapcolchk(0);
@@ -247,7 +242,7 @@ void boss()
                 }
 			}
 		}
-	}
+    }
 
 	// reset boss color set in case it flashed (just always)
     if (f18a) {
@@ -706,11 +701,11 @@ int checkdamage(int sr, int sc, int pwr) {
 }
  
 void whoded() { 
-	unsigned char rd,cd;
-    unsigned char r,c;
+	int rd,cd;
+    int r,c;
 
 	/*check boss specific collisions*/
-	for (uint8 a=0; a<NUM_SHOTS; a++) {
+	for (int a=0; a<NUM_SHOTS; a++) {
 		// check for valid shot
 		if (!shr[a]) continue;
 
@@ -723,7 +718,7 @@ void whoded() {
 		}
 
 		// check if hit an engine
-        for (uint8 b=0; b<3; ++b) {
+        for (int b=0; b<3; ++b) {
             if (ent[b] != ENEMY_ENGINE) continue;
             spposn(b+ENEMY_SPRITE, r, c);
             rd = abs(r-shr[a]);
