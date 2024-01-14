@@ -18,6 +18,16 @@ extern const unsigned char sfx_shieldwarn[];
 extern const unsigned char sfx_pwrwide[];
 extern const unsigned char sfx_shieldup[];
 extern const unsigned char sfx_pwrpulse[];
+extern const unsigned char sfx_armor_sid[];
+extern const unsigned char sfx_explosion_sid[];
+extern const unsigned char sfx_hitboss_sid[];
+extern const unsigned char sfx_nukebomb_sid[];
+extern const unsigned char sfx_shipdead_sid[];
+extern const unsigned char sfx_shielddown_sid[];
+extern const unsigned char sfx_shieldwarn_sid[];
+extern const unsigned char sfx_pwrwide_sid[];
+extern const unsigned char sfx_shieldup_sid[];
+extern const unsigned char sfx_pwrpulse_sid[];
 
 // although the music lives in various banks, the
 // player code is in the fixed bank, so we can
@@ -35,10 +45,74 @@ unsigned char blockSfx;
 // AY emulation
 static unsigned char a1,a2,b1,b2;
 
+// SID emulation
+static unsigned int freq1,freq2;
+static unsigned char oldv1, oldv2, oldv3;
+
 // we can change this out for the sound effect only version
 void (*doMusic)(void);
 
-// TODO: all the AY hits need to be replaced with SID hits
+// process a single SID command
+unsigned char *processSID(unsigned char *pShoot) {
+    unsigned char reg = *(pShoot++);
+    switch (reg) {
+        case 0x00:  /*freq1*/
+        case 0x0e:  /*freq2*/
+        case 0x1c:  /*freq3: frequency - 2 bytes */ 
+        {
+            volatile unsigned char *adr = (volatile unsigned char*)SID_BASE_ADDRESS+reg;
+            *(adr)=*(pShoot++); 
+            *(adr+2)=*(pShoot++); 
+        }
+        break;
+
+        // volumes we'll do separate since we need to remember the value
+        case 0x0c:  /*vol1*/
+        {
+            unsigned char val = *(pShoot++);
+            SIDBLASTER_SR1 = val;
+            if (val > oldv1) {
+                SIDBLASTER_CR1=SIDBLASTER_CR_PULSE;
+                SIDBLASTER_CR1=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE;
+            } else if (val == 0) {
+                SIDBLASTER_CR1=SIDBLASTER_CR_PULSE;
+            }
+            oldv1=val;
+        }
+        break;
+
+        case 0x1a:  /*vol2*/
+        {
+            unsigned char val = *(pShoot++);
+            SIDBLASTER_SR2 = val;
+            if (val > oldv2) {
+                SIDBLASTER_CR2=SIDBLASTER_CR_PULSE;
+                SIDBLASTER_CR2=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE;
+            } else if (val == 0) {
+                SIDBLASTER_CR2=SIDBLASTER_CR_PULSE;
+            }
+            oldv2=val;
+        }
+        break;
+
+        case 0x28:  /*vol3*/
+        {
+            unsigned char val = *(pShoot++);
+            SIDBLASTER_SR3 = val;
+            if (val > oldv3) {
+                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE;
+                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE;
+            } else if (val == 0) {
+                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE;
+            }
+            oldv3=val;
+        }
+        break;
+    }
+
+    return pShoot;
+}
+
 
 // one interrupt of music (not called on interrupt)
 void doAllMusic() {
@@ -68,7 +142,10 @@ void doAllMusic() {
     }
      
 checksfx:
+
     // run sound effects at 30 hz
+    SWITCH_IN_BANK4a;
+
     if (VDP_INT_COUNTER & 1) {
         if (NULL != pSfx) {
             // SFX data format:
@@ -79,8 +156,7 @@ checksfx:
                 // we'll undo the block next frame
             } else {
                 while (regs--) {
-//                    AY_REGISTER = *(pSfx++);
-//                    AY_DATA_WRITE = *(pSfx++);
+                    pSfx = processSID(pSfx);
                 }
             }
         } else {
@@ -95,8 +171,7 @@ checksfx:
                 pShoot = NULL;
             } else {
                 while (regs--) {
-//                    AY_REGISTER = *(pShoot++);
-//                    AY_DATA_WRITE = *(pShoot++);
+                    pShoot = processSID(pShoot);
                 }
             }
         }
@@ -122,6 +197,27 @@ void wrapAYcmd(unsigned char reg, unsigned char dat) {
     }
 }
 
+#if 0
+// this works=ish, but the resolution is too low for good sound and noises didn't work
+// the correct math is 1876713/cnt = sidcnt - but can't do that in 16 bits
+// do AY to SID conversion
+// same idea as wrapAYcmd, but target the SID
+// We don't need to bank the SID in cause we never bank it out after startup
+const unsigned char noisemapsid[8] = { 0xF0, 0xd0, 0xb0, 0x90, 0x70, 0x50, 0x30, 0x10 };
+void wrapAY2SID(unsigned char reg, unsigned char dat) {
+    switch (reg) {
+        case 0: /* al */ freq1=freq1|dat; freq1=(unsigned)58647/(freq1>>5); SIDBLASTER_FREQHI1=freq1>>8; SIDBLASTER_FREQLO1=freq1&0xff; break;
+        case 1: /* ah */ freq1=dat<<8; break;     // assume a low is coming
+        case 2: /* bl */ freq2=freq2|dat; freq2=(unsigned)58647/(freq2>>5); SIDBLASTER_FREQHI2=freq2>>8; SIDBLASTER_FREQLO2=freq2&0xff; break;
+        case 3: /* bh */ freq2=dat<<8; break;     // assume a low is coming
+        case 6: /* noi */ SIDBLASTER_FREQHI3=noisemap[dat>>5]; SIDBLASTER_FREQLO3=0; break;
+        case 8: /* vola */ SIDBLASTER_SR1=(dat&0xf)<<4; if (dat>oldv1) { SIDBLASTER_CR1=SIDBLASTER_CR_PULSE; SIDBLASTER_CR1=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv1=dat; break;
+        case 9: /* volb */ SIDBLASTER_SR2=(dat&0xf)<<4; if (dat>oldv2) { SIDBLASTER_CR2=SIDBLASTER_CR_PULSE; SIDBLASTER_CR2=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv2=dat; break;
+        case 10: /* volc */ SIDBLASTER_SR3=(dat&0xf)<<4; if (dat>oldv3) { SIDBLASTER_CR3=SIDBLASTER_CR_PULSE; SIDBLASTER_CR3=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv3=dat; break;
+    }
+}
+#endif
+
 // instead of music, do just SFX and convert it for the SN chip
 // no bank switch needed, but we do need to convert the AY data,
 // which I will do in real time since it's still quicker than 
@@ -132,6 +228,10 @@ void doSfxInstead() {
         StopSong();
         // don't shutup and don't kill loop music, in case it gets turned back on
     }
+
+	unsigned int old = nBank;
+    SWITCH_IN_BANK4a;
+
     // run sound effects at 30 hz
     if (VDP_INT_COUNTER & 1) {
         if (NULL != pSfx) {
@@ -163,6 +263,8 @@ void doSfxInstead() {
             }
         }
     }
+
+    SWITCH_IN_PREV_BANK(old);
 }
 
 void StartMusic(const unsigned char *p, unsigned int inBank, unsigned int idx, unsigned int bLoop) {
@@ -200,19 +302,10 @@ void shutup()
     pSfx = NULL;
     pShoot = NULL;
 
-#if 0
-    // note: turns out this is also important to work around a Phoenix powerup bug
-    AY_REGISTER = AY_VOLA;
-    AY_DATA_WRITE = 0x0;
-    AY_REGISTER = AY_VOLB;
-    AY_DATA_WRITE = 0x0;
-    AY_REGISTER = AY_VOLC;
-    AY_DATA_WRITE = 0x0;
-    // To work around another Phoenix AY bug, make sure the tone C generator is 
-    // running at an audible rate
-    AY_REGISTER = AY_PERIODC_LOW;
-    AY_DATA_WRITE = 0x10;
-#endif
+    // just turn off all the SID gates
+    SIDBLASTER_CR1 = SIDBLASTER_CR_PULSE;
+    SIDBLASTER_CR2 = SIDBLASTER_CR_PULSE;
+    SIDBLASTER_CR3 = SIDBLASTER_CR_NOISE;
 }
 
 // do any necessary sound chip initialization
@@ -223,38 +316,77 @@ void initSound() {
     a2=0;
     b1=0;
     b2=0;
-    // set up the AY so A and B are tone channels, and C is noise
-//    AY_REGISTER = AY_MIXER;
-//    AY_DATA_WRITE = 0x1C;
+
+    // set up the SID so 1 and 2 are tone channels, and 3 is noise
+    SIDBLASTER_CR1 = SIDBLASTER_CR_PULSE;
+    SIDBLASTER_CR2 = SIDBLASTER_CR_PULSE;
+    SIDBLASTER_CR3 = SIDBLASTER_CR_NOISE;
+    SIDBLASTER_PWHI1 = 0x08;
+    SIDBLASTER_PWHI2 = 0x08;
+    SIDBLASTER_PWLO1 = 0;
+    SIDBLASTER_PWLO2 = 0;
+    SIDBLASTER_AD1 = 0;
+    SIDBLASTER_AD2 = 0;
+    SIDBLASTER_AD3 = 0;
+    SIDBLASTER_SR1 = 0;
+    SIDBLASTER_SR2 = 0;
+    SIDBLASTER_SR3 = 0;
+    SIDBLASTER_MODEVOL = 0xf;   // maximum volume
+
+    freq1=0;
+    freq2=0;
+    oldv1=0;
+    oldv2=0;
+    oldv3=0;
 }
 
 // hit an armored enemy
 void playsfx_armor() {
     if (blockSfx < 2) {
-        pSfx = sfx_armor;
+        if (doMusic != doSfxInstead) {
+            pSfx = sfx_armor_sid;
+        } else {
+            pSfx = sfx_armor;
+        }
         blockSfx = 1;
     }
 }
 // boss engine explodes
 void playsfx_explosion() {
-    pSfx = sfx_explosion;
+    if (doMusic != doSfxInstead) {
+        pSfx = sfx_explosion_sid;
+    } else {
+        pSfx = sfx_explosion;
+    }
     blockSfx = 2;
 }
 // hit boss body
 void playsfx_hitboss() {
     if (!blockSfx) {
-        pSfx = sfx_hitboss;
+        if (doMusic != doSfxInstead) {
+            pSfx = sfx_hitboss_sid;
+        } else {
+            pSfx = sfx_hitboss;
+        }
     }
 }
 // blow up a nuke
 void playsfx_nukebomb() {
-    pSfx = sfx_nukebomb;
+    if (doMusic != doSfxInstead) {
+        pSfx = sfx_nukebomb_sid;
+    } else {
+        pSfx = sfx_nukebomb;
+    }
     blockSfx = 2;
 }
 // enemy ship dead
 void playsfx_shipdead() {
     if (!blockSfx) {
-        pSfx = sfx_shipdead;
+        if (doMusic != doSfxInstead) {
+            pSfx = sfx_shipdead_sid;
+        } else {
+            pSfx = sfx_shipdead;
+        }
     }
 }
 
@@ -262,22 +394,42 @@ void playsfx_shipdead() {
 
 // shield offline
 void playsfx_shielddown() {
-    pShoot = sfx_shielddown;
+    if (doMusic != doSfxInstead) {
+        pShoot = sfx_shielddown_sid;
+    } else {
+        pShoot = sfx_shielddown;
+    }
 }
 // shield powerup
 void playsfx_shieldup() {
-    pShoot = sfx_shieldup;
+    if (doMusic != doSfxInstead) {
+        pShoot = sfx_shieldup_sid;
+    } else {
+        pShoot = sfx_shieldup;
+    }
 }
 // shield about to expire
 void playsfx_shieldwarn() {
-    pShoot = sfx_shieldwarn;
+    if (doMusic != doSfxInstead) {
+        pShoot = sfx_shieldwarn_sid;
+    } else {
+        pShoot = sfx_shieldwarn;
+    }
 }
 // pulse weapon powerup
 void playsfx_pwrpulse() {
-    pShoot = sfx_pwrpulse;
+    if (doMusic != doSfxInstead) {
+        pShoot = sfx_pwrpulse_sid;
+    } else {
+        pShoot = sfx_pwrpulse;
+    }
 }
 // wide shot powerup
 void playsfx_pwrwide() {
-    pShoot = sfx_pwrwide;
+    if (doMusic != doSfxInstead) {
+        pShoot = sfx_pwrwide_sid;
+    } else {
+        pShoot = sfx_pwrwide;
+    }
 }
 

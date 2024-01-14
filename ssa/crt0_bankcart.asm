@@ -108,7 +108,16 @@ cpsclp:
   li sp, 0x3ff6
 
 * prevent screen blank
-  inc @0x83d6
+  li r0,1
+  soc r0,@>83d6
+
+* Clear flags and user interrupt
+  li r1,>0100
+  mov r1,@>83fc
+  clr @>83c4
+
+* call vdpinit to set critical variables
+  bl @vdpinit  
 
 * Start running C code
   bl @main

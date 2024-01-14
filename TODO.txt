@@ -1,11 +1,10 @@
-Boss is completely borked (though it does TRY to appear)
-    - attract mode boss seemed to actually operate a moment, though extremely slowly
-
 Implement SID for sound effects
+- noise sound effects 2,4,5 are too quiet - check the correct frequency conversion from AY noise (it's a different count I think)
+  Alternately, use the SN reproduction, but fix it.
 
-Am I seeing things, or do the gnat bullets vanish sometimes?
+Make the difficulty/ship select screen more TI-like
 
-Enemy collisions (at least on homing bullets) seem a bit loose, maybe we need to check that.
+Because of the F18A, we should probably disable the console QUIT and check for QUIT ourselves.
 
 --------------------------
 
@@ -157,9 +156,9 @@ Hold 0 when powering on until the HarmlessLion screen to disable F18A enhancemen
 - Qwertian screen - back to title page
 - Game Over - after the music - back to title page
 
-Hold fire when moving left and right to access the ships GNAT and PRINCESS
+Hold fire when moving left and right to access the ships GNAT and SELENA
 	-GNAT is tiny and has only a single gun with no powerups (game mode '1' on score last digit)
-	-PRINCESS has fully powered homing shots but has only one life (game mode '2' on score last digit)
+	-SELENA has fully powered homing shots but has only one life (game mode '2' on score last digit)
 
 Hold DOWN when selecting SNOWBALL for cloaked enemy mode (game mode '3' on score last digit)
 

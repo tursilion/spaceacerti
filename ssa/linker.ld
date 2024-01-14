@@ -77,7 +77,6 @@ SECTIONS {
         superspaceacer.o(.text .rodata)
         trampolines.o(.text .rodata)
         music.o(.text .rodata)
-        sfxs.o(.text .rodata)
         *libti99.a:*(.text .rodata)
         *libtivgm2.a:*(.text .rodata)
     } > FIXED AT> FLASH
@@ -125,6 +124,7 @@ SECTIONS {
     bank4a :
     {
         difficulty.o(.text .rodata)
+        sfxs.o(.text .rodata)
         PROVIDE(ebank4a = .);
     } > CART4A AT> FLASH
 

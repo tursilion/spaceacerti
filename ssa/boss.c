@@ -591,7 +591,6 @@ void mboss() {
                     // don't fire homing laser if we are not fully onscreen
                     if (br >= 1) {
 					    // homing laser shot - we assume the bullets are all free!
-                        // TODO: the colors are not good, but we'll need to see when we get the final palettes
 					    ers[7]=0;	// start static
 					    ecs[7]=0;
 					    ent[7]=ENEMY_SHOT; 

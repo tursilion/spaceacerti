@@ -390,10 +390,6 @@ void pboom()
 	// delete 'boss approaching' if it's up
 	if (flag != BOSS_LOOP_ACTIVE) {
 		// the blimp gets corrupted by this - any other time worst case is we lose a star, I don't care about that :)
-		// TODO: Compiler bug here. It tries to copy the int 32 for length to the byte 32 for character, and just
-		// assumes a MOVB will work. It's in movqi but I don't know what to do to correct it. If we can't fix it,
-		// it might be easier to just change the type to int. This causes a line of character 0 (stars) across the center
-		// when the ship explodes. Not sure where else it might be happening.
 		hchar(11, 0, 32, 32);
 	}
 	DelSprButPlayer(killedby+ENEMY_SPRITE);

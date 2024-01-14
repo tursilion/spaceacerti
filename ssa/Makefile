@@ -21,7 +21,7 @@ ELF2CART=/mnt/d/work/ti/Elf2BankedCart/elf2bankedcart
 # Flags used during linking
 #
 # Locate the code (.text section) and the data (.data section)
-# TODO: a linker script is necessary to define the output sections (that will replace the list in the Coleco CRT0)
+# a linker script is necessary to define the output sections (that will replace the list in the Coleco CRT0)
 # That will also let us set the start addresses. The ELF should in theory contain section names which will let
 # out custom cartridge builder figure out where things go.
 # https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_node/ld_19.html
@@ -31,7 +31,8 @@ INCPATH=-I/mnt/d/work/libti99ALL -I/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBPATH=-L/mnt/d/work/libti99ALL/buildti -L/mnt/d/work/ti/vgmcomp2/Players/libtivgm2
 LIBS=-lti99 -ltivgm2
 
-CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin -minline_rtl
+CFLAGS=-Os -std=c99 -c -s --save-temp -DTI99 -fno-builtin
+#-minline_rtl
 
 
 .PHONY: all clean

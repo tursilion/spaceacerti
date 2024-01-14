@@ -20,7 +20,6 @@
 #define uint8 unsigned char
 #define int8 signed char
 #define NULL (0)
-#define abs(x) ((x)<0 ? -(x) : (x))
 
 // these functions currently live in crt0_bios.s
 void *memset (void *buf, unsigned int ch, unsigned int count);
@@ -29,6 +28,7 @@ void *memmove (void *dst, const void *src, unsigned int count);
 // these don't
 int strlen(const char *s);
 void strcpy(char *p, const char *s);
+inline int abs(int x) { if (x<0) return -x; else return x; }
 
 // bank switching - nOldBank is used to let a function restore the original bank
 // the banks are based on the Coleco 16k banking, thus a/b for the TI 8k banks

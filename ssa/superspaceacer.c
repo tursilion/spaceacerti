@@ -798,8 +798,6 @@ void main() {
 	if (seed == 0) ++seed;
 
     if (f18a) {
-        // TODO: this needs the graphics in 14a - maybe we can copy them to the top of the 32k if we can get fixed down?
-        // Otherwise, it's one time, it's okay if it's a bit slower
         SWITCH_IN_BANK7b;
         initF18GPU();                           // and load the GPU code and init the graphics
     }
@@ -1348,6 +1346,9 @@ void sgrint()
 // reboot wrapper that saves off some handy variables and restarts the game
 void reboot() {
 	unsigned char x;
+
+    // ask the GPU to stop to avoid conflict during the restart
+    VDP_SET_REGISTER(F18A_REG_GPUCFG, 0);   // clear the GO bit
 
 	// to preserve the score while keeping the lazy reboot, we save it off above the stack
 	// we save it twice, once inverted as a checksum, so the boot will always know it's right
