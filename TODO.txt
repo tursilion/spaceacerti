@@ -1,7 +1,3 @@
-Implement SID for sound effects
-- noise sound effects 2,4,5 are too quiet - check the correct frequency conversion from AY noise (it's a different count I think)
-  Alternately, use the SN reproduction, but fix it.
-
 Make the difficulty/ship select screen more TI-like
 
 Because of the F18A, we should probably disable the console QUIT and check for QUIT ourselves.

@@ -53,16 +53,24 @@ static unsigned char oldv1, oldv2, oldv3;
 void (*doMusic)(void);
 
 // process a single SID command
-unsigned char *processSID(unsigned char *pShoot) {
+unsigned char *processSID(const unsigned char *pShoot) {
     unsigned char reg = *(pShoot++);
     switch (reg) {
         case 0x00:  /*freq1*/
         case 0x0e:  /*freq2*/
-        case 0x1c:  /*freq3: frequency - 2 bytes */ 
+        {
+            volatile  unsigned char *adr = (volatile unsigned char*)SID_BASE_ADDRESS+reg;
+            *(adr)=*(pShoot++); 
+            *(adr+2)=*(pShoot++); 
+        }
+        break;
+
+        case 0x1c:  /*freq3: noise - 2 bytes */ 
         {
             volatile unsigned char *adr = (volatile unsigned char*)SID_BASE_ADDRESS+reg;
             *(adr)=*(pShoot++); 
-            *(adr+2)=*(pShoot++); 
+            unsigned char x = *(pShoot++);
+            *(adr+2)=x<<4; 
         }
         break;
 
@@ -100,10 +108,10 @@ unsigned char *processSID(unsigned char *pShoot) {
             unsigned char val = *(pShoot++);
             SIDBLASTER_SR3 = val;
             if (val > oldv3) {
-                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE;
-                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE;
+                SIDBLASTER_CR3=SIDBLASTER_CR_NOISE;
+                SIDBLASTER_CR3=SIDBLASTER_CR_NOISE|SIDBLASTER_CR_GATE;
             } else if (val == 0) {
-                SIDBLASTER_CR3=SIDBLASTER_CR_PULSE;
+                SIDBLASTER_CR3=SIDBLASTER_CR_NOISE;
             }
             oldv3=val;
         }
