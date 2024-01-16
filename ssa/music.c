@@ -53,24 +53,16 @@ static unsigned char oldv1, oldv2, oldv3;
 void (*doMusic)(void);
 
 // process a single SID command
-unsigned char *processSID(const unsigned char *pShoot) {
+const unsigned char *processSID(const unsigned char *pShoot) {
     unsigned char reg = *(pShoot++);
     switch (reg) {
         case 0x00:  /*freq1*/
         case 0x0e:  /*freq2*/
-        {
-            volatile  unsigned char *adr = (volatile unsigned char*)SID_BASE_ADDRESS+reg;
-            *(adr)=*(pShoot++); 
-            *(adr+2)=*(pShoot++); 
-        }
-        break;
-
         case 0x1c:  /*freq3: noise - 2 bytes */ 
         {
             volatile unsigned char *adr = (volatile unsigned char*)SID_BASE_ADDRESS+reg;
             *(adr)=*(pShoot++); 
-            unsigned char x = *(pShoot++);
-            *(adr+2)=x<<4; 
+            *(adr+2)=*(pShoot++); 
         }
         break;
 
@@ -121,37 +113,68 @@ unsigned char *processSID(const unsigned char *pShoot) {
     return pShoot;
 }
 
+// run the music on the specified soundchip (used for stock and ForTI)
+void playSNMusic(unsigned int soundChipAddress) {
+	// check whether we're playing
+	SWITCH_IN_PREV_BANK(musBank);
+
+    if (!(isSNPlaying)) {
+		// loop music if needed
+        // - we mute only the passed in sound chip! otherwise we'll kill sfx on the forti card
+        volatile unsigned char *aud = (unsigned char*)soundChipAddress;
+        // firing this every frame seems excessive... but I guess
+        // it's cheaper than playing the music
+        *aud=TONE1_VOL|0x0f; 
+        *aud=TONE2_VOL|0x0f; 
+        *aud=TONE3_VOL|0x0f; 
+        *aud=NOISE_VOL|0x0f;
+		if (pLoopMus != NULL) {
+			StartMusic(pLoopMus, loopBank, loopIdx, 1);
+			// we'll try not returning for smoother transition to intros,
+			// but, this player is still kind of heavy-weight.
+		} else {
+			return;
+		}
+	}
+
+    // replacement for CALL_PLAYER_SN that wraps it and sets the sound chip address as requested
+    //CALL_PLAYER_SN;
+    // This is hacky -- because only r8 is not declared (r10 is stack) the compiler will put our data in r8 where we need it,
+    // but it's not a guaranteed fix
+    __asm__ volatile (                                              \
+        "bl @Song2Lp"                                               \
+        : /* no outputs */                                          \
+        : [adr]"r"(soundChipAddress)                                \
+        : "r0","r1","r2","r3","r4","r5","r6","r7","r9","r11","r12","r13","r14","r15","cc"   \
+        );
+}
 
 // one interrupt of music (not called on interrupt)
+
+// SN music, no sound effects (for cases where the SID is a poor quality clone)
+void doMusicOnly() {
+	unsigned int old = nBank;
+
+	// no music in demo, but sfx are okay
+	if (joynum != 0) {
+        // warning: changes bank
+        playSNMusic(SOUNDCHIP);    // stock sound chip
+    }
+
+	SWITCH_IN_PREV_BANK(old);
+}
+
+// regular case - music plus sound effects on SID (if present)
 void doAllMusic() {
 	unsigned int old = nBank;
 
 	// no music in demo, but sfx are okay
 	if (joynum != 0) {
-	    // check whether we're playing
-	    SWITCH_IN_PREV_BANK(musBank);
-
-        if (!(isSNPlaying)) {
-		    // loop music if needed
-		    if (pLoopMus != NULL) {
-			    MUTE_SOUND();	// don't carry over any old tones
-			    StartMusic(pLoopMus, loopBank, loopIdx, 1);
-			    // we'll try not returning for smoother transition to intros,
-			    // but, this player is still kind of heavy-weight.
-		    } else {
-                // firing this every frame seems excessive... but I guess
-                // it's cheaper than playing the music
-			    MUTE_SOUND();
-			    goto checksfx;
-		    }
-	    }
-
-        CALL_PLAYER_SN;
+        // warning: changes bank
+        playSNMusic(SOUNDCHIP);    // stock sound chip
     }
      
-checksfx:
-
-    // run sound effects at 30 hz
+    // run sound effects at 30 hz - SID version
     SWITCH_IN_BANK4a;
 
     if (VDP_INT_COUNTER & 1) {
@@ -192,45 +215,24 @@ checksfx:
 // we assume SN compatible data, since there's nothing else today
 // and we assume there's never a high tone byte not followed by a low
 const unsigned char noisemap[8] = { 0xe4,0xe4,0xe5,0xe5,0xe6,0xe6,0xe6,0xe6 };
-void wrapAYcmd(unsigned char reg, unsigned char dat) {
+void wrapAYcmd(volatile unsigned char *soundchip, unsigned char reg, unsigned char dat) {
     switch (reg) {
-        case 0: /* al */ a1=0x80|(dat&0x0f); a2=(a2&0xf0)|((dat&0xf0)>>4); SOUND=a1; SOUND=a2; break;
+        case 0: /* al */ a1=0x80|(dat&0x0f); a2=(a2&0xf0)|((dat&0xf0)>>4); *soundchip=a1; *soundchip=a2; break;
         case 1: /* ah */ a2=(dat<<4)|(a2&0x0f); break;  // assume a low is coming
-        case 2: /* bl */ b1=0xa0|(dat&0x0f); b2=(b2&0xf0)|((dat&0xf0)>>4); SOUND=b1; SOUND=b2; break;
+        case 2: /* bl */ b1=0xa0|(dat&0x0f); b2=(b2&0xf0)|((dat&0xf0)>>4); *soundchip=b1; *soundchip=b2; break;
         case 3: /* bh */ b2=(dat<<4)|(b2&0x0f); break;  // assume a low is coming
-        case 6: /* noi */ SOUND=noisemap[dat>>5]; break;
-        case 8: /* vola */ SOUND=(15-dat)|0x90; break;
-        case 9: /* volb */ SOUND=(15-dat)|0xb0; break;
-        case 10: /* vola */ SOUND=(15-dat)|0xf0; break;
+        case 6: /* noi */ *soundchip=noisemap[dat>>5]; break;
+        case 8: /* vola */ *soundchip=(15-dat)|0x90; break;
+        case 9: /* volb */ *soundchip=(15-dat)|0xb0; break;
+        case 10: /* volc */ *soundchip=(15-dat)|0xf0; break;
     }
 }
-
-#if 0
-// this works=ish, but the resolution is too low for good sound and noises didn't work
-// the correct math is 1876713/cnt = sidcnt - but can't do that in 16 bits
-// do AY to SID conversion
-// same idea as wrapAYcmd, but target the SID
-// We don't need to bank the SID in cause we never bank it out after startup
-const unsigned char noisemapsid[8] = { 0xF0, 0xd0, 0xb0, 0x90, 0x70, 0x50, 0x30, 0x10 };
-void wrapAY2SID(unsigned char reg, unsigned char dat) {
-    switch (reg) {
-        case 0: /* al */ freq1=freq1|dat; freq1=(unsigned)58647/(freq1>>5); SIDBLASTER_FREQHI1=freq1>>8; SIDBLASTER_FREQLO1=freq1&0xff; break;
-        case 1: /* ah */ freq1=dat<<8; break;     // assume a low is coming
-        case 2: /* bl */ freq2=freq2|dat; freq2=(unsigned)58647/(freq2>>5); SIDBLASTER_FREQHI2=freq2>>8; SIDBLASTER_FREQLO2=freq2&0xff; break;
-        case 3: /* bh */ freq2=dat<<8; break;     // assume a low is coming
-        case 6: /* noi */ SIDBLASTER_FREQHI3=noisemap[dat>>5]; SIDBLASTER_FREQLO3=0; break;
-        case 8: /* vola */ SIDBLASTER_SR1=(dat&0xf)<<4; if (dat>oldv1) { SIDBLASTER_CR1=SIDBLASTER_CR_PULSE; SIDBLASTER_CR1=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv1=dat; break;
-        case 9: /* volb */ SIDBLASTER_SR2=(dat&0xf)<<4; if (dat>oldv2) { SIDBLASTER_CR2=SIDBLASTER_CR_PULSE; SIDBLASTER_CR2=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv2=dat; break;
-        case 10: /* volc */ SIDBLASTER_SR3=(dat&0xf)<<4; if (dat>oldv3) { SIDBLASTER_CR3=SIDBLASTER_CR_PULSE; SIDBLASTER_CR3=SIDBLASTER_CR_PULSE|SIDBLASTER_CR_GATE; } oldv3=dat; break;
-    }
-}
-#endif
 
 // instead of music, do just SFX and convert it for the SN chip
 // no bank switch needed, but we do need to convert the AY data,
 // which I will do in real time since it's still quicker than 
-// the music player was
-void doSfxInstead() {
+// the music player was.
+void doSnSfx(unsigned char *soundchip) {
     // if any music is active, stop it
     if (isSNPlaying) {
         StopSong();
@@ -252,7 +254,7 @@ void doSfxInstead() {
             } else {
                 while (regs--) {
                     unsigned char reg = *(pSfx++);
-                    wrapAYcmd(reg, *(pSfx++));
+                    wrapAYcmd(soundchip, reg, *(pSfx++));
                 }
             }
         }
@@ -266,11 +268,31 @@ void doSfxInstead() {
             } else {
                 while (regs--) {
                     unsigned char reg = *(pShoot++);
-                    wrapAYcmd(reg, *(pShoot++));
+                    wrapAYcmd(soundchip, reg, *(pShoot++));
                 }
             }
         }
     }
+
+    SWITCH_IN_PREV_BANK(old);
+}
+
+// Sound effects on the stock SN, no music
+void doSfxInstead() {
+    doSnSfx((unsigned char*)SOUNDCHIP);    // stock sound chip
+}
+
+// ForTI card version - we only use chips 0 and 1
+void doForTI() {
+	unsigned int old = nBank;
+
+    // no music in demo, but sfx are okay
+	if (joynum != 0) {
+        // warning: changes bank
+        playSNMusic(FORTI_CHIP1);    // chip 1
+    }
+
+    doSnSfx((unsigned char*)FORTI_CHIP2);    // chip 2
 
     SWITCH_IN_PREV_BANK(old);
 }
@@ -309,6 +331,7 @@ void shutup()
 
     pSfx = NULL;
     pShoot = NULL;
+    blockSfx = 0;
 
     // just turn off all the SID gates
     SIDBLASTER_CR1 = SIDBLASTER_CR_PULSE;
@@ -351,7 +374,7 @@ void initSound() {
 // hit an armored enemy
 void playsfx_armor() {
     if (blockSfx < 2) {
-        if (doMusic != doSfxInstead) {
+        if (doMusic == doAllMusic) {
             pSfx = sfx_armor_sid;
         } else {
             pSfx = sfx_armor;
@@ -361,7 +384,7 @@ void playsfx_armor() {
 }
 // boss engine explodes
 void playsfx_explosion() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pSfx = sfx_explosion_sid;
     } else {
         pSfx = sfx_explosion;
@@ -371,7 +394,7 @@ void playsfx_explosion() {
 // hit boss body
 void playsfx_hitboss() {
     if (!blockSfx) {
-        if (doMusic != doSfxInstead) {
+        if (doMusic == doAllMusic) {
             pSfx = sfx_hitboss_sid;
         } else {
             pSfx = sfx_hitboss;
@@ -380,7 +403,7 @@ void playsfx_hitboss() {
 }
 // blow up a nuke
 void playsfx_nukebomb() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pSfx = sfx_nukebomb_sid;
     } else {
         pSfx = sfx_nukebomb;
@@ -390,7 +413,7 @@ void playsfx_nukebomb() {
 // enemy ship dead
 void playsfx_shipdead() {
     if (!blockSfx) {
-        if (doMusic != doSfxInstead) {
+        if (doMusic == doAllMusic) {
             pSfx = sfx_shipdead_sid;
         } else {
             pSfx = sfx_shipdead;
@@ -402,7 +425,7 @@ void playsfx_shipdead() {
 
 // shield offline
 void playsfx_shielddown() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pShoot = sfx_shielddown_sid;
     } else {
         pShoot = sfx_shielddown;
@@ -410,7 +433,7 @@ void playsfx_shielddown() {
 }
 // shield powerup
 void playsfx_shieldup() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pShoot = sfx_shieldup_sid;
     } else {
         pShoot = sfx_shieldup;
@@ -418,7 +441,7 @@ void playsfx_shieldup() {
 }
 // shield about to expire
 void playsfx_shieldwarn() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pShoot = sfx_shieldwarn_sid;
     } else {
         pShoot = sfx_shieldwarn;
@@ -426,7 +449,7 @@ void playsfx_shieldwarn() {
 }
 // pulse weapon powerup
 void playsfx_pwrpulse() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pShoot = sfx_pwrpulse_sid;
     } else {
         pShoot = sfx_pwrpulse;
@@ -434,7 +457,7 @@ void playsfx_pwrpulse() {
 }
 // wide shot powerup
 void playsfx_pwrwide() {
-    if (doMusic != doSfxInstead) {
+    if (doMusic == doAllMusic) {
         pShoot = sfx_pwrwide_sid;
     } else {
         pShoot = sfx_pwrwide;

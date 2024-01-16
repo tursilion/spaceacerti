@@ -51,10 +51,14 @@ char * const selenaText[] = {
 
 // simple sound test
 char * const musText[] = {
-	"MUSIC TEST",
-	"PRESS BUTTON ON KEYPAD",
-	"HOLD UP FOR SFX",
-	"PRESS FIRE TO EXIT"
+    "PRESS:",
+    "  1-9 FOR MUSIC",
+    "  0   TO STOP MUSIC",
+    "  A   TO SET MUSIC+SFX SID",
+    "  B   TO SET MUSIC+SFX FORTI",
+    "  C   TO SET MUSIC ONLY",
+    "  D   TO SET SFX ONLY",
+    "  F   F18A"
 };
 
 const unsigned char SCHEMATICS[] = {
@@ -229,19 +233,45 @@ const unsigned char SCHEMATICS[] = {
 	0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
+const char SetStr[]  = "\x8  USING";
+const char UnsetStr[] =  "  TO SET";
+
 void soundtest() {
 	unsigned char r;
 
 	cls();
-	for (r=1; r<9; r+=2) {
-		centr(r, musText[r>>1]);
+	for (r=0; r<8; ++r) {
+		writestring(r<<1, 1, musText[r]);
 	}
+    writestring(17, 1, "PRESS FIRE TO EXIT");
+    writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
+
 	wrapinitstars();
 	level = 1;	// to make sure we get stars
 
+	screen(COLOR_LTGREEN);
+
+    // wait for key release
+    while (KSCAN_KEY != 0xff) {
+        kscanfast(0);
+    }
+
 	for (;;) {
+        // update cursor
+        writestring(6, 5, (char*)(doMusic==doAllMusic   ? SetStr:UnsetStr));
+        writestring(8, 5, (char*)(doMusic==doForTI      ? SetStr:UnsetStr));
+        writestring(10,5, (char*)(doMusic==doMusicOnly  ? SetStr:UnsetStr));
+        writestring(12,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
+
+        if (!realf18a) {
+            writestring(14, 3, "    F18A NOT INSTALLED");
+        } else if (f18a) {
+            writestring(14, 7, "TO RESTART WITHOUT F18A");
+        } else {
+            writestring(14, 7, "TO RESTART WITH F18A");
+        }
+
 		waitforstep();
-		//screen(COLOR_MEDRED);
 
 		joystfast(joynum);
 		kscanfast(joynum);	// all keys except '*' are okay (cause we are called with '*' down)
@@ -252,7 +282,7 @@ void soundtest() {
 
 		switch (KSCAN_KEY) {
 		case JOY_FIRE:	
-			screen(COLOR_DKBLUE);
+			screen(COLOR_CYAN);
 			return;
 
 		case '1':
@@ -336,24 +366,65 @@ void soundtest() {
 	    			wrapGamWin();
                 }
 			}
+            break;
+
+        case 'A':
+            doMusic = doAllMusic;
+            writestring(21,0, "NORMAL SETTING FOR MOST SYSTEMS.");
+            writestring(23,0, "(IT'S OKAY IF YOU HAVE NO SID.) ");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'B':
+            doMusic = doForTI;
+            writestring(21,0, " IF YOU HAVE A FORTI CARD AVAIL ");
+            writestring(23,0, "(MUSIC AND SFX WILL PLAY ON 1&2)");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'C':
+            doMusic = doMusicOnly;
+            writestring(21,0, "IF YOUR SID CAUSES UNWANTED SND ");
+            writestring(23,0, "(SOME CLONE SIDS MAY SOUND POOR)");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'D':
+            doMusic = doSfxInstead;
+            writestring(21,0, " DISABLE MUSIC, ONLY PLAY SFX.  ");
+            writestring(23,0, " (IF YOU DON'T LIKE THE MUSIC.) ");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'F':
+            if (realf18a) {
+                if (f18a) {
+                    f18a = 0;
+                } else {
+                    f18a = 1;
+                }
+                reboot();
+            }
+            break;
 		}
 
-		// just for fun, and don't incude in timing
-		screen(COLOR_DKBLUE);
+		// just for fun
 		wrapbackground();		// for stars
 	}
 }
 
 // selects difficulty
 const char * const sSkillText[] = {
-	"TO SELECT GAME OPTION,",
-	"PRESS BUTTON ON KEYPAD",
-	"",
-	"1 = SKILL 1/ONE PLAYER",
-	"2 = SKILL 2/ONE PLAYER",
-	"3 = SKILL 3/ONE PLAYER",
-	"","",
-	"LEFT/RIGHT TO SELECT SHIP:"
+	"S U P E R   S P A C E   A C E R",
+    "",
+    " PRESS:",
+	"   1 FOR EASY GAME",
+	"   2 FOR INTERMEDIATE GAME",
+	"   3 FOR ADVANCED GAME",
+	"   S FOR SETUP AND MUSIC TEST",
+    "",
+    "",
+	" USE LEFT/RIGHT TO SELECT SHIP"
 };
 
 void getDifficulty() {
@@ -373,23 +444,31 @@ void getDifficulty() {
         VDP_SET_REGISTER(F18A_REG_ECM, 0);
     }
 
-	// the schematic should be gray
-	vdpchar(gCOLOR+16, 0xe0);
+    // standard TI character set
+    charset();
+
+    // black text
+    for (int idx=2; idx<16; idx++) {
+        vdpchar(gCOLOR+idx, COLOR_BLACK<<4);
+    }
+
+	// the schematic should be lt blue
+	vdpchar(gCOLOR+16, COLOR_LTBLUE<<4);
 	VDP_SAFE_DELAY();
-	vdpchar(gCOLOR+17, 0xe0);
+	vdpchar(gCOLOR+17, COLOR_LTBLUE<<4);
 	VDP_SAFE_DELAY();
-	vdpchar(gCOLOR+18, 0xe0);
+	vdpchar(gCOLOR+18, COLOR_LTBLUE<<4);
 	VDP_SAFE_DELAY();
-	vdpchar(gCOLOR+19, 0xe0);
+	vdpchar(gCOLOR+19, COLOR_LTBLUE<<4);
 
 redraw:
 	cls();
 	txtIdx = 0;
-	for (r=1; txtIdx<9; r+=2) {
+	for (r=0; txtIdx<11; r+=2) {
 		if (sSkillText[txtIdx][0] == '\0') {
 			--r;	// skip 1 line instead of 2
 		} else {
-			centr(r, sSkillText[txtIdx]);
+			writestring(r, 0, (char*)sSkillText[txtIdx]);
 		}
 		++txtIdx;
 	}
@@ -446,8 +525,8 @@ redraw2:
 		waitforstep();
 		++cnt;
 
-		// set background to blue (also resets after music test)
-		screen(COLOR_DKBLUE);
+		// set background color (also resets after music test)
+		screen(COLOR_CYAN);
 
 		kscanfast(joynum);
 		if ((KSCAN_KEY > '0') && (KSCAN_KEY < '4')) {
@@ -479,25 +558,12 @@ redraw2:
 
 			break;
 		}
-		if (KSCAN_KEY == ',') {
+		if (KSCAN_KEY == 'S') {
 			spdel(0);
 			spdel(1);
 
 			soundtest();
 			goto redraw;
-		}
-		if (KSCAN_KEY == '.') {
-			if (doMusic == doAllMusic) {
-				doMusic = doSfxInstead;
-				centr(12, "Music Off");
-			} else {
-				doMusic = doAllMusic;
-				centr(12, "Music On ");
-			}
-			shutup();
-			do {
-				kscanfast(joynum);
-			} while (KSCAN_KEY == '.');
 		}
 
 		// handle the ship select at the bottom
@@ -692,4 +758,7 @@ redraw2:
 			spdel(1);
 		}
 	}
+
+    // restore the game character set
+    loadcharset();
 }

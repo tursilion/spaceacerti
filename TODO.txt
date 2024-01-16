@@ -1,6 +1,6 @@
-Make the difficulty/ship select screen more TI-like
-
 Because of the F18A, we should probably disable the console QUIT and check for QUIT ourselves.
+
+Need to add a keyboard mode
 
 --------------------------
 
@@ -17,15 +17,12 @@ Gnat ending - working
 Selena ending - working
 Scroll Text - working
 Attract mode game - working
-
 Regular Game - working
-- limited testing
+F18A game - working
 
 Invisible game
 - not tested
 
-F18A game - not working fully
-- loosely tested
 
 VRAM map (except for ending routines)
 --------

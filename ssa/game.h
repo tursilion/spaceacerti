@@ -297,6 +297,7 @@ extern int oldshield;
 extern unsigned int seed;
 extern unsigned int force;
 extern int f18a;
+extern int realf18a;
 
 
 #endif

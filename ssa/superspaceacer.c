@@ -63,6 +63,8 @@ unsigned int force = 0;
 
 // holds whether the F18A was detected
 int f18a = 0;
+// holds the true detection state since we can turn it off
+int realf18a = 0;
 
 // function pointers for shield graphics swap functions
 // these functions MUST exist in the fixed bank
@@ -754,6 +756,9 @@ void main() {
     // Turn off most of the console interrupt routine
     VDP_INT_CTRL = VDP_INT_CTRL_DISABLE_SPRITES|VDP_INT_CTRL_DISABLE_SOUND;
 
+    // do a quick check of the F18A
+    realf18a = detect_f18a();
+
 	// check for a score saved off above stack. If it's there, we can load it and also zero playership
 	memcpy(tmpbuf, SAVEDSCORE, 4);
 	score = *((unsigned short*)tmpbuf);
@@ -767,9 +772,14 @@ void main() {
 		*SAVEDATTRACT = attractShip & 1;
 		attractShip >>= 4;
         f18a=*SAVEDF18A;
+        if (!realf18a) f18a=0;  // just be sure
         // be really careful on music - a bad pointer will crash us, so don't trust it
         if ((void(*))(*SAVEDMUSIC) == doSfxInstead) {
             doMusic = doSfxInstead;
+        } else if ((void(*))(*SAVEDMUSIC) == doMusicOnly) {
+            doMusic = doMusicOnly;
+        } else if ((void(*))(*SAVEDMUSIC) == doForTI) {
+            doMusic = doForTI;
         } else {
             doMusic = doAllMusic;
         }
@@ -780,7 +790,7 @@ void main() {
         doMusic = doAllMusic;
         *SAVEDMUSIC = (unsigned int)doMusic;    // make sure the saved pointer is valid in case of early reboot // TODO: not 32-bit safe
 
-        f18a = detect_f18a();
+        f18a = realf18a;
         if (f18a) {
             // check keypad for 0 - this will disable F18A
             kscanfast(1);
@@ -828,7 +838,6 @@ titleagain:
 			*SAVEDATTRACT = 0;
             // switch music to sound effects so it's not completely mute
             *SAVEDMUSIC = (unsigned int)doMusic;    // TODO WARNING: not 32-bit safe
-			doMusic = doSfxInstead;
 		}
 	}
 
@@ -996,6 +1005,10 @@ titleagain:
                 // Don't trust the saved pointer - corruption would crash us
                 if ((void(*))(*SAVEDMUSIC) == doSfxInstead) {
                     doMusic = doSfxInstead;
+                } else if ((void(*))(*SAVEDMUSIC) == doMusicOnly) {
+                    doMusic = doMusicOnly;
+                } else if ((void(*))(*SAVEDMUSIC) == doForTI) {
+                    doMusic = doForTI;
                 } else {
                     doMusic = doAllMusic;
                 }

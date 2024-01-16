@@ -1,4 +1,3 @@
-// these are hand assembled
 // player shooting sounds go on voice A
 // enemy sounds play on B or C depending on whether they are tone or noise
 
