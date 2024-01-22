@@ -291,6 +291,7 @@ void musicsync() {
 }
 
 // end of frame handler - handles sprite copy unless we were late
+// also check quit so we can do the f18a reset before we do
 void waitforstep() {
 	static int nSpriteOffset=0;
 
@@ -343,7 +344,13 @@ void waitforstep() {
 	++nSpriteOffset;
 
 	// play music
-	doMusic();  
+	doMusic();
+
+    // check quit
+    if (check_reset()) {
+        reset_f18a();
+        __asm__ volatile("blwp @>0000");
+    }
 }
 
 // loads a default ASCII character set from ROM
@@ -754,7 +761,7 @@ void main() {
 	unsigned char i;
 
     // Turn off most of the console interrupt routine
-    VDP_INT_CTRL = VDP_INT_CTRL_DISABLE_SPRITES|VDP_INT_CTRL_DISABLE_SOUND;
+    VDP_INT_CTRL = VDP_INT_CTRL_DISABLE_ALL;
 
     // do a quick check of the F18A
     realf18a = detect_f18a();

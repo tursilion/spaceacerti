@@ -244,7 +244,11 @@ void soundtest() {
 		writestring(r<<1, 1, musText[r]);
 	}
     writestring(17, 1, "PRESS FIRE TO EXIT");
-    writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
+
+    if (doMusic != doMusicOnly) {
+        // don't bother with the SFX hint if SFX are turned off
+        writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
+    }
 
 	wrapinitstars();
 	level = 1;	// to make sure we get stars
@@ -409,8 +413,17 @@ void soundtest() {
 		}
 
 		// just for fun
-		wrapbackground();		// for stars
-	}
+        // wait for key release
+        if (KSCAN_KEY != 0xff) {
+            do {
+		        wrapbackground();		// for stars
+                kscanfast(joynum);
+                waitforstep();
+	        } while (KSCAN_KEY != 0xff);
+        } else {
+            wrapbackground();
+        }
+    }
 }
 
 // selects difficulty
@@ -528,7 +541,7 @@ redraw2:
 		// set background color (also resets after music test)
 		screen(COLOR_CYAN);
 
-		kscanfast(joynum);
+		kscanfast(0);
 		if ((KSCAN_KEY > '0') && (KSCAN_KEY < '4')) {
 			// hold up while selecting to enable cheat mode
 			joystfast(joynum);
