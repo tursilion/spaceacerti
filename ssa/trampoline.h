@@ -59,4 +59,5 @@ void wrapAddDestroyed(unsigned int ptr);
 void wrapladybugwin();
 void wrapbossdraw();
 void wrapGameWinHard();
+void wrapsoundtest();
 #endif

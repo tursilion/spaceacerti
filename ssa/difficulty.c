@@ -3,11 +3,14 @@
 #include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
+#include <TISNPlay.h>
 
 // game
 #include "game.h"
 #include "trampoline.h"
 #include "music.h"
+
+extern void displayScore();
 
 char * const cruiserText[] = {
 	"NAME:   CRUISER ",
@@ -49,18 +52,17 @@ char * const selenaText[] = {
 	"DOUBLED         "
 };
 
-// simple sound test
-char * const musText[] = {
-    "PRESS:",
-    "  1-9 FOR MUSIC",
-    "  0   TO STOP MUSIC",
-    "  A   TO SET MUSIC+SFX SID",
-    "  B   TO SET MUSIC+SFX FORTI",
-    "  C   TO SET MUSIC ONLY",
-    "  D   TO SET SFX ONLY",
-    "  F   F18A"
+// well, not as nice as LCARS, but what the hell, just some lines
+const unsigned char LCARS[] = {
+    0x00,0x00,0x0F,0x30,0x63,0x67,0x66,0x66,
+    0x00,0x00,0xFF,0x00,0xFF,0x00,0x00,0x00,
+    0x00,0x00,0xF0,0x0C,0xC6,0xE6,0x66,0x66,
+    0x66,0x66,0x67,0x63,0x30,0x0F,0x00,0x00,
+    0x66,0x66,0xE6,0xC6,0x0C,0xF0,0x00,0x00,
+    0x66,0x66,0x66,0x66,0x66,0x66,0x66,0x66,
+    0x00,0x00,0x00,0xFF,0x00,0xFF,0x00,0x00
 };
-
+    
 const unsigned char SCHEMATICS[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,	// cruiser top
 	0x01,0x01,0x01,0x01,0x02,0x02,0x02,0x26,
@@ -233,211 +235,16 @@ const unsigned char SCHEMATICS[] = {
 	0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-const char SetStr[]  = "\x8  USING";
-const char UnsetStr[] =  "  TO SET";
-
-void soundtest() {
-	unsigned char r;
-
-	cls();
-	for (r=0; r<8; ++r) {
-		writestring(r<<1, 1, musText[r]);
-	}
-    writestring(17, 1, "PRESS FIRE TO EXIT");
-
-    if (doMusic != doMusicOnly) {
-        // don't bother with the SFX hint if SFX are turned off
-        writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
-    }
-
-	wrapinitstars();
-	level = 1;	// to make sure we get stars
-
-	screen(COLOR_LTGREEN);
-
-    // wait for key release
-    while (KSCAN_KEY != 0xff) {
-        kscanfast(0);
-    }
-
-	for (;;) {
-        // update cursor
-        writestring(6, 5, (char*)(doMusic==doAllMusic   ? SetStr:UnsetStr));
-        writestring(8, 5, (char*)(doMusic==doForTI      ? SetStr:UnsetStr));
-        writestring(10,5, (char*)(doMusic==doMusicOnly  ? SetStr:UnsetStr));
-        writestring(12,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
-
-        if (!realf18a) {
-            writestring(14, 3, "    F18A NOT INSTALLED");
-        } else if (f18a) {
-            writestring(14, 7, "TO RESTART WITHOUT F18A");
-        } else {
-            writestring(14, 7, "TO RESTART WITH F18A");
-        }
-
-		waitforstep();
-
-		joystfast(joynum);
-		kscanfast(joynum);	// all keys except '*' are okay (cause we are called with '*' down)
-
-		if ((KSCAN_KEY != 0xff)&&(KSCAN_JOYY != JOY_UP)) {
-			shutup();
-		}
-
-		switch (KSCAN_KEY) {
-		case JOY_FIRE:	
-			screen(COLOR_CYAN);
-			return;
-
-		case '1':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_armor();
-			} else {
-				StartMusic(STAGE1MUS, 1);
-			}
-			break;
-
-		case '2':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_explosion();
-			} else {
-				StartMusic(STAGE2MUS, 1);
-			}
-			break;
-
-		case '3':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_hitboss();
-			} else {
-				StartMusic(STAGE3MUS, 1);
-			}
-			break;
-
-		case '4':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_nukebomb();
-			} else {
-				StartMusic(STAGE4MUS, 1);
-			}
-			break;
-
-		case '5':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_shipdead();
-			} else {
-				StartMusic(STAGE5MUS, 1);
-			}
-			break;
-
-		case '6':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_shielddown();
-			} else {
-				StartMusic(BOSSMUS, 1);
-			}
-			break;
-
-		case '7':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_shieldwarn();
-			} else {
-				StartMusic(GAMEOVERMUS, 0);
-			}
-			break;
-
-		case '8':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_shieldup();
-			} else {
-				StartMusic(WINSCROLLMUS, 1);
-			}
-			break;
-
-		case '9':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_pwrpulse();
-			} else {
-    			StartMusic(WINANIMMUS, 0);
-			}
-			break;
-
-		case '0':
-			if (KSCAN_JOYY == JOY_UP) {
-				playsfx_pwrwide();
-			} else {
-                if (KSCAN_JOYY == JOY_DOWN) {
-    				nDifficulty = DIFFICULTY_HARD;
-	    			wrapGamWin();
-                }
-			}
-            break;
-
-        case 'A':
-            doMusic = doAllMusic;
-            writestring(21,0, "NORMAL SETTING FOR MOST SYSTEMS.");
-            writestring(23,0, "(IT'S OKAY IF YOU HAVE NO SID.) ");
-            //                 01234567890123456789012345678901
-            break;
-
-        case 'B':
-            doMusic = doForTI;
-            writestring(21,0, " IF YOU HAVE A FORTI CARD AVAIL ");
-            writestring(23,0, "(MUSIC AND SFX WILL PLAY ON 1&2)");
-            //                 01234567890123456789012345678901
-            break;
-
-        case 'C':
-            doMusic = doMusicOnly;
-            writestring(21,0, "IF YOUR SID CAUSES UNWANTED SND ");
-            writestring(23,0, "(SOME CLONE SIDS MAY SOUND POOR)");
-            //                 01234567890123456789012345678901
-            break;
-
-        case 'D':
-            doMusic = doSfxInstead;
-            writestring(21,0, " DISABLE MUSIC, ONLY PLAY SFX.  ");
-            writestring(23,0, " (IF YOU DON'T LIKE THE MUSIC.) ");
-            //                 01234567890123456789012345678901
-            break;
-
-        case 'F':
-            if (realf18a) {
-                if (f18a) {
-                    f18a = 0;
-                } else {
-                    f18a = 1;
-                }
-                reboot();
-            }
-            break;
-		}
-
-		// just for fun
-        // wait for key release
-        if (KSCAN_KEY != 0xff) {
-            do {
-		        wrapbackground();		// for stars
-                kscanfast(joynum);
-                waitforstep();
-	        } while (KSCAN_KEY != 0xff);
-        } else {
-            wrapbackground();
-        }
-    }
-}
-
 // selects difficulty
 const char * const sSkillText[] = {
-	"S U P E R   S P A C E   A C E R",
-    "",
-    " PRESS:",
-	"   1 FOR EASY GAME",
-	"   2 FOR INTERMEDIATE GAME",
-	"   3 FOR ADVANCED GAME",
-	"   S FOR SETUP AND MUSIC TEST",
+    "PRESS:",
+	"  1 FOR EASY GAME",
+	"  2 FOR INTERMEDIATE GAME",
+	"  3 FOR ADVANCED GAME",
+	"  S FOR SETUP AND MUSIC TEST",
     "",
     "",
-	" USE LEFT/RIGHT TO SELECT SHIP"
+	"USE LEFT/RIGHT TO SELECT SHIP"
 };
 
 void getDifficulty() {
@@ -457,15 +264,7 @@ void getDifficulty() {
         VDP_SET_REGISTER(F18A_REG_ECM, 0);
     }
 
-    // standard TI character set
-    charset();
-
-    // black text
-    for (int idx=2; idx<16; idx++) {
-        vdpchar(gCOLOR+idx, COLOR_BLACK<<4);
-    }
-
-	// the schematic should be lt blue
+	// the schematic should be lt blue (gray on Coleco)
 	vdpchar(gCOLOR+16, COLOR_LTBLUE<<4);
 	VDP_SAFE_DELAY();
 	vdpchar(gCOLOR+17, COLOR_LTBLUE<<4);
@@ -474,20 +273,48 @@ void getDifficulty() {
 	VDP_SAFE_DELAY();
 	vdpchar(gCOLOR+19, COLOR_LTBLUE<<4);
 
+    // load the extra characters
+    vdpmemcpy(gPATTERN+160*8, LCARS, sizeof(LCARS));
+    vdpchar(gColor+20, COLOR_LTRED<<4);
+
 redraw:
 	cls();
+
+    // draw the frames
+    hchar(1,1,166,31);
+    hchar(2,1,161,31);
+    hchar(13,1,166,31);
+    hchar(14,1,161,31);
+    vchar(0,0,165,24);
+    hchar(0,10,165,2);
+    xchar(1,10,164);
+    xchar(1,11,163);
+    xchar(1,0,163);
+    xchar(2,0,160);
+    xchar(13,0,163);
+    xchar(14,0,160);
+
+    // print the title
+    writestring(0, 14, "SUPER SPACE ACER");
+
 	txtIdx = 0;
-	for (r=0; txtIdx<11; r+=2) {
+	for (r=3; txtIdx<8; r+=2) {
 		if (sSkillText[txtIdx][0] == '\0') {
 			--r;	// skip 1 line instead of 2
 		} else {
-			writestring(r, 0, (char*)sSkillText[txtIdx]);
+			writestring(r, 1, (char*)sSkillText[txtIdx]);
 		}
 		++txtIdx;
 	}
 
+    // and display the current score
+	VDP_SET_ADDRESS_WRITE((unsigned int)(gIMAGE+2));
+    displayScore();
+
 redraw2:
-	vdpmemset(gIMAGE+16*32, 32, 8*32);	// partial screen clear
+    for (int idx=gIMAGE+17*32+2; idx<gIMAGE+23*32+2; idx+=32) {
+    	vdpmemset(idx, 32, 30);	// partial screen clear
+    }
 	txtIdx = 0;
 	r=17;
 	c=2;
@@ -539,7 +366,7 @@ redraw2:
 		++cnt;
 
 		// set background color (also resets after music test)
-		screen(COLOR_CYAN);
+		screen(COLOR_BLACK);
 
 		kscanfast(0);
 		if ((KSCAN_KEY > '0') && (KSCAN_KEY < '4')) {
@@ -575,7 +402,7 @@ redraw2:
 			spdel(0);
 			spdel(1);
 
-			soundtest();
+			wrapsoundtest();
 			goto redraw;
 		}
 

@@ -229,6 +229,9 @@
     <ClCompile Include="harmlesslion_p.c">
       <Filter>Gfx</Filter>
     </ClCompile>
+    <ClCompile Include="soundtest.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">

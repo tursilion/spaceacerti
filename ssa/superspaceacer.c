@@ -6,6 +6,7 @@
 #include <f18a.h>
 #include <sound.h>
 #include <kscan.h>
+#include <system.h>
 
 #include <TISNPlay.h>
 
@@ -290,6 +291,16 @@ void musicsync() {
 	}
 }
 
+// check and exit if quit pressed
+void checkQuit() {
+    if (check_reset()) {
+        // work around a Classic99 bug and turn off the BML
+        VDP_SET_REGISTER(F18A_REG_BMLCFG, 0);
+        reset_f18a();
+        exit();
+    }
+}
+
 // end of frame handler - handles sprite copy unless we were late
 // also check quit so we can do the f18a reset before we do
 void waitforstep() {
@@ -347,10 +358,7 @@ void waitforstep() {
 	doMusic();
 
     // check quit
-    if (check_reset()) {
-        reset_f18a();
-        __asm__ volatile("blwp @>0000");
-    }
+    checkQuit();
 }
 
 // loads a default ASCII character set from ROM
@@ -1276,15 +1284,12 @@ void playmv() {
 	}
 }
 
-// adds to score and displays the result
-void addscore(unsigned int val) {
+// draw the score - set VDP write address first
+void displayScore() {
 	unsigned int x;
 	unsigned int c;
 
-	score+=val;
 	x=score;
-
-	VDP_SET_ADDRESS_WRITE((unsigned int)(gIMAGE+13));
 
 #if 0
 	// This version does 1000 passes with values 0-255 in 179 ticks - 2983uS average
@@ -1299,7 +1304,7 @@ void addscore(unsigned int val) {
 	// should be enough calculation delay here
 	VDPWD=((x%10)+'0');
 #else
-	// this version does 1000 passes with 0-255 in 29 ticks - 483uS average (6x faster!)
+	// this version does 1000 passes with 0-255 in 29 ticks - 483uS average (6x faster! (SDCC timings))
 	c='0';
 	while (x>=10000) {
 		++c;
@@ -1335,6 +1340,14 @@ void addscore(unsigned int val) {
 	VDPWD=('0');
 //	VDP_SAFE_DELAY();
 	VDPWD=('0'+scoremode);
+}
+
+// adds to score and displays the result
+void addscore(unsigned int val) {
+	score+=val;
+
+	VDP_SET_ADDRESS_WRITE((unsigned int)(gIMAGE+13));
+    displayScore();
 }
 
 // displays centered, NUL terminated text

@@ -118,6 +118,7 @@ SECTIONS {
     {
         selena_end_c.o(.text .rodata)
         selena_end_p.o(.text .rodata)
+        soundtest.o(.text .rodata)
         PROVIDE(ebank3b = .);
     } > CART3B AT> FLASH
 

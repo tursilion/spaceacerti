@@ -45,7 +45,7 @@ OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o bo
         ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
         gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
         human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o \
-        hllogoc.o hllogop.o 
+        hllogoc.o hllogop.o soundtest.o
 
 # List of all files needed in executable
 PREREQUISITES=$(OBJECT_LIST)
@@ -167,8 +167,10 @@ ship4_p.o: ../title2/ship4_p.c
 font.o: font.c
 	$(CC) $(CFLAGS) $(INCPATH) -o font.o font.c
 
-difficulty.o: difficulty.c
+difficulty.o: difficulty.c trampoline.h
 	$(CC) $(CFLAGS) $(INCPATH) -o difficulty.o difficulty.c
+soundtest.o: soundtest.c
+	$(CC) $(CFLAGS) $(INCPATH) -o soundtest.o soundtest.c
 
 selena_end_c.o: selena_end_c.c
 	$(CC) $(CFLAGS) $(INCPATH) -o selena_end_c.o selena_end_c.c

@@ -134,6 +134,7 @@
     <ClCompile Include="sfxs.c" />
     <ClCompile Include="snowballbase_c.c" />
     <ClCompile Include="snowballbase_p.c" />
+    <ClCompile Include="soundtest.c" />
     <ClCompile Include="ssd_inc.c" />
     <ClCompile Include="ssd_inc2.c" />
     <ClCompile Include="string.c" />

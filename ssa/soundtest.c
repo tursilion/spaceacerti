@@ -1,0 +1,272 @@
+// libti99
+#include <vdp.h>
+#include <f18a.h>
+#include <sound.h>
+#include <kscan.h>
+#include <TISNPlay.h>
+
+// game
+#include "game.h"
+#include "trampoline.h"
+#include "music.h"
+
+// simple sound test
+char * const musText[] = {
+    "PRESS:",
+    "  1-9 FOR MUSIC",
+    "  0   TO STOP MUSIC",
+    "  A   TO SET MUSIC+SFX SID",
+    "  B   TO SET MUSIC+SFX FORTI",
+    "  C   TO SET MUSIC ONLY",
+    "  D   TO SET SFX ONLY",
+    "  F   "
+};
+
+const unsigned char VUMETER[] = {
+    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7e,
+    0x00,0x00,0x00,0x00,0x00,0x00,0x7e,0x7e,
+    0x00,0x00,0x00,0x00,0x00,0x7e,0x7e,0x7e,
+    0x00,0x00,0x00,0x00,0x7e,0x7e,0x7e,0x7e,
+    0x00,0x00,0x00,0x7e,0x7e,0x7e,0x7e,0x7e,
+    0x00,0x00,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,
+    0x00,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,
+    0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e
+};
+
+const char SetStr[]  = "\x8  USING";
+const char UnsetStr[] =  "  TO SET";
+
+// To be called only from getDifficulty()
+void soundtest() {
+	unsigned char r;
+
+	cls();
+
+    // load vu graphics
+    vdpmemcpy(gPATTERN+168*8, VUMETER, sizeof(VUMETER));
+    vdpchar(gCOLOR+21, COLOR_LTYELLOW<<4);
+
+    // draw boxes
+    hchar(0, 6, 161, 26);
+    hchar(16, 1, 166, 31);
+    hchar(17, 7, 161, 18);
+    hchar(19, 7, 166, 18);
+    hchar(20, 0, 161, 32);
+    vchar(1, 0, 165, 15);
+    xchar(0, 0, 160);
+    xchar(16, 0, 163);
+    xchar(17, 6, 160);
+    xchar(19, 6, 163);
+    xchar(17, 25, 162);
+    xchar(19, 25, 164);
+    xchar(18, 6, 165);
+    xchar(18, 25, 165);
+
+    // draw menu
+	for (r=0; r<8; ++r) {
+		writestring(r<<1, 1, musText[r]);
+	}
+    writestring(18, 7, "PRESS FIRE TO EXIT");
+
+    if (doMusic != doMusicOnly) {
+        // don't bother with the SFX hint if SFX are turned off
+        writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
+    }
+
+	wrapinitstars();
+	level = 1;	// to make sure we get stars
+
+    // wait for key release
+    while (KSCAN_KEY != 0xff) {
+        kscanfast(0);
+    }
+
+	for (;;) {
+        // update cursor
+        writestring(6, 5, (char*)(doMusic==doAllMusic   ? SetStr:UnsetStr));
+        writestring(8, 5, (char*)(doMusic==doForTI      ? SetStr:UnsetStr));
+        writestring(10,5, (char*)(doMusic==doMusicOnly  ? SetStr:UnsetStr));
+        writestring(12,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
+
+        if (!realf18a) {
+            writestring(14, 3, "    F18A NOT INSTALLED");
+        } else if (f18a) {
+            writestring(14, 7, "TO RESTART WITHOUT F18A");
+        } else {
+            writestring(14, 7, "TO RESTART WITH F18A");
+        }
+
+		waitforstep();
+
+        // update VU Meters
+        for (int idx=0; idx<4; ++idx) {
+            unsigned int v=15-(songVol[idx]&0xf);
+            unsigned int adr = gIMAGE+VDP_SCREEN_POS(19,3+idx);
+            if (idx>1) adr+=22;
+            if (v == 0) {
+                vdpchar(adr, 32);
+                vdpchar(adr-32, 32);
+                continue;
+            } else if (v == 8) {
+                vdpchar(adr, 175);
+                continue;
+            } else if (v>8) {
+                vdpchar(adr, 175);
+                adr-=32;
+                v-=8;
+            } else {
+                vdpchar(adr-32, 32);
+            }
+            vdpchar(adr, 168+v);
+        }
+
+        // handle input
+		joystfast(joynum);
+		kscanfast(joynum);	// all keys except '*' are okay (cause we are called with '*' down)
+
+		if ((KSCAN_KEY != 0xff)&&(KSCAN_JOYY != JOY_UP)) {
+			shutup();
+		}
+
+		switch (KSCAN_KEY) {
+		case JOY_FIRE:	
+			screen(COLOR_CYAN);
+			return;
+
+		case '1':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_armor();
+			} else {
+				StartMusic(STAGE1MUS, 1);
+			}
+			break;
+
+		case '2':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_explosion();
+			} else {
+				StartMusic(STAGE2MUS, 1);
+			}
+			break;
+
+		case '3':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_hitboss();
+			} else {
+				StartMusic(STAGE3MUS, 1);
+			}
+			break;
+
+		case '4':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_nukebomb();
+			} else {
+				StartMusic(STAGE4MUS, 1);
+			}
+			break;
+
+		case '5':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_shipdead();
+			} else {
+				StartMusic(STAGE5MUS, 1);
+			}
+			break;
+
+		case '6':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_shielddown();
+			} else {
+				StartMusic(BOSSMUS, 1);
+			}
+			break;
+
+		case '7':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_shieldwarn();
+			} else {
+				StartMusic(GAMEOVERMUS, 0);
+			}
+			break;
+
+		case '8':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_shieldup();
+			} else {
+				StartMusic(WINSCROLLMUS, 1);
+			}
+			break;
+
+		case '9':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_pwrpulse();
+			} else {
+    			StartMusic(WINANIMMUS, 0);
+			}
+			break;
+
+		case '0':
+			if (KSCAN_JOYY == JOY_UP) {
+				playsfx_pwrwide();
+			} else {
+                if (KSCAN_JOYY == JOY_DOWN) {
+    				nDifficulty = DIFFICULTY_HARD;
+	    			wrapGamWin();
+                }
+			}
+            break;
+
+        case 'A':
+            doMusic = doAllMusic;
+            writestring(21,0, "NORMAL SETTING FOR MOST SYSTEMS.");
+            writestring(23,0, "(IT'S OKAY IF YOU HAVE NO SID.) ");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'B':
+            doMusic = doForTI;
+            writestring(21,0, " IF YOU HAVE A FORTI CARD AVAIL ");
+            writestring(23,0, "(MUSIC AND SFX WILL PLAY ON 1&2)");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'C':
+            doMusic = doMusicOnly;
+            writestring(21,0, "IF YOUR SID CAUSES UNWANTED SND ");
+            writestring(23,0, "(SOME CLONE SIDS MAY SOUND POOR)");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'D':
+            doMusic = doSfxInstead;
+            writestring(21,0, " DISABLE MUSIC, ONLY PLAY SFX.  ");
+            writestring(23,0, " (IF YOU DON'T LIKE THE MUSIC.) ");
+            //                 01234567890123456789012345678901
+            break;
+
+        case 'F':
+            if (realf18a) {
+                if (f18a) {
+                    f18a = 0;
+                } else {
+                    f18a = 1;
+                }
+                reboot();
+            }
+            break;
+		}
+
+		// just for fun
+        // wait for key release
+        if (KSCAN_KEY != 0xff) {
+            do {
+		        wrapbackground();		// for stars
+                kscanfast(joynum);
+                waitforstep();
+	        } while (KSCAN_KEY != 0xff);
+        } else {
+            wrapbackground();
+        }
+    }
+}
+

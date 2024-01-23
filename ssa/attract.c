@@ -25,6 +25,8 @@ const char story[] =
 	"cruisers. Success at all costs! "
 	"*";
 
+extern void checkQuit();
+
 unsigned char delayText(unsigned char frames) {
 	unsigned char cnt;
 
@@ -42,6 +44,7 @@ unsigned char delayText(unsigned char frames) {
 			VDP_INT_POLL;
 			if (cnt != VDP_INT_COUNTER) break;
 		}
+        checkQuit();
 	}
 
 	return 0;

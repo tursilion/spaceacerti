@@ -39,6 +39,7 @@
 extern const unsigned int f18BlackPal[16];
 
 void ladybugwin(void);
+void soundtest(void);
 
 void wrapenemy() {
 	unsigned int old = nBank;
@@ -796,5 +797,13 @@ void wrapladybugwin() {
 
     SWITCH_IN_BANK14b;
     ladybugwin();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapsoundtest() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK3b;
+    soundtest();
 	SWITCH_IN_PREV_BANK(old);
 }
