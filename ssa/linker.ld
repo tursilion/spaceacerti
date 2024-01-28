@@ -18,7 +18,7 @@ SEARCH_DIR("/home/tursi/gcc9900/tms9900/lib");
 
 MEMORY
 {
-    INIT(xr) : ORIGIN = 0x6000, LENGTH = 256
+    INIT(xr) : ORIGIN = 0x6000, LENGTH = 512
 
     FIXED(xrw) : ORIGIN = 0xA000, LENGTH = 24K
     STACK(xrw) : ORIGIN = 0x2000, LENGTH = 8K
@@ -72,10 +72,10 @@ SECTIONS {
     . = 0xA000;
     fixed :
     {
-        crt0.o
         superspaceacer.o(.text .rodata)
         trampolines.o(.text .rodata)
         music.o(.text .rodata)
+        input.o(.text .rodata)
         *libti99.a:*(.text .rodata)
         *libtivgm2.a:*(.text .rodata)
     } > FIXED AT> FLASH
@@ -187,6 +187,7 @@ SECTIONS {
         winmed.o(.text .rodata)
         ssd_inc2.o(.text .rodata)
         bossdat.o(.text .rodata)
+        highscores.o(.text .rodata)
         PROVIDE(ebank8a = .);
     } > CART8A AT> FLASH
 

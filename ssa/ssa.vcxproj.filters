@@ -232,6 +232,12 @@
     <ClCompile Include="soundtest.c">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Input.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="highscores.c">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -278,6 +284,9 @@
     </ClInclude>
     <ClInclude Include="..\..\vgmcomp2\Players\libtivgm2\TISNPlay.h">
       <Filter>libti99</Filter>
+    </ClInclude>
+    <ClInclude Include="highscores.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,7 @@
 #include "attract.h"
 #include "boss.h"
 #include "f18load.h"
+#include "highscores.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "f18sprites8sl.c"
@@ -784,7 +785,7 @@ void main() {
 		seed = (scoremode>>4)&0x0f;
 		scoremode &= 0x0f;
 		attractShip = *SAVEDATTRACT;
-		*SAVEDATTRACT = attractShip & 1;
+		*SAVEDATTRACT = attractShip & 3;
 		attractShip >>= 4;
         f18a=*SAVEDF18A;
         if (!realf18a) f18a=0;  // just be sure
@@ -840,23 +841,7 @@ titleagain:
 	SWITCH_IN_BANK9a;
 	handleTitlePage();
 
-	if (joynum == 0) {
-		// this is an attract timeout
-		// we'll use a flag in VDP above the score to note
-		// gameplay attract or story attract
-		if (!(*SAVEDATTRACT)) {
-			*SAVEDATTRACT = 1;
-			SWITCH_IN_BANK12a;
-			doAttract();	// never returns
-		} else {
-			// we'll do the demo play
-			*SAVEDATTRACT = 0;
-            // switch music to sound effects so it's not completely mute
-            *SAVEDMUSIC = (unsigned int)doMusic;    // TODO WARNING: not 32-bit safe
-		}
-	}
-
-	// set regular graphics mode
+	// set regular graphics mode (we need this in 3 of the 4 attract modes plus difficulty)
 	i = grf1();
 	
 	/*load VDP data */
@@ -877,13 +862,49 @@ titleagain:
 
 	sgrint();	// sets color table
 
+	if (joynum == 0) {
+		// this is an attract timeout
+		// we'll use a flag in VDP above the stack to note
+		// gameplay attract or story attract
+        // attract is now 0,1,2,3 (high score, demo, qwertian, demo)
+        *SAVEDATTRACT = (*SAVEDATTRACT)+1;
+        switch (*SAVEDATTRACT) {
+            case 1:
+			    SWITCH_IN_BANK8a;
+                // check for ubergrom before we bother with the high score table
+                if (checkHighScores()) {
+    			    doShowHighScores();	// never returns
+                } else {
+    			    SWITCH_IN_BANK12a;
+                    doAttract();        // never returns
+                }
+
+            case 2:
+			    // we'll do the demo play
+                // switch music to sound effects so it's not completely mute
+                *SAVEDMUSIC = (unsigned int)doMusic;    // TODO WARNING: not 32-bit safe
+                break;
+
+            case 3:
+			    SWITCH_IN_BANK12a;
+			    doAttract();	// never returns
+
+            case 4:
+			    // we'll do the demo play
+			    *SAVEDATTRACT = 0;      // wrap around
+                // switch music to sound effects so it's not completely mute
+                *SAVEDMUSIC = (unsigned int)doMusic;    // TODO WARNING: not 32-bit safe
+                break;
+        }
+	}
+
 	SWITCH_IN_BANK4a;
-	scoremode = 0;
 	if (joynum != 0) {
         playership = 0;     // always reset to cruiser on entry
 		getDifficulty();	// sets scoremode
 	} else {
 		// demo mode
+    	scoremode = 0;
 		nDifficulty = DIFFICULTY_EASY;
 		playership = attractShip++;
 		if (attractShip > 4) attractShip=0;
@@ -1393,7 +1414,7 @@ void reboot() {
 	*SAVEDMODE = (((*SAVEDMODE+0x10)&0xf0) | scoremode)&0xff;
 	// save off the last attract ship too
 	x = *SAVEDATTRACT;
-	x = (attractShip<<4)|(x&1);
+	x = (attractShip<<4)|(x&3);
 	*SAVEDATTRACT = x&0xff;
 
     // save off the detected F18A state (partly to save redetect, mostly to save if it was disabled)

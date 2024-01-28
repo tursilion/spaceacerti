@@ -53,7 +53,7 @@ char * const selenaText[] = {
 };
 
 // well, not as nice as LCARS, but what the hell, just some lines
-const unsigned char LCARS[] = {
+const unsigned char LCARS[7*8] = {
     0x00,0x00,0x0F,0x30,0x63,0x67,0x66,0x66,
     0x00,0x00,0xFF,0x00,0xFF,0x00,0x00,0x00,
     0x00,0x00,0xF0,0x0C,0xC6,0xE6,0x66,0x66,
@@ -237,14 +237,14 @@ const unsigned char SCHEMATICS[] = {
 
 // selects difficulty
 const char * const sSkillText[] = {
-    "PRESS:",
-	"  1 FOR EASY GAME",
-	"  2 FOR INTERMEDIATE GAME",
-	"  3 FOR ADVANCED GAME",
-	"  S FOR SETUP AND MUSIC TEST",
+    "Press:",
+	"  1 for EASY game",
+	"  2 for INTERMEDIATE game",
+	"  3 for ADVANCED game",
+	"  C for CONFIG and MUSIC TEST",
     "",
     "",
-	"USE LEFT/RIGHT TO SELECT SHIP"
+	"Use LEFT/RIGHT to select SHIP"
 };
 
 void getDifficulty() {
@@ -388,6 +388,7 @@ redraw2:
 					nDifficulty = DIFFICULTY_HARD;
 					break;
 			}
+            scoremode = 0;
 			if (playership == SHIP_GNAT) scoremode = 1;
 			if (playership == SHIP_SELENA) scoremode = 2;
 			if ((playership == SHIP_SNOWBALL) && (KSCAN_JOYY == JOY_DOWN)) scoremode = 3;
@@ -398,7 +399,7 @@ redraw2:
 
 			break;
 		}
-		if (KSCAN_KEY == 'S') {
+		if (KSCAN_KEY == 'C') {
 			spdel(0);
 			spdel(1);
 

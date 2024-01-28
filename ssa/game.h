@@ -168,6 +168,8 @@ struct _sprite {
 extern struct _sprite SpriteTab[32];
 
 // some pointers above the stack to store data across reboots
+// SAVEDATTRACT has the ship in the upper nibble and the mode in the lower nibble
+// but the ship part is only stored there during reboot, and cleared otherwise
 #define SAVEDMUSIC ((unsigned int*)0x3ff6)
 #define SAVEDSCORE ((unsigned char*)0x3ffa)
 #define SAVEDMODE ((unsigned char*)0x3ffe)

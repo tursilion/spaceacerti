@@ -46,7 +46,7 @@ OBJECT_LIST = crt0.o superspaceacer.o trampolines.o ssd_inc.o ssd_inc2.o bg.o bo
         ladybugc.o ladybugp.o ladybugscreenc.o ladybugscreenp.o gnat1rlec.o gnat1rlep.o gnat2rlec.o gnat2rlep.o \
         gnat3rlec.o gnat3rlep.o gnat4rlec.o gnat4rlep.o gnat5rlec.o gnat5rlep.o snowballbasec.o snowballbasep.o \
         human.o human2.o winmed.o cruiserendc.o cruiserendp.o f18sprites.o f18load.o f18load2.o f18load3.o f18load4.o f18abosses.o \
-        hllogoc.o hllogop.o soundtest.o
+        hllogoc.o hllogop.o soundtest.o input.o highscores.o
 
 # List of all files needed in executable
 PREREQUISITES=$(OBJECT_LIST)
@@ -89,8 +89,14 @@ human.o: human.c game.h f18load.h
 human2.o: human2.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o human2.o human2.c
 
-superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h f18load.h
+superspaceacer.o: superspaceacer.c game.h enemy.h trampoline.h human.h music.h attract.h boss.h f18load.h highscores.h
 	$(CC) $(CFLAGS) $(INCPATH) -o superspaceacer.o superspaceacer.c
+
+input.o: input.c
+	$(CC) $(CFLAGS) $(INCPATH) -o input.o input.c
+
+highscores.o: highscores.c
+	$(CC) $(CFLAGS) $(INCPATH) -o highscores.o highscores.c
 
 titlepage.o: titlepage.c game.h
 	$(CC) $(CFLAGS) $(INCPATH) -o titlepage.o titlepage.c

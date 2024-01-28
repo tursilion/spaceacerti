@@ -119,8 +119,10 @@
     <ClCompile Include="gnat5rlep.c" />
     <ClCompile Include="harmlesslion_c.c" />
     <ClCompile Include="harmlesslion_p.c" />
+    <ClCompile Include="highscores.c" />
     <ClCompile Include="human.c" />
     <ClCompile Include="human2.c" />
+    <ClCompile Include="Input.c" />
     <ClCompile Include="ladybugc.c" />
     <ClCompile Include="ladybugp.c" />
     <ClCompile Include="ladybugscreenC.c" />
@@ -173,6 +175,7 @@
     <ClInclude Include="enemy.h" />
     <ClInclude Include="f18load.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="highscores.h" />
     <ClInclude Include="human.h" />
     <ClInclude Include="music.h" />
     <ClInclude Include="trampoline.h" />

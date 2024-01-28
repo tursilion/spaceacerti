@@ -12,13 +12,13 @@
 
 // simple sound test
 char * const musText[] = {
-    "PRESS:",
-    "  1-9 FOR MUSIC",
-    "  0   TO STOP MUSIC",
-    "  A   TO SET MUSIC+SFX SID",
-    "  B   TO SET MUSIC+SFX FORTI",
-    "  C   TO SET MUSIC ONLY",
-    "  D   TO SET SFX ONLY",
+    "Press:",
+    "  1-9 for MUSIC",
+    "  0   to STOP MUSIC",
+    "  A   to set MUSIC+SFX SID",
+    "  B   to set MUSIC+SFX FORTI",
+    "  C   to set MUSIC ONLY",
+    "  D   to set SFX ONLY",
     "  F   "
 };
 
@@ -33,8 +33,8 @@ const unsigned char VUMETER[] = {
     0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e,0x7e
 };
 
-const char SetStr[]  = "\x8  USING";
-const char UnsetStr[] =  "  TO SET";
+const char SetStr[]  = "\x8  using";
+const char UnsetStr[] =  "  to set";
 
 // To be called only from getDifficulty()
 void soundtest() {
@@ -66,11 +66,11 @@ void soundtest() {
 	for (r=0; r<8; ++r) {
 		writestring(r<<1, 1, musText[r]);
 	}
-    writestring(18, 7, "PRESS FIRE TO EXIT");
+    writestring(18, 7, "Press FIRE to EXIT");
 
     if (doMusic != doMusicOnly) {
         // don't bother with the SFX hint if SFX are turned off
-        writestring(21, 1, "(HINT: HOLD UP AND # FOR SFX)");
+        writestring(21, 1, "(HINT: Hold UP and # for SFX)");
     }
 
 	wrapinitstars();
@@ -89,11 +89,11 @@ void soundtest() {
         writestring(12,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
 
         if (!realf18a) {
-            writestring(14, 3, "    F18A NOT INSTALLED");
+            writestring(14, 3, "    F18A not installed");
         } else if (f18a) {
-            writestring(14, 7, "TO RESTART WITHOUT F18A");
+            writestring(14, 7, "to restart WITHOUT F18A");
         } else {
-            writestring(14, 7, "TO RESTART WITH F18A");
+            writestring(14, 7, "to restart WITH F18A");
         }
 
 		waitforstep();
@@ -130,7 +130,6 @@ void soundtest() {
 
 		switch (KSCAN_KEY) {
 		case JOY_FIRE:	
-			screen(COLOR_CYAN);
 			return;
 
 		case '1':
@@ -218,29 +217,29 @@ void soundtest() {
 
         case 'A':
             doMusic = doAllMusic;
-            writestring(21,0, "NORMAL SETTING FOR MOST SYSTEMS.");
-            writestring(23,0, "(IT'S OKAY IF YOU HAVE NO SID.) ");
+            writestring(21,0, "Normal setting for most systems.");
+            writestring(23,0, "(It's okay if you have no SID.) ");
             //                 01234567890123456789012345678901
             break;
 
         case 'B':
             doMusic = doForTI;
-            writestring(21,0, " IF YOU HAVE A FORTI CARD AVAIL ");
-            writestring(23,0, "(MUSIC AND SFX WILL PLAY ON 1&2)");
+            writestring(21,0, " If you have a FORTI card avail ");
+            writestring(23,0, "(Music and SFX will play on 1&2)");
             //                 01234567890123456789012345678901
             break;
 
         case 'C':
             doMusic = doMusicOnly;
-            writestring(21,0, "IF YOUR SID CAUSES UNWANTED SND ");
-            writestring(23,0, "(SOME CLONE SIDS MAY SOUND POOR)");
+            writestring(21,0, "If your SID causes unwanted snd ");
+            writestring(23,0, "(Some SID clones may sound poor)");
             //                 01234567890123456789012345678901
             break;
 
         case 'D':
             doMusic = doSfxInstead;
-            writestring(21,0, " DISABLE MUSIC, ONLY PLAY SFX.  ");
-            writestring(23,0, " (IF YOU DON'T LIKE THE MUSIC.) ");
+            writestring(21,0, " Disable music, only play SFX.  ");
+            writestring(23,0, " (If you don't like the music.) ");
             //                 01234567890123456789012345678901
             break;
 

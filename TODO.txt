@@ -1,11 +1,6 @@
-High score on menu doesn't include the game mode - (correct on title page and game screen)
-
-Try lowercase on the menu screens
-
-Need to add a keyboard mode
-
 Should we include an UBERGROM that saves settings and high score? Can we make a small one work? (Then we have GPL start up too).
 - Greg notes we could use a normal UberGROM cart - it's got 512k ROM and a 128k ubergrom already
+- pretty wasteful given we only need about 50 bytes of eeprom ;)
 
 test invisible game
 

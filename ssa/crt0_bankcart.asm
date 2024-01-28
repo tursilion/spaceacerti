@@ -47,6 +47,15 @@ _start:
 * The registers will be located at the start of scratchpad memory 
   lwpi 0x8300
 
+* check for RAM before we start - if there is RAM at >a000 we assume 32k compatible layout
+  clr @>a000
+  mov @>a000,r0
+  jne failboot
+  seto @>a000
+  mov @>a000,r0
+  inc r0
+  jne failboot
+
 * Initialize data segment to known values
   li   r0,0x6002       * Point into the standard header as above
   mov  *r0+, r1        * R1 = Start of data section
@@ -146,4 +155,44 @@ cplp:
   b *r11            * back to caller
 cpend:
 
+* Tell the user we need 32k - assume a character set is loaded
+* and the boot environment is set
+failboot:
+  li r0,>0040       * going to write to VDP
+  movb r0,@>8c02
+  swpb r0
+  movb r0,@>8c02
 
+  li r0,>2000       * space
+  li r1,320         * 10 rows of 32
+scrnclr:
+  movb r0,@>8c00
+  dec r1
+  jne scrnclr
+
+  li r1,warn32k     * emit the message
+txtprint:
+  movb *r1+,@>8c00  
+  jne txtprint      * 0 terminated (0 is also blank)
+
+  li r1,448-12      * the rest of the screen (if we go too far we''ll get sprite corruption)
+scrnclr2:
+  movb r0,@>8c00
+  dec r1
+  jne scrnclr2
+
+  lwpi >83e0        * GPLWS
+waitky:
+  li r0,>0500
+  movb r0,@>8374    * keymode 5
+  bl @>000e         * call SCAN
+  clr r0
+  movb @>8375,r0    * key code
+  ci r0,>ff00       * no key
+  jeq waitky
+
+  blwp @>0000       * reboot
+
+warn32k:
+  text '32K REQUIRED'
+  data 0
