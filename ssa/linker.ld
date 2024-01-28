@@ -1,10 +1,9 @@
 /* 
  256k banked cartridge with 32k RAM support
- Fixed bank is copied into 32k by the CRT0
- I think my cartridge builder will have to
- deal with how that works, but we will assume
- a maximum size of 16k since that's what the
- Coleco source used. All other pages here
+ Fixed bank is copied into 32k by the CRT0.
+ The cartridge builder deal with how that works,
+ and we will assume a maximum size of 24k (the
+ entire high memory bank). All other pages here
  become 8k, so for now I'll use a PAGEA/PAGEB
  concept to split up the Coleco pages.
 */
@@ -85,6 +84,7 @@ SECTIONS {
     
     bank1a :
     {
+        /* not used - this is part of fixed above */
         PROVIDE(ebank1a = .);
     } > CART1A AT> FLASH
     

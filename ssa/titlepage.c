@@ -26,7 +26,7 @@ const unsigned char F18Text[] = {
     0x7C,0xC6,0xC6,0xDE,0xC6,0xC6,0xC6,0x00
 };
 
-extern checkQuit();
+extern void checkQuit(void);
 
 // only ship1 is on the same page as we are, 2-4 are on another page
 

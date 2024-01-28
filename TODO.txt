@@ -1,10 +1,13 @@
-checkreset is triggering on any key, not just quit, and it's not called during the title page when it's most important.
+High score on menu doesn't include the game mode - (correct on title page and game screen)
 
-Because of the F18A, we should probably disable the console QUIT and check for QUIT ourselves.
+Try lowercase on the menu screens
 
 Need to add a keyboard mode
 
 Should we include an UBERGROM that saves settings and high score? Can we make a small one work? (Then we have GPL start up too).
+- Greg notes we could use a normal UberGROM cart - it's got 512k ROM and a 128k ubergrom already
+
+test invisible game
 
 --------------------------
 
