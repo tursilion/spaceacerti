@@ -1,7 +1,11 @@
+#ifndef HIGHSCORES_H
+#define HIGHSCORES_H
+
 #define UBERGROM_RD *((volatile unsigned char*)0x983c)
 #define UBERGROM_WD *((volatile unsigned char*)0x9C3c)
 #define UBERGROM_CHECK 0xf800
 #define UBERGROM_WRITE 0xfa00
+#define UBERGROM_MUSIC 0xfa3e
 #define UBERGROM_UNLOCK 0xffff
 #define UBERGROM_MAGIC 0x994A
 
@@ -17,6 +21,10 @@ struct _scores {
 
 void saveScores(struct _scores *scores);
 int checkHighScores();
+void clearHighScores();
 void displayHighScores(struct _scores *scores);
 void showHighScores();
 void doShowHighScores();
+void registerHiScore();
+
+#endif

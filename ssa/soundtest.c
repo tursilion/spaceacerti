@@ -13,13 +13,13 @@
 // simple sound test
 char * const musText[] = {
     "Press:",
-    "  1-9 for MUSIC",
-    "  0   to STOP MUSIC",
+    "  1-9 for MUSIC, 0 to STOP",
     "  A   to set MUSIC+SFX SID",
     "  B   to set MUSIC+SFX FORTI",
     "  C   to set MUSIC ONLY",
     "  D   to set SFX ONLY",
-    "  F   "
+    "  F   ",
+    "  H   to CLEAR HIGH SCORES"
 };
 
 const unsigned char VUMETER[] = {
@@ -40,6 +40,7 @@ const char UnsetStr[] =  "  to set";
 void soundtest() {
 	unsigned char r;
 
+repaint:
 	cls();
 
     // load vu graphics
@@ -83,17 +84,17 @@ void soundtest() {
 
 	for (;;) {
         // update cursor
-        writestring(6, 5, (char*)(doMusic==doAllMusic   ? SetStr:UnsetStr));
-        writestring(8, 5, (char*)(doMusic==doForTI      ? SetStr:UnsetStr));
-        writestring(10,5, (char*)(doMusic==doMusicOnly  ? SetStr:UnsetStr));
-        writestring(12,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
+        writestring(4, 5, (char*)(doMusic==doAllMusic   ? SetStr:UnsetStr));
+        writestring(6, 5, (char*)(doMusic==doForTI      ? SetStr:UnsetStr));
+        writestring(8,5, (char*)(doMusic==doMusicOnly  ? SetStr:UnsetStr));
+        writestring(10,5, (char*)(doMusic==doSfxInstead ? SetStr:UnsetStr));
 
         if (!realf18a) {
-            writestring(14, 3, "    F18A not installed");
+            writestring(12, 3, "    F18A not installed");
         } else if (f18a) {
-            writestring(14, 7, "to restart WITHOUT F18A");
+            writestring(12, 7, "to restart WITHOUT F18A");
         } else {
-            writestring(14, 7, "to restart WITH F18A");
+            writestring(12, 7, "to restart WITH F18A");
         }
 
 		waitforstep();
@@ -220,6 +221,8 @@ void soundtest() {
             writestring(21,0, "Normal setting for most systems.");
             writestring(23,0, "(It's okay if you have no SID.) ");
             //                 01234567890123456789012345678901
+            *SAVEDMUSIC = (unsigned int)doMusic;
+            wrapSaveScores(NULL);
             break;
 
         case 'B':
@@ -227,6 +230,8 @@ void soundtest() {
             writestring(21,0, " If you have a FORTI card avail ");
             writestring(23,0, "(Music and SFX will play on 1&2)");
             //                 01234567890123456789012345678901
+            *SAVEDMUSIC = (unsigned int)doMusic;
+            wrapSaveScores(NULL);
             break;
 
         case 'C':
@@ -234,6 +239,8 @@ void soundtest() {
             writestring(21,0, "If your SID causes unwanted snd ");
             writestring(23,0, "(Some SID clones may sound poor)");
             //                 01234567890123456789012345678901
+            *SAVEDMUSIC = (unsigned int)doMusic;
+            wrapSaveScores(NULL);
             break;
 
         case 'D':
@@ -241,6 +248,8 @@ void soundtest() {
             writestring(21,0, " Disable music, only play SFX.  ");
             writestring(23,0, " (If you don't like the music.) ");
             //                 01234567890123456789012345678901
+            *SAVEDMUSIC = (unsigned int)doMusic;
+            wrapSaveScores(NULL);
             break;
 
         case 'F':
@@ -253,6 +262,34 @@ void soundtest() {
                 reboot();
             }
             break;
+
+        case 'H':
+            for (int i=2; i<15; i+=2) {
+                hchar(i, 3, 32, 29);
+            }
+            if (!wrapCheckHighScores()) {
+                writestring(8, 6, "No high score memory");
+            } else {
+                writestring(8, 6, "Clear High Scores? Y/N");
+                while ((KSCAN_KEY != 'Y') && (KSCAN_KEY != 'N')) {
+                    kscanfast(0);
+                }
+                if (KSCAN_KEY == 'Y') {
+                    wrapClearHighScores();
+                    writestring(8, 6, "High scores cleared   ");
+                } else {
+                    // no need to wait in the N case
+                    goto repaint;
+                }
+            }
+            while (KSCAN_KEY != 0xff) {
+                kscanfast(0);
+            };
+            writestring(10, 9, "Press any key");
+            while (KSCAN_KEY == 0xff) {
+                kscanfast(0);
+            }
+            goto repaint;
 		}
 
 		// just for fun

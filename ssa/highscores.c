@@ -3,6 +3,8 @@
 #include <kscan.h>
 #include "game.h"
 #include "highscores.h"
+#include "trampoline.h"
+#include "music.h"
 
 extern void displayScore();
 extern void checkQuit();
@@ -25,11 +27,24 @@ void saveScores(struct _scores *scores) {
 	GromWriteData(0xffff, 15, 0xaa);
 	GromWriteData(0xffff, 15, 0x5a);
 
-    // now write the data
-    unsigned char *pDat = (unsigned char*)scores;
-    for (int idx=UBERGROM_WRITE; idx<UBERGROM_WRITE+sizeof(struct _scores); ++idx) {
-        // A bit slower this way, setting the address each time
-        GromWriteData(UBERGROM_WRITE+idx, 15, *(pDat++));
+    if (scores != NULL) {
+        // now write the data
+        unsigned char *pDat = (unsigned char*)scores;
+        for (int idx=UBERGROM_WRITE; idx<UBERGROM_WRITE+sizeof(struct _scores); ++idx) {
+            // A bit slower this way, setting the address each time
+            GromWriteData(idx, 15, *(pDat++));
+        }
+    }
+
+    // and write out the music setting as 1-4
+    if (*SAVEDMUSIC == (unsigned int)doSfxInstead) {
+        GromWriteData(UBERGROM_MUSIC, 15, '4');
+    } else if (*SAVEDMUSIC == (unsigned int)doMusicOnly) {
+        GromWriteData(UBERGROM_MUSIC, 15, '3');
+    } else if (*SAVEDMUSIC == (unsigned int)doForTI) {
+        GromWriteData(UBERGROM_MUSIC, 15, '2');
+    } else {
+        GromWriteData(UBERGROM_MUSIC, 15, '1');
     }
 
     // and relock the eeprom
@@ -54,6 +69,20 @@ int checkHighScores() {
     return 1;
 }
 
+// destroys the magic byte so high scores will be reset
+void clearHighScores() {
+    // unlock the eeprom
+	GromWriteData(0xffff, 15, 0x55);
+	GromWriteData(0xffff, 15, 0xaa);
+	GromWriteData(0xffff, 15, 0x5a);
+
+    // now write the data to corrupt the magic
+    GromWriteData(UBERGROM_WRITE, 15, 0);
+
+    // and relock the eeprom
+	GromWriteData(0xffff, 15, 0);
+}
+
 void readHighScores(struct _scores *scores) {
     // we think the device exists, so suck in the high scores
     // we don't bother assume the cache is valid - we re-read each time
@@ -68,7 +97,7 @@ void readHighScores(struct _scores *scores) {
         // No. Load a default one
         scores->magic = UBERGROM_MAGIC;
         for (int idx=0; idx<10; ++idx) {
-            scores->entry[idx].val = (10-idx)*10;
+            scores->entry[idx].val = (10-idx)*100;
             memset(&scores->entry[idx].data, 'A', 4);
             scores->entry[idx].data[0]=0;
         }
@@ -161,14 +190,23 @@ void showHighScores() {
 }
 
 // enter the high score, if earned
+// warning: may or may not return - we reboot here if a high score is entered
 void registerHiScore() {
+#define LONG_DELAY 45
+#define SHORT_DELAY 5
+
 	int scoreidx,i;
 	int pos, chr;
-	int delay=0;
+	int delay=LONG_DELAY;
     struct _scores scores;
 
     // is the ubergrom present?
     if (!checkHighScores()) {
+        return;
+    }
+
+    // no entry if cheating
+    if (scoremode == 9) {
         return;
     }
 
@@ -181,6 +219,9 @@ void registerHiScore() {
 		if (score > scores.entry[scoreidx].val) {
 			break;
 		}
+        if ((score == scores.entry[scoreidx].val) && (scoremode > scores.entry[scoreidx].data[0])) {
+            break;
+        }
 	}
 	if (scoreidx > 9) {
 		// no high score
@@ -217,10 +258,7 @@ void registerHiScore() {
     hchar(row,  8, 161, 2);
     hchar(row, 23, 161, 2);
 
-#define LONG_DELAY 45
-#define SHORT_DELAY 5
-
-    pos = 0;    // which position (0-2)
+    pos = 0;    // which position (0-2) (note the array is 1,2,3 - 0 is the scoremode)
     chr = 0;    // which character (0-27 = A-Z,.,<<)
 
 	for (;;) {
@@ -264,14 +302,14 @@ void registerHiScore() {
 					    if (pos > 0) {
                             xchar(row, col+pos, ' ');
                             --pos;
-                            scores.entry[scoreidx].data[pos]=' ';
+                            scores.entry[scoreidx].data[pos+1]=' ';
 					    }
                         delay = LONG_DELAY;
 					    break;
 
 				    case 26:
 					    // period selected
-                        scores.entry[scoreidx].data[pos]='.';
+                        scores.entry[scoreidx].data[pos+1]='.';
                         xchar(row, col+pos, '.');
                         ++pos;
                         delay = LONG_DELAY;
@@ -279,7 +317,7 @@ void registerHiScore() {
 
 				    default:
 					    // letter selected
-                        scores.entry[scoreidx].data[pos]=chr+'A';
+                        scores.entry[scoreidx].data[pos+1]=chr+'A';
                         xchar(row, col+pos, chr+'A');
                         ++pos;
                         delay = LONG_DELAY;
@@ -312,14 +350,6 @@ void registerHiScore() {
 
 // just a wrapper for showHighScores so we can reboot on exit
 void doShowHighScores() {
-//	showHighScores();
-
-    // TODO: this block is just to force a high score for testing
-    joynum = 1;
-    score = 42;
-    scoremode = 1;
-    registerHiScore();
-    // END todo block
-
+	showHighScores();
 	reboot();
 }

@@ -1,11 +1,3 @@
-Should we include an UBERGROM that saves settings and high score? Can we make a small one work? (Then we have GPL start up too).
-- Greg notes we could use a normal UberGROM cart - it's got 512k ROM and a 128k ubergrom already
-- pretty wasteful given we only need about 50 bytes of eeprom ;)
-- high score code is mostly working except that it's not apparently saving (emulation issue? I don't know)
-- need to read high scores on startup so we can show the top one on the title page (and always init it)
-- need to call registerHiScores() after game over to save high scores
-
-
 test invisible game
 
 --------------------------
@@ -153,7 +145,7 @@ Hold 0 when powering on until the HarmlessLion screen to disable F18A enhancemen
 '0' also ends delays in three places:
 - title page - goes to attract mode
 - Qwertian screen - back to title page
-- Game Over - after the music - back to title page
+- Game Over - after the music - immediately restart with same ship - will skip high score screen!
 
 Hold fire when moving left and right to access the ships GNAT and SELENA
 	-GNAT is tiny and has only a single gun with no powerups (game mode '1' on score last digit)

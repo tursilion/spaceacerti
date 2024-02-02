@@ -56,6 +56,10 @@ void gamwin() {
 		gamewineasy();
 	}
 
+    // see about high scores
+    // This might not return if a high score was entered (we'll reboot there instead)
+    wrapRegisterHiScore();
+
 	// on end, reboot
 	reboot();
 }

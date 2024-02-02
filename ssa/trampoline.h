@@ -2,6 +2,7 @@
 #define TRAMPOLINE_H
 
 #include "game.h"
+#include "highscores.h"
 
 // trampoline functions
 void wrapenemy();
@@ -60,4 +61,9 @@ void wrapladybugwin();
 void wrapbossdraw();
 void wrapGameWinHard();
 void wrapsoundtest();
+void wrapRegisterHiScore();
+int wrapCheckHighScores();
+void wrapClearHighScores();
+void wrapSaveScores(struct _scores *);
+
 #endif

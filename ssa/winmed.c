@@ -45,7 +45,7 @@ int scorecountdown;
 // the scrolltext will probably need to be converted for performance's sake
 // (but, maybe not, only 32 characters?)
 // space must be first :) j and p are unused.
-const char fontstr[] = " ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnoprstuvwxyz=!()-012369.`";
+const char fontstr[] = " ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnoprstuvwxyz=!()-012469.`";
 
 // at the end of the scroll text we will display a secret
 

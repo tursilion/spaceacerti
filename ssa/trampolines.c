@@ -11,6 +11,7 @@
 #include "human.h"
 #include "boss.h"
 #include "f18load.h"
+#include "highscores.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "selena_end_c.c"
@@ -805,5 +806,40 @@ void wrapsoundtest() {
 
     SWITCH_IN_BANK3b;
     soundtest();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapRegisterHiScore() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    registerHiScore();  // warning: might reboot instead of returning
+	SWITCH_IN_PREV_BANK(old);
+}
+
+int wrapCheckHighScores() {
+	unsigned int old = nBank;
+    int ret;
+
+    SWITCH_IN_BANK8a;
+    ret = checkHighScores();
+	SWITCH_IN_PREV_BANK(old);
+
+    return ret;
+}
+
+void wrapClearHighScores() {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    clearHighScores();
+	SWITCH_IN_PREV_BANK(old);
+}
+
+void wrapSaveScores(struct _scores *scores) {
+	unsigned int old = nBank;
+
+    SWITCH_IN_BANK8a;
+    saveScores(scores);
 	SWITCH_IN_PREV_BANK(old);
 }

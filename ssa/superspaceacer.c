@@ -7,6 +7,7 @@
 #include <sound.h>
 #include <kscan.h>
 #include <system.h>
+#include <grom.h>
 
 #include <TISNPlay.h>
 
@@ -20,6 +21,7 @@
 #include "boss.h"
 #include "f18load.h"
 #include "highscores.h"
+#include "kscan.h"
 
 #define BIN2INC_HEADER_ONLY
 #include "f18sprites8sl.c"
@@ -804,6 +806,19 @@ void main() {
 		score = 0;
 		scoremode = 0;
         doMusic = doAllMusic;
+
+        // check for UberGROM and pull the saved sound setting from there if valid
+        if (wrapCheckHighScores()) {
+            // there are 62 bytes of high score, and we'll store the music setting next
+            int c = GromReadData(UBERGROM_MUSIC, 15);
+            switch (c) {
+                case '4': doMusic = doSfxInstead; break;
+                case '3': doMusic = doMusicOnly;  break;
+                case '2': doMusic = doForTI; break;
+                default:  doMusic = doAllMusic; break;
+            }
+        }
+
         *SAVEDMUSIC = (unsigned int)doMusic;    // make sure the saved pointer is valid in case of early reboot // TODO: not 32-bit safe
 
         f18a = realf18a;
@@ -1014,9 +1029,18 @@ titleagain:
 				if (flag == PLAYER_DIED) {
 					// 2 means game over
 					gamovr();
+                    if (KSCAN_KEY == '0') {
+                        // player wants to restart - bypass high score check
+                        level = 7;  // flag to loop
+                    } else {
+                        // check high scores
+                        wrapRegisterHiScore();
+                        // back to title screen if we return
+                        level = 9;
+                    }
 				}
 			} else {
-				// back to title screen
+				// attract mode - back to title screen
 				level = 9;
 			}
 
@@ -1200,7 +1224,6 @@ void gamovr()
 	StartMusic(GAMEOVERMUS, 0);
 	
 	nCnt=300;
-	level=7;			// flag for exit to restart
 	spdall();
 
 	for (;;) {
@@ -1215,7 +1238,6 @@ void gamovr()
 
 		nCnt--;
 		if (nCnt == 0) {
-			level=9;	// change flag to go back to title pic
 			break;
 		}
 
@@ -1226,7 +1248,7 @@ void gamovr()
 			}
         } else if (KSCAN_KEY == '0') {
             if (btnok) {
-                nCnt=1; // force early timeout
+                nCnt=1; // force early timeout (this will force the restart now)
             }
         } else {
 			btnok = 1;

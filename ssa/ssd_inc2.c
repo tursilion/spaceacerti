@@ -50,6 +50,9 @@ const char TXTDAT2[] =
  "         Chris Jonansen         "
  "          Steve Burns           "
  "        Lloyd Galenzoski        "
+ "            Insomnia            "
+ "            Khanivore           "
+ "            JasonACT            "
  "             Yurkie             "
  "             RasmusM            "
  "             TheMole            "
@@ -67,12 +70,12 @@ const char TXTDAT2[] =
  "         by Mike Brent          "
  "   ` 1992 by Julius Software    "
  "                                "
- "       Final score              "
- "                                "
- "      now Harmlesslion.com      "
- "       ` 2023 Mike Brent        ";
+ "       Final score              ";
 const char TXTDAT3[] = 
- "                               "      // remove one again...
+ "                               " // remove one again...
+ "      now Harmlesslion.com      "
+ "       ` 2024 Mike Brent        "
+ "                                "      
  " ============================== "
  "@";
 
