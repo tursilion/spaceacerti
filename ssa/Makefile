@@ -54,6 +54,40 @@ PREREQUISITES=$(OBJECT_LIST)
 all: $(PREREQUISITES)
 	$(LD) $(OBJECT_LIST) $(LIBS) $(LIBPATH) $(LDFLAGS_EA5) -o $(NAME).ea5.elf > ea5.map
 	$(ELF2CART) $(NAME).ea5.elf $(NAME)8.bin
+	$(CP) $(NAME)8.bin ../ubergrom/ssa_uber_rom8.bin
+    # ugh, need to patch all 32 banks
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 0000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 2000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 4000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 6000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 8000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin A000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin C000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin E000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 10000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 12000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 14000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 16000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 18000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 1A000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 1C000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 1E000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 20000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 22000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 24000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 26000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 28000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 2A000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 2C000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 2E000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 30000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 32000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 34000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 36000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 38000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 3A000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 3C000 00
+	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin 3E000 00
 
 clean:
 	-rm *.o *.map *.lst *.sym *.ihx *.rom

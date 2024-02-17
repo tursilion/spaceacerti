@@ -1,3 +1,5 @@
+non-F18 Innerpest and Texin bosses are still corrupting on some frames
+check why SID causes a click on reset
 test invisible game
 
 --------------------------
