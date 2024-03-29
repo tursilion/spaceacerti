@@ -6,7 +6,7 @@
  def _init_data
  
 * cartridge header here - we dont expect a normal startup entry
-* We can reserve 44 bytes for the header on every page - that must take us to the bank switch!
+* We can reserve 46 bytes for the header on every page - that must take us to the bank switch!
     aorg >6000
     
 * because many bytes in the standard header are unused, and location is well known,
@@ -25,7 +25,7 @@ _prog:
     text 'SUPER SPACE ACER 2023'
     even
 
-* 40 bytes used till this point (note title length!)
+* 42 bytes used till this point (note title length!)
 * Pad the above if necessary to get to 42 bytes so the cartridge headers work.
 
 * Entry point for C runtime initilization code
@@ -85,7 +85,7 @@ bss_clear_end:
 
 * now copy the rest of the fixed data into RAM
 * we are lazy here and assume a load address of 0xA000
-* we also assume the rest of this page and all of page 1-2
+* we also assume the rest of this page and all of page 1-2 (excluding header of 46 bytes)
 * for (almost) 24k. Anyway... to do this right we are going to
 * need to work from scratchpad - copy into >8320
 
@@ -136,7 +136,7 @@ cpsclp:
 
 cpcode:
 * start from R1, copy the rest of the page,
-* then switch the page and copy the whole thing,
+* then switch the page and copy the whole thing (except 46 byte header),
 * then reset bank and return. Only copies first 24k
 * (minus the header bits)
   li r2,>6002       * next page
@@ -146,7 +146,7 @@ cplp:
   ci r1,>8000
   jne cplp
 
-  li r1,>6000       * restart copy
+  li r1,>602E       * restart copy
   clr *r2+          * but on next page, and increment
   dec r3            * check if more
   jne cplp

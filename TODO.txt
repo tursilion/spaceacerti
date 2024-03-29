@@ -1,7 +1,14 @@
-non-F18 Innerpest and Texin bosses are still corrupting on some frames
-check why SID causes a click on reset
-test invisible game
+- write ubergrom programming instructions (need to write flash and eeprom)
 
+- non-F18 Innerpest and Texin bosses are still corrupting on some frames
+
+- test invisible game
+
+- restart WITH F18A option crashes GPU if boot with '0' key to turn OFF F18A
+    - maybe not every time, but make sure we stop the GPU before we restart (not what this describes)
+    - might be a good idea to stop the GPU on START, too, just to be safe
+
+- test ForTI mode -- do we need to build a ForTI clone? I think so
 --------------------------
 
 HarmlessLion screen working

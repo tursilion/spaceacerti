@@ -15,6 +15,9 @@ ENTRY(_start)
 SEARCH_DIR("/home/tursi/gcc9900/tms9900/lib");
 
 /* banked offset of 46 bytes to account for header space */
+/* We also make the 24k block smaller by 46*3 so we can */
+/* Although this script gives 24k, note we lose an extra */
+/* 92 bytes for the headers in page 2 and 3 */
 
 MEMORY
 {

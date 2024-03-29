@@ -362,7 +362,10 @@ void initSound() {
     SIDBLASTER_SR1 = 0;
     SIDBLASTER_SR2 = 0;
     SIDBLASTER_SR3 = 0;
-    SIDBLASTER_MODEVOL = 0xf;   // maximum volume
+
+    // This causes a click in the emulation. Does it click on hardware? 
+    // This might be a wontfix in the end, anyway
+    SIDBLASTER_MODEVOL = 0xf;
 
     freq1=0;
     freq2=0;
