@@ -1424,7 +1424,7 @@ void reboot() {
 	unsigned char x;
 
     // ask the GPU to stop to avoid conflict during the restart
-    VDP_SET_REGISTER(F18A_REG_GPUCFG, 0);   // clear the GO bit
+	stopgpu_f18a();
 
 	// to preserve the score while keeping the lazy reboot, we save it off above the stack
 	// we save it twice, once inverted as a checksum, so the boot will always know it's right

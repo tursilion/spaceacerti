@@ -1,14 +1,21 @@
-- write ubergrom programming instructions (need to write flash and eeprom)
+TESTING:
+- test invisible game
+- test ubergrom hardware
 
+REPRODUCED BUGS:
+- non-F18 player shields no longer show up
+    - the generated code in playv looks wrong, assuming the 'oldshield' value is in r1, but the F18A side works and the non-F18A side doesn't?
+    - confirmed this is a GCC bug - it might be in my skill set to solve?
 - non-F18 Innerpest and Texin bosses are still corrupting on some frames
 
-- test invisible game
+UNKNOWN BUGS:
+- on hardware non-F18 moving left freezes the game
+- on hardware non-F18 up for SFX doesn't work on config screen
+- on hardware qwertian screen never shows up (always does ship demo play)
 
-- restart WITH F18A option crashes GPU if boot with '0' key to turn OFF F18A
-    - maybe not every time, but make sure we stop the GPU before we restart (not what this describes)
-    - might be a good idea to stop the GPU on START, too, just to be safe
+DOCUMENTATION:
+- write ubergrom programming instructions (need to write flash and eeprom)
 
-- test ForTI mode -- do we need to build a ForTI clone? I think so
 --------------------------
 
 HarmlessLion screen working

@@ -174,7 +174,7 @@ void doAllMusic() {
         playSNMusic(SOUNDCHIP);    // stock sound chip
     }
      
-    // run sound effects at 30 hz - SID version
+    // run sound effects at 30 hz - //SID// version
     SWITCH_IN_BANK4a;
 
     if (VDP_INT_COUNTER & 1) {
@@ -233,12 +233,6 @@ void wrapAYcmd(volatile unsigned char *soundchip, unsigned char reg, unsigned ch
 // which I will do in real time since it's still quicker than 
 // the music player was.
 void doSnSfx(unsigned char *soundchip) {
-    // if any music is active, stop it
-    if (isSNPlaying) {
-        StopSong();
-        // don't shutup and don't kill loop music, in case it gets turned back on
-    }
-
 	unsigned int old = nBank;
     SWITCH_IN_BANK4a;
 
@@ -250,13 +244,15 @@ void doSnSfx(unsigned char *soundchip) {
             unsigned char regs = *(pSfx++);
             if (0 == regs) {
                 pSfx = NULL;
-                blockSfx = 0;
+                // we'll undo the block next frame
             } else {
                 while (regs--) {
                     unsigned char reg = *(pSfx++);
                     wrapAYcmd(soundchip, reg, *(pSfx++));
                 }
             }
+        } else {
+            blockSfx = 0;   // make sure we didn't forget to clear something
         }
     } else {
         if (NULL != pShoot) {
@@ -279,6 +275,12 @@ void doSnSfx(unsigned char *soundchip) {
 
 // Sound effects on the stock SN, no music
 void doSfxInstead() {
+    // if any music is active, stop it
+    if (isSNPlaying) {
+        StopSong();
+        // don't shutup and don't kill loop music, in case it gets turned back on
+    }
+
     doSnSfx((unsigned char*)SOUNDCHIP);    // stock sound chip
 }
 
