@@ -1,17 +1,11 @@
 TESTING:
-- test invisible game
 - test ubergrom hardware
-
-REPRODUCED BUGS:
-- non-F18 player shields no longer show up
-    - the generated code in playv looks wrong, assuming the 'oldshield' value is in r1, but the F18A side works and the non-F18A side doesn't?
-    - confirmed this is a GCC bug - it might be in my skill set to solve?
-- non-F18 Innerpest and Texin bosses are still corrupting on some frames
 
 UNKNOWN BUGS:
 - on hardware non-F18 moving left freezes the game
-- on hardware non-F18 up for SFX doesn't work on config screen
-- on hardware qwertian screen never shows up (always does ship demo play)
+- on hardware non-F18 up for SFX doesn't (reliably) work on config screen
+- non-F18 Innerpest and Texin bosses are still corrupting on some frames
+    - are they? Have played through successfully on emulation on easy mode
 
 DOCUMENTATION:
 - write ubergrom programming instructions (need to write flash and eeprom)
@@ -153,6 +147,15 @@ SPRITES
 18-21 		- player shield
 22-30 		- player shots
 31			- mine tips
+
+
+Controls
+--------
+
+Left joystick, or ESDX to move and period to fire.
+
+In either mode, comma (,) to pause/unpause.
+
 
 Secret Game Modes
 -----------------
