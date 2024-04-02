@@ -27,9 +27,8 @@ Scroll Text - working
 Attract mode game - working
 Regular Game - working
 F18A game - working
-
-Invisible game
-- not tested
+Invisible game - working F18A
+Invisible game - working 9918A
 
 
 VRAM map (except for ending routines)
