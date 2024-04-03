@@ -767,6 +767,29 @@ void displayHLLogo() {
 extern void draw1();
 extern char br,bc,bd;
 
+void keyboardTest() {
+	// set regular graphics mode (we need this in 3 of the 4 attract modes plus difficulty)
+	set_text();
+	
+	/*load VDP data */
+	charset();
+    VDP_SET_REGISTER(VDP_REG_COL, 0x17);
+
+    for (;;) {
+        // inputs
+        joystfast(1);
+        kscanfast(1);
+
+        // print it
+        printf("%3d %3d %3d\n", KSCAN_JOYX, KSCAN_JOYY, KSCAN_KEY);
+
+        // return
+        if (KSCAN_KEY == 18) {
+            break;
+        }
+    }
+}
+
 extern void selenawin();
 void main() {
 	unsigned char i;
@@ -821,16 +844,23 @@ void main() {
 
         *SAVEDMUSIC = (unsigned int)doMusic;    // make sure the saved pointer is valid in case of early reboot // TODO: not 32-bit safe
 
+        // check keyboard for f18a and input test
+        kscanfast(1);
+
         f18a = realf18a;
         if (f18a) {
             // check keypad for 0 - this will disable F18A
-            kscanfast(1);
             if (KSCAN_KEY == '0') {
                 // enable flicker before we lock the F18A
                 VDP_SET_REGISTER(F18A_REG_MAXSPR, 4);
                 lock_f18a();
                 f18a=0;
             }
+        }
+
+        // hold '1' for keyboard test
+        if (KSCAN_KEY == '1') {
+            keyboardTest();
         }
 
         // since it's the first run, do the HL logo

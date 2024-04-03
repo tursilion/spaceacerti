@@ -71,7 +71,7 @@ repaint:
 
     if (doMusic != doMusicOnly) {
         // don't bother with the SFX hint if SFX are turned off
-        writestring(21, 1, "(HINT: Hold UP and # for SFX)");
+        writestring(21, 1, "(HINT: Hold LEFT and # for SFX)");
     }
 
 	wrapinitstars();
@@ -129,12 +129,16 @@ repaint:
 			shutup();
 		}
 
+        // The CRU does not allow up or down with numbers on the same row,
+        // possible feedback issue? It didn't work with my Wico adapter either,
+        // and didn't work from TI BASIC either. So changing from UP to LEFT.
+
 		switch (KSCAN_KEY) {
 		case JOY_FIRE:	
 			return;
 
 		case '1':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_armor();
 			} else {
 				StartMusic(STAGE1MUS, 1);
@@ -142,7 +146,7 @@ repaint:
 			break;
 
 		case '2':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_explosion();
 			} else {
 				StartMusic(STAGE2MUS, 1);
@@ -150,7 +154,7 @@ repaint:
 			break;
 
 		case '3':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_hitboss();
 			} else {
 				StartMusic(STAGE3MUS, 1);
@@ -158,7 +162,7 @@ repaint:
 			break;
 
 		case '4':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_nukebomb();
 			} else {
 				StartMusic(STAGE4MUS, 1);
@@ -166,7 +170,7 @@ repaint:
 			break;
 
 		case '5':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_shipdead();
 			} else {
 				StartMusic(STAGE5MUS, 1);
@@ -174,7 +178,7 @@ repaint:
 			break;
 
 		case '6':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_shielddown();
 			} else {
 				StartMusic(BOSSMUS, 1);
@@ -182,7 +186,7 @@ repaint:
 			break;
 
 		case '7':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_shieldwarn();
 			} else {
 				StartMusic(GAMEOVERMUS, 0);
@@ -190,7 +194,7 @@ repaint:
 			break;
 
 		case '8':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_shieldup();
 			} else {
 				StartMusic(WINSCROLLMUS, 1);
@@ -198,7 +202,7 @@ repaint:
 			break;
 
 		case '9':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_pwrpulse();
 			} else {
     			StartMusic(WINANIMMUS, 0);
@@ -206,7 +210,7 @@ repaint:
 			break;
 
 		case '0':
-			if (KSCAN_JOYY == JOY_UP) {
+			if (KSCAN_JOYX == JOY_LEFT) {
 				playsfx_pwrwide();
 			} else {
                 if (KSCAN_JOYY == JOY_DOWN) {
@@ -292,7 +296,6 @@ repaint:
             goto repaint;
 		}
 
-		// just for fun
         // wait for key release
         if (KSCAN_KEY != 0xff) {
             do {

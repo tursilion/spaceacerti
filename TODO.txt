@@ -1,12 +1,6 @@
 TESTING:
 - test ubergrom hardware
 
-UNKNOWN BUGS:
-- on hardware non-F18 moving left freezes the game
-- on hardware non-F18 up for SFX doesn't (reliably) work on config screen
-- non-F18 Innerpest and Texin bosses are still corrupting on some frames
-    - are they? Have played through successfully on emulation on easy mode
-
 DOCUMENTATION:
 - write ubergrom programming instructions (need to write flash and eeprom)
 
