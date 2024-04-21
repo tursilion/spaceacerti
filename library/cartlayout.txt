@@ -1,0 +1,43 @@
+Base 00 - R15 = 9800
+
+6000 - keeping free for Editor/Assembler
+8000 - 
+    0000 - 01FF - library menu
+    0200 - 1D00 - SSC
+         - 1C40 inside SSC has the asm loaders, >A0 bytes for >2100
+    1D00 - 1FFF - library font
+A000 - 
+    0000 - 1FFA - SSA
+C000 - 
+    0000 - 1FFA - SSB
+E000 - 
+    0000 - 1FFA - ssa2_a1
+
+Base 01 - R15 = 9804
+
+6000 - keeping free for Editor/Assembler
+8000 - 
+    0000 - 1FFA - ssa2_a2
+A000 - 
+    0000 - 17FF - acer_c
+    1800 - 1D00 - ssa_a3
+C000 - 
+    0000 - 17FF - acer_p
+E000 - 
+    0000 - 13FF - sse
+    1400 - 1AFF - demq (load to >2000, >770 bytes)
+
+Base 02 - R15 = 9808
+
+6000 - 
+    0000 - 08ff - story reader 1
+    0900 - 11ff - story reader 2
+8000 - 
+    0000 - 0EFF - ssd
+A000 - 
+    0000 - 1AFF - SSA2 Story
+C000 - 
+    0000 - 1FDF - SSA1 Story part 1
+E000 - 
+    0000 - 1CEF - SSA1 Story part 2
+

@@ -1,0 +1,21 @@
+Music player isn't ready for prime time. Just sneak in the TF3 Tribute as the second 256k.
+    
+Original Super Space Acer - GROM space
+Story   10k - round up to 16
+Game    52k - up to 56 unpacked (use the 32k cart project to hack DSRLNK correctly but copy from GPL)
+Menu     8k
+      -----
+       120k
+       
+The SSA menu needs a little, but we can make it fit with the story or picture banks
+
+
+e
+0CDC 050A 0,1 Horizontal string projection
+0CDE 0508 2,3 Vertical string projection
+0CE0 0504 4,5 Repeat horizontal character
+0CE2 0502 6,7 Repeat vertical character
+0CE4 0534 8,9 Relative fixed row
+0CE6 0532 A,B Relative fixed column
+0CE8 053A C,D Loop values
+0CEA 056C E,F Fixed position row and column, screen offset

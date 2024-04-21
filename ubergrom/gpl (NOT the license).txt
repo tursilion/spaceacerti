@@ -1,0 +1,218 @@
+* GPL Boot Code for Super Space Acer
+* Hand Assembled - no assembler syntax honored
+
+* Start at >8000 so >6000 is free for Editor/Assembler
+    org >8000
+    
+* standard header
+    data >aa01      * intro
+    data >0000      * program count+spare
+    data >800C      * powerup list
+    data >8060      * program list
+    data >0000      * DSR list
+    data >0000      * subprogram list
+    
+* startup list    
+    data >0000
+    data >8040
+    
+* 8010 - program entry
+    data >0000      * link to next
+    data >8030      * program start
+    data >1553      * length plus 'S'
+    text 'UPER SPACE ACER 2024'
+    
+* padding
+    data >ffff
+    data >ffff
+    data >ffff
+    
+* 8030 - program start
+07 20   all >20             * clear screen
+bf 00   dst @>8300,>602a    * start address of CPU code
+60 2a
+0f f0   XML >F0             * run assembly from pointer at >8300
+0b      EXIT                * reboot if somehow we return
+
+* padding to get to >8040
+        byte >ff
+        data >ffff
+        data >ffff
+        data >ffff
+        
+* 8040 - powerup link - secret jump to TF3 boot
+* test keyboard for space bar
+be 74
+05      ST >05,@>8374
+03      SCAN
+d6 75
+20      CEQ >20,@>8375
+40 56   BR >8056
+	
+* 8049
+07 20   all >20             * clear screen
+86 8F
+E3 40   clr @>6040          * set cartridge page
+bf 00   dst @>8300,>7318    * start address of CPU code
+73 18
+0f f0   XML >F0             * run assembly from pointer at >8300
+0b      EXIT                * reboot if somehow we return
+
+* 8056
+bd 90
+73 90
+72      DST *>8372,*>8373	* Transfer address from data stack (72) to sub stack (73)
+96 72   DECT @>8372			* decrement data stack pointer
+00      RTN					* branches to next powerup routine        
+        
+* padding
+        data >ffff
+        
+* Library option
+* 8060 - program entry
+    data >8010      * link to next
+    data >8070      * program start
+    data >074C      * length plus 'L'
+    text 'IBRARY'
+
+* paddng
+        data >ffff
+        
+* startup - copy program
+* 8070
+07 20   all >20
+bf 8f
+1D 00
+A5 5A   DST @>A000,>A55a    * memory test
+D7 8f
+1D 00
+a5 5a   DCEQ @>A000,>a55a   * check value
+60 99   bs >8099            * skip ahead if passed
+  
+* 8080
+31 00
+0c a1
+60 80
+8D      move >0C from G@>808d to V@>0160
+
+* 8087
+03      scan                * mode was already set
+d6 75   CEQ >20,@>8375      * wait for space bar
+40 56   BR >8056
+0B      EXIT                * reboot
+ 
+* 808D        
+        TEXT '32K REQUIRED'
+
+* 8099
+* We'll append the library code here
+
+        
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+** Old powerup link that made the screen black and set up sprites as moving stars
+** Broke TI BASIC though, would need an interrupt routine to check and stop it.
+
+* padding to get to >8040
+        byte >ff
+        data >ffff
+        data >ffff
+        data >ff01          * last byte used for screen color
+
+* 8040 - powerup link
+
+* black screen
+39 00   move 1 to reg>07 from GROM@>803F
+01 07
+80 3f
+
+* set color set for text to cyan on black
+be a3   st VDP@>380,>71
+80 71
+35 00   move 11 to VDP@>381 from VDP@>380
+0b a3
+81 a3
+80
+
+* set up a sprite table for stars
+31 00   move 80 to VDP@>300 from GROM@>8070
+50 a3
+00 80
+70
+
+* set up automotion
+31 00   move 64 to VDP@>780 from GROM@>80c0
+40 a7
+80 80
+c0
+be 7a   st @>837a,15
+0f
+
+* call next powerup routine
+bd 90   dst *>8373,*>8372       * transfer from data stack to sub stack
+73 90 
+72
+96 72   dect @>8372             * update data stack pointer
+00      rtn                     * branches to next routine
+     
+* padding
+        data >ffff
+        data >ffff
+        data >ffff
+        
+* 8070 - sprite data
+        data >714d,>680f
+        data >6872,>680f
+        data >8361,>680f
+        data >b88c,>680f
+        data >b637,>680f
+        data >4097,>680f
+        data >b4f6,>680f
+        data >30e7,>680f
+        data >8fb9,>680f
+        data >7110,>680f
+        data >04d1,>680f
+        data >f88e,>680f
+        data >3456,>680f
+        data >634c,>680f
+        data >54c5,>680f
+        data >d000,>ffff
+        
+* 80B0 - sprite pattern 104-105 (star and spare)
+        data >0100,>0000,>0000,>0000
+        data >ffff,>ffff,>ffff,>ffff
+        
+* 80c0 - sprite automotion
+        data >0100,>0f00,>0700,>0900
+        data >0900,>0e00,>0b00,>0a00
+        data >0300,>0700,>0800,>0100
+        data >0200,>0600,>0a00,>0a00
+        data >0100,>0700,>0300,>0f00
+        data >0a00,>0e00,>0600,>0200
+        data >0a00,>0800,>0300,>0500
+        data >0400,>0c00,>0000,>0000
+        data >ffff,>ffff
+        
+        

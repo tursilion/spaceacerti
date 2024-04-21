@@ -1,0 +1,152 @@
+xb2gpl <input text file> <grom base address in hex> <output text file>
+*10 CALL CLEAR
+  8099: ALL >20
+* 07,20,
+
+*20 CALL CHARSET
+  809B: DST @>834A,>0900
+  809F: CALL GROM@>0018
+* BF,4A,09,00,06,00,18,
+
+*30 REM LOAD THE REAL CHARACTER SET DIRECTLY - 0x300 BYTES
+*40 REM GPL MOVE >0300 TO V@>0900 FROM G@>9D00
+  80A3: MOVE >0300 TO V@>0900 FROM G@>9D00
+* 31,03,00,A9,00,9D,00,
+
+*41 REM LOAD THE ASM SUPPORT
+*45 REM GPL MOVE >00A0 TO @>2800 FROM G@>9C40
+  80AA: MOVE >00A0 TO @>2800 FROM G@>9C40
+* 31,00,A0,8F,A5,00,9C,40,
+
+*50 DISPLAY AT(1,8):"Super Space Acer"
+  80B1: FMT
+  80B2:   COL 10
+  80B4:   ROW 1
+  80B6:   HTEX 16 "Super Space Acer"
+*60 DISPLAY AT(3,4):"1) Play 1992 version"
+  80C7:   COL+ 12
+  80C8:   ROW+ 1
+  80C9:   HTEX 20 "1) Play 1992 version"
+*70 DISPLAY AT(4,4):"2) Read 1992 story text"
+  80DE:   COL+ 12
+  80DF:   HTEX 23 "2) Read 1992 story text"
+*80 DISPLAY AT(5,4):"3) See  1995 intro"
+  80F7:   COL+ 9
+  80F8:   HTEX 18 "3) See  1995 intro"
+*90 DISPLAY AT(6,4):"4) Read 1995 story text"
+  810B:   COL+ 14
+  810C:   HTEX 23 "4) Read 1995 story text"
+*100 DISPLAY AT(8,7):"Press QUIT to exit"
+  8124:   COL+ 12
+  8125:   ROW+ 1
+  8126:   HTEX 18 "Press QUIT to exit"
+*110 CALL KEY(0,K,S)
+  8139: ENDFMT
+* 08,FF,09,FE,00,0F,53,75,
+* 70,65,72,20,53,70,61,63,
+* 65,20,41,63,65,72,8B,A0,
+* 13,31,29,20,50,6C,61,79,
+* 20,31,39,39,32,20,76,65,
+* 72,73,69,6F,6E,8B,16,32,
+* 29,20,52,65,61,64,20,31,
+* 39,39,32,20,73,74,6F,72,
+* 79,20,74,65,78,74,88,11,
+* 33,29,20,53,65,65,20,20,
+* 31,39,39,35,20,69,6E,74,
+* 72,6F,8D,16,34,29,20,52,
+* 65,61,64,20,31,39,39,35,
+* 20,73,74,6F,72,79,20,74,
+* 65,78,74,8B,A0,11,50,72,
+* 65,73,73,20,51,55,49,54,
+* 20,74,6F,20,65,78,69,74,
+* FB,
+
+*110 CALL KEY(0,K,S)
+  813A: ST @>8374,>00
+  813D: SCAN
+*120 IF S=0 THEN 110
+  813E: BR G@L110
+* Mapping 'k' to >8375
+* BE,74,00,03,40,00,
+
+*130 IF K=49 THEN 1000
+  8140: CEQ @>8375,>31
+  8143: BS G@L1000
+* D6,75,31,60,00,
+
+*140 IF K=51 THEN 2000
+  8145: CEQ @>8375,>33
+  8148: BS G@L2000
+* D6,75,33,60,00,
+
+*150 IF K=50 THEN 3000
+  814A: CEQ @>8375,>32
+  814D: BS G@L3000
+* D6,75,32,60,00,
+
+*160 IF K=52 THEN 4000
+  814F: CEQ @>8375,>34
+  8152: BS G@L4000
+* D6,75,34,60,00,
+
+*170 GOTO 110
+  8154: B G@L110
+* 05,00,00,
+
+*1000 REM play 1992 game
+*1010 CALL LOAD(-32000,40,0)
+  8157: ST @>8300,>28
+  815A: ST @>8301,>00
+* BE,00,28,BE,01,00,
+
+*1030 REM GPL XML >F0
+  815E: XML >F0
+* 0F,F0,
+
+*1160 REM - then can start. There are four DSRLNK hits:
+*1170 REM SSD - 0F00 bytes to 2000, R14=A830
+*1180 REM SSE - 13AE bytes to A000, R14=DA0E
+*1190 REM ACER_C - 1800 bytes to V@2000, R14=A656
+*1200 REM ACER_P - 1800 bytes to V@0000, R14=A638
+*1210 REM entry wp is >209a, remember to inct r14 before RTWP
+*2000 REM play 1995 intro
+*2010 CALL LOAD(-32000,40,64)
+  815F: ST @>8300,>28
+  8162: ST @>8301,>40
+* BE,00,28,BE,01,40,
+
+*2030 REM GPL XML >F0
+  8166: XML >F0
+* 0F,F0,
+
+*3000 REM read text file 1 - story 1 - assume one block
+*3010 CALL LOAD(-32000,40,102)
+  8167: ST @>8300,>28
+  816A: ST @>8301,>66
+* BE,00,28,BE,01,66,
+
+*3030 REM GPL XML >F0
+  816E: XML >F0
+* 0F,F0,
+
+*4000 REM read text file 2 - story 2 - assume one block
+*4010 CALL LOAD(-32000,40,122)
+  816F: ST @>8300,>28
+  8172: ST @>8301,>7A
+* BE,00,28,BE,01,7A,
+
+*4030 REM GPL XML >F0
+  8176: XML >F0
+* 0F,F0,
+
+
+
+* Absolute fixups:
+*  >00BC (>8155): G@L110 = G@>813A
+
+* Relative fixups:
+*  >00A5 (>813E): G@L110 = G@>813A
+*  >00AA (>8143): G@L1000 = G@>8157
+*  >00AF (>8148): G@L2000 = G@>815F
+*  >00B4 (>814D): G@L3000 = G@>8167
+*  >00B9 (>8152): G@L4000 = G@>816F

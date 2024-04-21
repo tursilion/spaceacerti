@@ -1,0 +1,36 @@
+NOTE: This version hacked to run from the second half of a 512k cart. All pages offset by 0x40
+
+6040	LOADER
+6042	EA#5 part 1 (warning: no header)
+6044	EA#5 part 2
+6046    EA#5 part 3
+6048	TF3TI00
+604A	TF3TI01
+604C	TF3TI02
+604E	TF3TI03
+6050	TF3TI04
+6052	TF3TI05
+6054	TF3TI06
+6056	TF3TI07
+6058	TF3TI08
+605A	TF3TI09
+605C	TF3TI10
+605E	TF3TI11
+6060	map_boss_unknown
+6062	map_bosscerberus
+6064	map_bossfish
+6066	map_bossfort
+6068	map_bossgargoyle
+606A	map_bosslobster
+606C	map_bossvulcan
+606E	map_briefing
+6070	map_briefingornbase
+6072	map_titleThird1
+6074	map_titleThird2
+6076	map_titleThird3
+6078	TF3TI12
+607A	TF3TI13
+607C	TF3TI14
+607E	LOADER
+
+Most banks, except the EA#5 ones, have lots of space free, but we did need more than 128k and 256k was the next legal size. But we'd probably want to pack better if we ever wanted to add scrolling level data (or double again to 512k).
