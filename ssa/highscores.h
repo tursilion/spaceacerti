@@ -12,7 +12,7 @@
 // the high score table
 struct _score {
     unsigned int val;
-    unsigned char data[4];  // scoremode as a byte, then 3 initials
+    unsigned char data[4];  // ship as a nibble (most sig), scoremode as a nibble (least sig), then 3 initials
 };
 struct _scores {
     unsigned int magic;

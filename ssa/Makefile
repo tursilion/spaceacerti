@@ -57,6 +57,7 @@ all: $(PREREQUISITES)
 	$(CP) $(NAME)8.bin ../ubergrom/ssa_uber_rom8.bin
     # just to remove the ROM header byte (we'll use the GROM instead to boot)
 	/mnt/d/work/PatchBin/release/PatchBin.exe ../ubergrom/ssa_uber_rom8.bin -bank 2000 0000 00
+	cat ../ubergrom/ssa_uber_rom8.bin ../ubergrom/ssa_uber_rom8.bin > ../ubergrom/ssa_uber_rom512_8.bin
 
 clean:
 	-rm *.o *.map *.lst *.sym *.ihx *.rom

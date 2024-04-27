@@ -1,8 +1,12 @@
-TESTING:
-- test ubergrom hardware
+BUGS:
+- Still glitchy on Innerpest and probably Texin
+    - but why doesn't it ALWAYS happen? Didn't happen on Selena on Easy, for instance.
+- There are some timing glitches on the first boss (and probably all), but that might be okay
+- F18A version hangs before title page?
 
 DOCUMENTATION:
-- write ubergrom programming instructions (need to write flash and eeprom)
+- write manual/instruction sheet that can be printed?
+- write ubergrom programming instructions (need to write flash, AVR and eeprom)
 
 --------------------------
 
@@ -165,7 +169,12 @@ Hold fire when moving left and right to access the ships GNAT and SELENA
 
 Hold DOWN when selecting SNOWBALL for cloaked enemy mode (game mode '3' on score last digit)
 
-Hold UP when starting for cheat mode. You are invincible, plus each key does something different in cheat mode:
+Hold UP when starting for cheat mode. You have to use a different start key:
+    Q - Easy Mode
+    W - Medium Mode
+    E - Hard Mode
+    
+You are invincible, plus each key does something different in cheat mode:
 	0 - no shields
 	2 - add shields
 	3 - add life

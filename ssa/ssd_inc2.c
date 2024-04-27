@@ -97,7 +97,7 @@ const char WINTIPS[] =
 	 " Secret ship SELENE is powerful "
 	 "LADYBIRD shields recharge on hit"
 	 "Use the force  dont fire or miss"
-	 " Hold UP to activate cheat mode "
+     "   UP and Q W E for cheat mode  "
 	 "Isn't it fun to read through the binary?"
 ;
 

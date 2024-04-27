@@ -369,6 +369,21 @@ redraw2:
 		screen(COLOR_BLACK);
 
 		kscanfast(0);
+		// to make cheats work, we also accept QWE as inputs for 123 - remap here
+		switch (KSCAN_KEY) {
+			case 'Q': 
+				KSCAN_KEY = '1';
+				break;
+
+			case 'W': 
+				KSCAN_KEY = '2';
+				break;
+
+			case 'E': 
+				KSCAN_KEY = '3';
+				break;
+		}
+
 		if ((KSCAN_KEY > '0') && (KSCAN_KEY < '4')) {
 			// hold up while selecting to enable cheat mode
 			joystfast(joynum);

@@ -20,6 +20,14 @@ static const unsigned char LCARS[] = {
     0x00,0x00,0x00,0xFF,0x00,0xFF,0x00,0x00
 };
 
+static const char *SHIPNAMES[] = {
+    "CRUISER ",
+    "SNOWBALL",
+    "LADYBIRD",
+    "GNAT    ",
+    "SELENA  "
+};
+
 // write the high scores out - we assume that the device was already checked for
 void saveScores(struct _scores *scores) {
     // unlock the eeprom
@@ -117,8 +125,8 @@ void displayHighScores(struct _scores *scores) {
 	level = 1;	// to make sure we get stars
 
     // draw the frames
-    vchar(0,7,165,24);
-    vchar(0,25,165,24);
+    vchar(0,4,165,24);
+    vchar(0,27,165,24);
     hchar(0,11,161,11);
     hchar(2,11,166,11);
     xchar(0,10,160);
@@ -139,9 +147,18 @@ void displayHighScores(struct _scores *scores) {
 
         for (int idx=0; idx<10; ++idx) {
             score = scores->entry[idx].val;
-            scoremode = scores->entry[idx].data[0];
-	        VDP_SET_ADDRESS_WRITE((unsigned int)(gIMAGE+VDP_SCREEN_POS((idx*2)+4,11)));
+            scoremode = scores->entry[idx].data[0]&0x0f;
+	        VDP_SET_ADDRESS_WRITE((unsigned int)(gIMAGE+VDP_SCREEN_POS((idx*2)+4,6)));
             displayScore();
+            VDPWD=' ';
+            {
+                const char *p = SHIPNAMES[(scores->entry[idx].data[0])&0xf];
+                if (((scores->entry[idx].data[0])&0xf0) == 0x30) p = "CLOAKED ";
+                if (((scores->entry[idx].data[0])&0xf0) == 0x90) p = "CHEATED ";
+                for (int i=0; i<8; ++i) {
+                    VDPWD = *(p++);
+                }
+            }
             VDPWD=' ';
             VDPWD=scores->entry[idx].data[1];
             VDPWD=scores->entry[idx].data[2];
@@ -210,6 +227,10 @@ void registerHiScore() {
         return;
     }
 
+    // reload the special characters (bosses overwrite them)
+    vdpmemcpy(0x2000+160*8, LCARS, sizeof(LCARS));
+    vdpchar(gColor+20, COLOR_LTRED<<4);
+
     // get scores (will load default table if needed)
     readHighScores(&scores);
 
@@ -239,24 +260,25 @@ void registerHiScore() {
 
 	// set up the high score so it draws nicely
 	scores.entry[scoreidx].val=score;
-    scores.entry[scoreidx].data[0] = scoremode;
+    scores.entry[scoreidx].data[0] = scoremode | (playership<<4);
     scores.entry[scoreidx].data[1] =' ';
     scores.entry[scoreidx].data[2] =' ';
     scores.entry[scoreidx].data[3] =' ';
 
     // now get the high scores up on screen
     displayHighScores(&scores);
+    writestring(1, 11, "NAME ENTRY ");  // overwrite 'HIGH SCORES'
 
     int row = scoreidx*2+4;     // which row we are working on
-    const int col = 19;
+    const int col = 23;
 
     // highlight the row
-    vchar(0, 7, 32, row);
-    vchar(0, 25, 32, row);
-    xchar(row,  7, 160);
-    xchar(row, 25, 162);
-    hchar(row,  8, 161, 2);
-    hchar(row, 23, 161, 2);
+    vchar(0, 4, 32, row);
+    vchar(0, 27, 32, row);
+    xchar(row,  4, 160);
+    xchar(row, 27, 162);
+    xchar(row,  5, 161);
+    xchar(row, 26, 161);
 
     pos = 0;    // which position (0-2) (note the array is 1,2,3 - 0 is the scoremode)
     chr = 0;    // which character (0-27 = A-Z,.,<<)
