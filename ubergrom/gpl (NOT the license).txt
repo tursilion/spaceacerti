@@ -7,7 +7,7 @@
 * standard header
     data >aa01      * intro
     data >0000      * program count+spare
-    data >800C      * powerup list
+    data >0000      * powerup list (was 800C for TF3 secret, but that has been removed)
     data >8060      * program list
     data >0000      * DSR list
     data >0000      * subprogram list
