@@ -364,6 +364,9 @@ void erboss() {
 		    vdpmemset(p, 32, BNC);
 		    p+=32;
 	    }
+
+        // reset default character table
+        VDP_SET_REGISTER(VDP_REG_PDT, 4);
     }
 }
 

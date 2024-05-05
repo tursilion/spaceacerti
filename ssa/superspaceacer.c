@@ -1057,7 +1057,6 @@ titleagain:
 			// have to check again in case you died facing a boss
 			if (joynum) {
 				if (flag == PLAYER_DIED) {
-					// 2 means game over
 					gamovr();
                     if (KSCAN_KEY == '0') {
                         // player wants to restart - bypass high score check

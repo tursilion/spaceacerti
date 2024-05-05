@@ -152,9 +152,9 @@ void displayHighScores(struct _scores *scores) {
             displayScore();
             VDPWD=' ';
             {
-                const char *p = SHIPNAMES[(scores->entry[idx].data[0])&0xf];
-                if (((scores->entry[idx].data[0])&0xf0) == 0x30) p = "CLOAKED ";
-                if (((scores->entry[idx].data[0])&0xf0) == 0x90) p = "CHEATED ";
+                const char *p = SHIPNAMES[((scores->entry[idx].data[0])&0xf0)>>4];
+                if (((scores->entry[idx].data[0])&0xf) == 0x3) p = "CLOAKED ";
+                if (((scores->entry[idx].data[0])&0xf) == 0x9) p = "CHEATED ";
                 for (int i=0; i<8; ++i) {
                     VDPWD = *(p++);
                 }
