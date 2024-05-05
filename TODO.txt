@@ -1,8 +1,7 @@
 BUGS:
 - Still glitchy on Innerpest and probably Texin
     - but why doesn't it ALWAYS happen? Didn't happen on Selena on Easy, for instance.
-- There are some timing glitches on the first boss (and probably all), but that might be okay
-- F18A version hangs before title page?
+    - table 3800, innerpest last 4 rows
 
 DOCUMENTATION:
 - write manual/instruction sheet that can be printed?

@@ -21,8 +21,8 @@
 _prog:
     data 0x0000             * next program
     data _start             * entry point
-    byte 21                 * length of following name
-    text 'SUPER SPACE ACER 2023'
+    byte 20                 * length of following name
+    text 'SUPER SPACE ACER ''24'
     even
 
 * 42 bytes used till this point (note title length!)
