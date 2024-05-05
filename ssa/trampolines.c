@@ -174,6 +174,14 @@ void wrapinitstars() {
 	SWITCH_IN_PREV_BANK(old);
 }
 
+void wrapbaseinit() {
+	unsigned int old = nBank;
+	// no switch needed, we're calling the fixed bank. But we need to restore the
+	// right bank before we return, because ispace changes it.
+	baseinit();
+	SWITCH_IN_PREV_BANK(old);
+}
+
 void wrapispace() {
 	unsigned int old = nBank;
 	// no switch needed, we're calling the fixed bank. But we need to restore the
@@ -182,6 +190,14 @@ void wrapispace() {
 	SWITCH_IN_PREV_BANK(old);
 }
  
+void wrapispaceraw() {
+	unsigned int old = nBank;
+	// no switch needed, we're calling the fixed bank. But we need to restore the
+	// right bank before we return, because ispace changes it.
+	ispaceraw();
+	SWITCH_IN_PREV_BANK(old);
+}
+
 void wrapbackground() {
 	unsigned int old = nBank;
 	SWITCH_IN_BANK6a;

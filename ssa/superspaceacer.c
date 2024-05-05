@@ -790,10 +790,33 @@ void keyboardTest() {
     }
 }
 
-extern void selenawin();
-void main() {
+void baseinit() {
 	unsigned char i;
 
+    // set regular graphics mode (we need this in 3 of the 4 attract modes plus difficulty)
+	i = grf1();
+	
+	/*load VDP data */
+	loadcharset();
+	
+	SWITCH_IN_BANK5b;
+	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
+    if (!f18a) {
+    	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
+    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*2), CHARS, SIZE_OF_CHARS);
+    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*3), CHARS, SIZE_OF_CHARS);
+    }
+
+	spdall();	// clears sprite table
+	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
+	VDP_SET_REGISTER(VDP_REG_MODE1, i);	// Switch screen on
+	FIX_KSCAN(i);
+
+	sgrint();	// sets color table
+}
+
+extern void selenawin();
+void main() {
     // Turn off most of the console interrupt routine
     VDP_INT_CTRL = VDP_INT_CTRL_DISABLE_ALL;
 
@@ -886,26 +909,8 @@ titleagain:
 	SWITCH_IN_BANK9a;
 	handleTitlePage();
 
-	// set regular graphics mode (we need this in 3 of the 4 attract modes plus difficulty)
-	i = grf1();
-	
-	/*load VDP data */
-	loadcharset();
-	
-	SWITCH_IN_BANK5b;
-	vdpmemcpy(gPATTERN, CHARS, SIZE_OF_CHARS);
-    if (!f18a) {
-    	vdpmemcpy(gPATTERN+SCROLL_OFFSET, CHARS, SIZE_OF_CHARS);
-    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*2), CHARS, SIZE_OF_CHARS);
-    	vdpmemcpy(gPATTERN+(SCROLL_OFFSET*3), CHARS, SIZE_OF_CHARS);
-    }
-
-	spdall();	// clears sprite table
-	vdpmemset(gSPRITES, 0xd0, 128);	// clears VDP copy of sprite table (fixes initial gfx glitch)
-	VDP_SET_REGISTER(VDP_REG_MODE1, i);	// Switch screen on
-	FIX_KSCAN(i);
-
-	sgrint();	// sets color table
+    // base up basic graphics
+    baseinit();
 
 	if (joynum == 0) {
 		// this is an attract timeout
@@ -1166,12 +1171,7 @@ void space()
 	}
 }
 
-void ispace() {
-	/* init space level (stars, music, etc) */
-	/* actually it's any level now, but when first started this game was going to
-	 * include mazes like Major Havoc. Don't think I will have that now...
-	 */
-
+void ispaceraw() {
 	cls();
 	spdall();
 	screen(1);
@@ -1201,6 +1201,15 @@ void ispace() {
 	// small stars first
 	SWITCH_IN_BANK6a;
 	initstars();
+}
+
+void ispace() {
+	/* init space level (stars, music, etc) */
+	/* actually it's any level now, but when first started this game was going to
+	 * include mazes like Major Havoc. Don't think I will have that now...
+	 */
+
+    ispaceraw();
 
 	// show score
 	addscore(0);

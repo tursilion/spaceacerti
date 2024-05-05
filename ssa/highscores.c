@@ -1,6 +1,7 @@
 #include <grom.h>
 #include <vdp.h>
 #include <kscan.h>
+#include <TISNPlay.h>
 #include "game.h"
 #include "highscores.h"
 #include "trampoline.h"
@@ -114,7 +115,8 @@ void readHighScores(struct _scores *scores) {
     }
 }
 
-void displayHighScores(struct _scores *scores) {
+// if normal is false, don't display HIGH SCORES or draw side bars (for name registration)
+void displayHighScores(struct _scores *scores, int normal) {
     // get the border graphics
     vdpmemcpy(0x2000+160*8, LCARS, sizeof(LCARS));
     vdpchar(gColor+20, COLOR_LTRED<<4);
@@ -125,8 +127,11 @@ void displayHighScores(struct _scores *scores) {
 	level = 1;	// to make sure we get stars
 
     // draw the frames
-    vchar(0,4,165,24);
-    vchar(0,27,165,24);
+    if (normal) {
+        vchar(0,4,165,24);
+        vchar(0,27,165,24);
+        writestring(1, 11, "HIGH SCORES");
+    }
     hchar(0,11,161,11);
     hchar(2,11,166,11);
     xchar(0,10,160);
@@ -135,9 +140,6 @@ void displayHighScores(struct _scores *scores) {
     xchar(2,22,164);
     xchar(1,10,165);
     xchar(1,22,165);
-
-    // print the title
-    writestring(1, 11, "HIGH SCORES");
 
     // emit the scores
     { 
@@ -182,7 +184,7 @@ void showHighScores() {
     readHighScores(&scores);
 
     // put on screen
-    displayHighScores(&scores);
+    displayHighScores(&scores, 1);
 
     // wait for exit
     unsigned char cnt;
@@ -227,10 +229,6 @@ void registerHiScore() {
         return;
     }
 
-    // reload the special characters (bosses overwrite them)
-    vdpmemcpy(0x2000+160*8, LCARS, sizeof(LCARS));
-    vdpchar(gColor+20, COLOR_LTRED<<4);
-
     // get scores (will load default table if needed)
     readHighScores(&scores);
 
@@ -249,6 +247,13 @@ void registerHiScore() {
 		return;
 	}
 
+    // reload the special characters (bosses overwrite them)
+    // and fix the PDT base (overwritten by boss)
+    // and fix the SIT base (overwritten by scroll text)
+    wrapbaseinit();
+    vdpmemcpy(0x2000+160*8, LCARS, sizeof(LCARS));
+    vdpchar(gColor+20, COLOR_LTRED<<4);
+
 	// shift down the lower scores
 	for (i=9; i>scoreidx; i--) {
         scores.entry[i].val = scores.entry[i-1].val;
@@ -266,25 +271,45 @@ void registerHiScore() {
     scores.entry[scoreidx].data[3] =' ';
 
     // now get the high scores up on screen
-    displayHighScores(&scores);
-    writestring(1, 11, "NAME ENTRY ");  // overwrite 'HIGH SCORES'
+    displayHighScores(&scores, 0);
+    writestring(1, 11, "NAME ENTRY!");
 
     int row = scoreidx*2+4;     // which row we are working on
     const int col = 23;
 
-    // highlight the row
-    vchar(0, 4, 32, row);
-    vchar(0, 27, 32, row);
+    pos = 0;    // which position (0-2) (note the array is 1,2,3 - 0 is the scoremode)
+    chr = 0;    // which character (0-27 = A-Z,.,<<)
+
+    // flash the name entry a couple times before we start
+    for (int i=0; i<3; ++i) {
+        delaystars(25);
+        writestring(1, 11, "           ");
+        delaystars(25);
+        writestring(1, 11, "NAME ENTRY!");
+    }
+
+    // now draw the side bars up to the desired name
+    for (int i=23; i>row; --i) {
+        xchar(i, 4, 165);
+        xchar(i, 27, 165);
+        delaystars(3);
+    }
+    // final bend
     xchar(row,  4, 160);
     xchar(row, 27, 162);
     xchar(row,  5, 161);
     xchar(row, 26, 161);
 
-    pos = 0;    // which position (0-2) (note the array is 1,2,3 - 0 is the scoremode)
-    chr = 0;    // which character (0-27 = A-Z,.,<<)
+    // start the tune - when it ends we're done
+    StartMusic(WINSCROLLMUS, 0);
 
-	for (;;) {
+    for (;;) {
 		waitforstep();
+
+        if (!isSNPlaying) {
+            // timeout when music ends
+            break;
+        }
 
         checkQuit();
         wrapbackground();		// for stars
@@ -357,6 +382,8 @@ void registerHiScore() {
             default:    xchar(row, col+pos, chr+'A'); break;
         }
 	}
+
+    shutup();
 
     // save the scores to the cart
     saveScores(&scores);

@@ -22,7 +22,7 @@ struct _scores {
 void saveScores(struct _scores *scores);
 int checkHighScores();
 void clearHighScores();
-void displayHighScores(struct _scores *scores);
+void displayHighScores(struct _scores *scores, int normal);
 void showHighScores();
 void doShowHighScores();
 void registerHiScore();
