@@ -4,23 +4,26 @@ DOCUMENTATION:
 
 --------------------------
 
-HarmlessLion screen working
-Title page working
-Attract screen working
-Difficulty select working
-Music test (and all music) working
+Easy - works
+Medium - works
 
-Cruiser Ending - working
-Snowball ending - working
-Ladybird ending - working
-Gnat ending - working
-Selena ending - working
-Scroll Text - working
-Attract mode game - working
-Regular Game - working
-F18A game - working
-Invisible game - working F18A
-Invisible game - working 9918A
+Normal
+------
+Cruiser - ok
+Snowball - tested up to innerpest without cheats, otherwise ok
+Ladybird - ok
+Gnat - tested up to second boss without cheats, otherwise ok
+Selena - tested up to last level without cheats, then ok
+Invisible - tested to fourth stage without cheats - emulation with cheats
+
+F18A
+----
+Cruiser - ok
+Snowball - ok
+Ladybird - ok
+Gnat - tested but not 100% without cheats (died on last boss, last engine)
+Selena - tested but mostly with cheats
+Invisible - Tested to last stage - emulation with cheats
 
 
 VRAM map (except for ending routines)

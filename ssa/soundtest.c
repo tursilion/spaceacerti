@@ -214,6 +214,7 @@ repaint:
 				playsfx_pwrwide();
 			} else {
                 if (KSCAN_JOYY == JOY_DOWN) {
+                    scoremode = 9;      // make sure high scores don't register
     				nDifficulty = DIFFICULTY_HARD;
 	    			wrapGamWin();
                 }
