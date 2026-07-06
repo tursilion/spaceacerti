@@ -1,14 +1,12 @@
 20240518
 
-Super Space Acer
-----------------
+#Super Space Acer
 
-How to Play
------------
+#How to Play
 
-1) Move joystick
-2) shoot stuff
-3) don't die
+- Move joystick
+- shoot stuff
+- don't die
 
 There are thee ships you can choose from on the main game select. Each ship
 has a gameplay quirk to it. Unless otherwise mentioned, all ships move at
@@ -27,9 +25,7 @@ may be used offensively.
 There are also three difficulty modes. Higher difficulty modes offer more
 enemies, less shields, and better endings. ;)
 
--------
-Secrets
--------
+#Secrets
 
 The game has two secret ships and a third secret gameplay mode.
 
