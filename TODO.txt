@@ -1,6 +1,9 @@
-DOCUMENTATION:
-- write manual/instruction sheet that can be printed?
-- write ubergrom programming instructions (need to write flash, AVR and eeprom)
+Important:
+For libti99ALL, use this commit: 6a628e6ff9c41802dde5ff58d1e16a521d1d8036
+That's NOT the commit I built on, but the last one it's possible to.
+
+GBA:
+Background space scene: https://mastodon.gamedev.place/@NotJam/112649455631285980
 
 --------------------------
 
